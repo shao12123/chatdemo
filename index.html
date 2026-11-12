@@ -88,7 +88,7 @@
         }
         list.innerHTML = demos.map(demo => `
           <li>
-            <a class="card" href="${esc(demo.file)}">
+            <a class="card" href="${esc(demo.file)}" target="_blank" rel="noopener noreferrer">
               <h2>${esc(demo.title || demo.id)}</h2>
               <p>${esc(demo.summary || "")}</p>
               <div class="row"><span>打开 →</span><em>${esc(demo.owner || "未署名")}</em></div>
