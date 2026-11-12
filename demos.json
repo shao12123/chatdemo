@@ -1,0 +1,11 @@
+{
+  "demos": [
+    {
+      "id": "conversations",
+      "title": "MoreAI 对话",
+      "file": "conversations.html",
+      "owner": "共同维护",
+      "summary": "课程论文 / 修订分析卡 / 说明模式等主对话 demo"
+    }
+  ]
+}
