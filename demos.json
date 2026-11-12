@@ -6,6 +6,13 @@
       "file": "conversations.html",
       "owner": "共同维护",
       "summary": "课程论文 / 修订分析卡 / 说明模式等主对话 demo"
+    },
+    {
+      "id": "hot-topics",
+      "title": "高频主题汇总",
+      "file": "高频主题汇总.html",
+      "owner": "共同维护",
+      "summary": "MoreAI 推送卡片统一规范 · 高频主题汇总等 7 条推送 · 消息目录 · 说明模式"
     }
   ]
 }
