@@ -4989,12 +4989,22 @@ const roastPhotos = {green: "data:image/jpeg;base64,/9j/4QCARXhpZgAASUkqAAgAAAAF
     function clearScopedAnno() {
       annoDrag = null;
       annoCollapsed = true;
+      annoQueueOpen = false;
+      annoFrontId = null;
       const prefix = annoScopePrefix();
+      const removed = new Set();
       Object.keys(annoPacks).forEach(key => {
         if (key !== prefix && !key.startsWith(prefix)) return;
-        dropUnsentAnno(annoPacks[key], key);
+        (annoPacks[key].marks || []).forEach(mark => releaseAnno(mark));
+        annoPacks[key].marks = [];
+        removed.add(key);
       });
-      if (!annoPack().marks.some(mark => mark.id === activeAnno)) activeAnno = null;
+      const queueKey = annoQueueKey();
+      if (queueKey && annoQueues[queueKey]) {
+        annoQueues[queueKey] = annoQueues[queueKey].filter(item => !removed.has(item.key));
+      }
+      activeAnno = null;
+      syncSend();
     }
     function exitAnnotate() {
       if (!annotateOn) return;
@@ -5480,8 +5490,8 @@ const roastPhotos = {green: "data:image/jpeg;base64,/9j/4QCARXhpZgAASUkqAAgAAAAF
         { id: "f2", num: "2", group: "feature", title: "存储标注的胶囊和标注列表", body: "【用途】未发送的标注收在胶囊里，可展开查看。\n【行为】有标注时出现在备注框上方，并跟着备注框移动。文案只写条数，不带页码。点发送按钮左侧展开或收起，右侧只负责发送。每行显示序号和修改要求。" },
         { id: "f3", num: "3", group: "feature", title: "点击标注修改内容", body: "【行为】点击页上的标注序号，展开标注框，即可修改内容。再发送会更新队列里的这一条。" },
         { id: "f4", num: "4", group: "feature", title: "预览图上也展示标注", body: "【行为】右侧预览图按大图上的位置，展示标注功能留下的标注。" },
-        { id: "s7", group: "scene", title: "没点发送就关闭", body: "【前置】标注框已打开，修改要求还没点发送。\n【期望】关掉标注框、换页，或关掉标注功能再打开，这条草稿不保留。已经进队列的还在。正在改一条已入队的标注时，没再点发送就关掉，内容回到入队时的那一版。\n【验收】未发送的不出现在胶囊和页上序号里。已入队的序号和内容不变。\n【当前】演示已按这个处理。" },
-        { id: "s23", group: "scene", title: "关闭标注模式后，未发送的标注不会保存", body: "【前置】标注模式已打开，页面上有还没发送的标注。\n【期望】关闭标注模式后，这些未发送的标注不保存。已经进入队列的标注还在。\n【验收】再打开标注模式，没发送的框和内容都没有了。已入队的序号和内容还在。\n【当前】演示已按这个处理。" },
+        { id: "s7", group: "scene", title: "没点发送就关闭", body: "【前置】标注框已打开，修改要求还没点发送。\n【期望】关掉标注框或换页，这条草稿不保留。已经进队列的还在。正在改一条已入队的标注时，没再点发送就关掉，内容回到入队时的那一版。\n【验收】未发送的不出现在胶囊和页上序号里。只关框或换页时，已入队的序号和内容不变。\n【当前】演示已按这个处理。" },
+        { id: "s23", group: "scene", title: "关闭标注模式后，未发送的标注不会保存", body: "【前置】标注模式已打开，页面上有还没发送的标注，队列里也可以已经有标注。\n【期望】关闭标注模式后，草稿和已经进入队列的标注全部删掉。预览页、缩略图和队列里都不再保留。\n【验收】再打开标注模式，页上没有序号，胶囊也不在。已经发到对话里的标注标签还在。\n【当前】演示已按这个处理。" },
         { id: "s8", group: "scene", status: "已实现", title: "只点一下不产生标注", body: "【前置】标注功能已打开。\n【期望】只点一下，或只拉动一点点，不产生标注。拉开一块选区后，才出现标注框。\n【验收】页面上不会多出一个空序号。\n【当前】演示已按这个处理。" },
         { id: "s10", group: "scene", status: "已实现", title: "再框一处是新的标注", body: "【前置】页面上已经有标注。\n【期望】再拉出一个框，是新的一条。只有点开原来的序号，改完再发送，才会更新原来那一条。\n【验收】新框和原来的标注都留在队列里。更新时不会多出一条。\n【当前】演示已按这个处理。" },
         { id: "s11", group: "scene", title: "标注附件的数量和大小", body: "【前置】在标注框里上传文件或图片。\n【期望】最多 5 个文档、5 张图片。超出数量会提示并拒绝。图片超过 5MB、文档超过 10MB 也会提示并拒绝。\n【验收】超限的文件不会进到这条标注里。\n【当前】演示已按这个处理。" },
