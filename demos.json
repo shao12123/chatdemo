@@ -16,7 +16,7 @@
     },
     {
       "id": "chat-info-card",
-      "title": "Chat信息展示卡片",
+      "title": "标注修改",
       "file": "Chat信息展示卡片.html",
       "owner": "张宏尧",
       "summary": "PPT 标注修改：多标注发送、失败与部分失败、暂停后预览不保留标注"
