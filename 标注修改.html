@@ -825,15 +825,16 @@
     .anno-bar { display: none; width: 100%; min-height: 38px; box-sizing: border-box; justify-content: center; align-items: flex-end; position: relative; z-index: 20; pointer-events: none; }
     .oo-main.is-anno-on .anno-bar { display: flex; position: absolute; left: 0; right: 0; bottom: 0; min-height: 0; }
     .anno-bar .anno-store { position: relative; left: auto; top: auto; z-index: 1; width: max-content; transform: none; align-items: center; gap: 0; pointer-events: auto; }
-    @keyframes anno-beam { to { offset-distance: 100%; } }
+    @property --anno-angle { syntax: "<angle>"; inherits: false; initial-value: 0deg; }
+    @keyframes anno-beam { to { --anno-angle: 360deg; } }
     .anno-bar .anno-batch { position: relative; left: auto; top: auto; width: 280px; height: 38px; box-sizing: border-box; transform: none; justify-content: flex-start; gap: 8px; padding: 4px; border: 1px solid #e5e8ec; border-radius: 99px; background: #fff; box-shadow: none; color: #000; font-size: 14px; line-height: 22px; isolation: isolate; }
     .anno-beam { display: none; }
-    .anno-bar .anno-batch > .anno-beam { display: block; position: absolute; inset: -1px; z-index: 2; border: 1.5px solid transparent; border-radius: inherit; pointer-events: none; -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0); -webkit-mask-composite: xor; mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0); mask-composite: exclude; }
-    .anno-bar .anno-batch > .anno-beam > i { position: absolute; width: 64px; aspect-ratio: 1; background: linear-gradient(to left, #548bf9, #9ec0fc, transparent); offset-path: inset(0 round 19px); offset-rotate: auto; animation: anno-beam 6s linear infinite; }
+    .anno-bar .anno-batch > .anno-beam { display: block; position: absolute; inset: -2px; z-index: 0; border-radius: inherit; pointer-events: none; background: conic-gradient(from var(--anno-angle), transparent 0deg, transparent 280deg, #9ec0fc 318deg, #548bf9 340deg, #9ec0fc 356deg, transparent 360deg); filter: blur(9px); animation: anno-beam 6s linear infinite; }
+    .anno-bar .anno-batch > .anno-beam > i { display: none; }
     .anno-bar .anno-batch::after { content: ""; position: absolute; inset: 0; border-radius: inherit; background: #fff; pointer-events: none; z-index: 1; }
     .anno-bar .anno-batch > * { position: relative; z-index: 3; }
     @media (prefers-reduced-motion: reduce) {
-      .anno-bar .anno-beam > i,
+      .anno-bar .anno-beam,
       .anno-bar .anno-count-num.is-roll,
       .anno-store.is-notch .anno-count-num.is-roll { animation: none; }
       .anno-bar .anno-count-roll { animation: none; transform: translateY(-28px); }
@@ -5745,7 +5746,7 @@ const roastPhotos = {green: "data:image/jpeg;base64,/9j/4QCARXhpZgAASUkqAAgAAAAF
       const key = "moreai-ppt-annotation-v1";
       const defaults = [
         { id: "f1", num: "1", group: "feature", title: "多个标注一起发送修改", body: "【用途】多处修改先入队，再一次发给 Agent。\n【行为】打开标注后可跨页框选并入队。换页不丢，编号整稿连续，单页不限数量。卡片上的发送只入队并留下序号，不进对话。点胶囊右侧的「修改」，或在输入框写下「修改标注内容」这类要求后发送，都会把全部标注一次发出，输入的文字和附件一并带上。" },
-        { id: "f2", num: "2", group: "feature", title: "存储标注的胶囊和标注列表", body: "【用途】开启标注后，用底部胶囊查看未发送的标注。\n【行为】一进入标注模式，备注内容隐藏，但原来的备注高度还留着，上面的 PPT 不挪位置。白色胶囊叠在这块区域底部，底边距离屏幕底部 20px，缩放窗口时不挡住上面的 PPT。胶囊描边上有一段两端淡出的浅蓝色光，贴着边缘匀速环绕，不飘出描边，其余边缘没有辉光。左边是数量，中间是「几个标注」。展开箭头在分割线左侧，分割线右边是一级按钮「修改」。左侧数量圆标是浅蓝底、品牌色数字，样式和浅色按钮一致。有标注时点箭头向上展开队列，列表和胶囊都是 280 宽，再点收起。新标注进队列时，左侧数字向上滚到新数量，数字圆球同时上下弹一下，像 Mac 软件更新完成后图标在程序坞里跳动。没有标注时「修改」不可用。每行显示序号和修改要求。未悬停时行的左右留白一致；悬停出现编辑和删除，按钮下用渐变盖住文字。对话标题右侧可切换方案。方案2是顶部刘海，宽度和胶囊一样是 280，顶部两角是反向圆角，贴住预览框上沿、不盖住幻灯片。方案2的数字不跳动。预览描边和刘海底色都是 #548BF9。" },
+        { id: "f2", num: "2", group: "feature", title: "存储标注的胶囊和标注列表", body: "【用途】开启标注后，用底部胶囊查看未发送的标注。\n【行为】一进入标注模式，备注内容隐藏，但原来的备注高度还留着，上面的 PPT 不挪位置。白色胶囊叠在这块区域底部，底边距离屏幕底部 20px，缩放窗口时不挡住上面的 PPT。胶囊后面有一段两端淡出的浅蓝色辉光，沿边缘匀速环绕，从卡片背后透出来，其余边缘没有辉光。左边是数量，中间是「几个标注」。展开箭头在分割线左侧，分割线右边是一级按钮「修改」。左侧数量圆标是浅蓝底、品牌色数字，样式和浅色按钮一致。有标注时点箭头向上展开队列，列表和胶囊都是 280 宽，再点收起。新标注进队列时，左侧数字向上滚到新数量，数字圆球同时上下弹一下，像 Mac 软件更新完成后图标在程序坞里跳动。没有标注时「修改」不可用。每行显示序号和修改要求。未悬停时行的左右留白一致；悬停出现编辑和删除，按钮下用渐变盖住文字。对话标题右侧可切换方案。方案2是顶部刘海，宽度和胶囊一样是 280，顶部两角是反向圆角，贴住预览框上沿、不盖住幻灯片。方案2的数字不跳动。预览描边和刘海底色都是 #548BF9。" },
         { id: "f3", num: "3", group: "feature", title: "点击标注修改内容", body: "【行为】点击页上的标注序号，展开标注框，即可修改内容。再发送会更新队列里的这一条。" },
         { id: "f4", num: "4", group: "feature", title: "预览图上也展示标注", body: "【行为】右侧预览图按大图上的位置，展示标注功能留下的标注。" },
         { id: "s7", group: "scene", title: "没点发送就关闭", body: "【前置】标注框已打开，修改要求还没点发送。\n【期望】关掉标注框或换页，这条草稿不保留。已经进队列的还在。正在改一条已入队的标注时，没再点发送就关掉，内容回到入队时的那一版。\n【验收】未发送的不出现在胶囊和页上序号里。只关框或换页时，已入队的序号和内容不变。\n【当前】演示已按这个处理。" },
