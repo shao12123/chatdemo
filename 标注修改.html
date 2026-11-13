@@ -805,10 +805,9 @@
     @property --anno-glow { syntax: "<angle>"; inherits: true; initial-value: 0deg; }
     @keyframes anno-glow-flow { to { --anno-glow: 360deg; } }
     .anno-bar .anno-batch { position: relative; left: auto; top: auto; width: 280px; height: 38px; box-sizing: border-box; transform: none; justify-content: flex-start; gap: 8px; padding: 4px; border: 1px solid #e5e8ec; border-radius: 99px; background: #fff; box-shadow: none; color: #000; font-size: 14px; line-height: 22px; isolation: isolate; --anno-glow: 0deg; animation: anno-glow-flow 12s linear infinite; }
-    .anno-bar .anno-batch::before,
-    .anno-bar .anno-batch::after { content: ""; position: absolute; border-radius: inherit; pointer-events: none; z-index: -1; background: conic-gradient(from var(--anno-glow), #0a59f7 0deg, #6c9bfa 80deg, #8c3bfe 160deg, #ba89fe 220deg, #af76fe 280deg, #3b7af9 330deg, #0a59f7 360deg); }
-    .anno-bar .anno-batch::before { inset: -8px; filter: blur(10px); opacity: 0.72; }
-    .anno-bar .anno-batch::after { inset: -1.5px; padding: 1.5px; -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor; mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); mask-composite: exclude; }
+    .anno-bar .anno-batch::before { content: ""; position: absolute; inset: -22px; border-radius: inherit; pointer-events: none; z-index: 0; background: conic-gradient(from var(--anno-glow), #dae6fe 0deg, #b5cdfd 90deg, #c59dff 180deg, #ba89fe 250deg, #dae6fe 360deg); filter: blur(18px); opacity: 0.9; }
+    .anno-bar .anno-batch::after { content: ""; position: absolute; inset: 0; border-radius: inherit; background: #fff; pointer-events: none; z-index: 1; }
+    .anno-bar .anno-batch > * { position: relative; z-index: 2; }
     @media (prefers-reduced-motion: reduce) { .anno-bar .anno-batch { animation: none; } }
     .anno-bar .anno-batch-main { flex: 1; min-width: 0; margin: 0; padding: 0; gap: 8px; }
     .anno-bar .anno-batch-main > span.anno-count-num,
