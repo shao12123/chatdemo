@@ -554,6 +554,9 @@
     }
     .send:disabled { opacity: 0.5; cursor: default; }
     .send img { width: 16px; height: 16px; }
+    .send .send-stop { display: none; width: 12px; height: 12px; }
+    .send.is-stop .send-arrow { display: none; }
+    .send.is-stop .send-stop { display: block; }
 
     @media (max-width: 980px) {
       .pane-resize { display: none !important; }
@@ -1458,7 +1461,8 @@
               <span class="upload-tip" role="tooltip">最多 5 个文档、5 张图片</span>
               </span>
               <button class="send" id="send" type="submit" aria-label="发送" disabled>
-                <img src="data:image/svg+xml;base64,PHN2ZyBwcmVzZXJ2ZUFzcGVjdFJhdGlvPSJub25lIiBvdmVyZmxvdz0idmlzaWJsZSIgc3R5bGU9ImRpc3BsYXk6IGJsb2NrOyIgd2lkdGg9IjE2IiBoZWlnaHQ9IjE2IiB2aWV3Qm94PSIwIDAgMTYgMTYiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxnIGlkPSJDb21wb25lbnQgMSI+CjxwYXRoIGlkPSJWZWN0b3IiIGQ9Ik0xMi4yODU3IDcuMjg1NTNMOCAzTDMuNzE0MjkgNy4yODU3M004IDNWMTMiIHN0cm9rZS13aWR0aD0iMS4zMzMzMyIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIiBzdHJva2U9IndoaXRlIi8+CjwvZz4KPC9zdmc+Cg==" width="16" height="16" alt="" />
+                <img class="send-arrow" src="data:image/svg+xml;base64,PHN2ZyBwcmVzZXJ2ZUFzcGVjdFJhdGlvPSJub25lIiBvdmVyZmxvdz0idmlzaWJsZSIgc3R5bGU9ImRpc3BsYXk6IGJsb2NrOyIgd2lkdGg9IjE2IiBoZWlnaHQ9IjE2IiB2aWV3Qm94PSIwIDAgMTYgMTYiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxnIGlkPSJDb21wb25lbnQgMSI+CjxwYXRoIGlkPSJWZWN0b3IiIGQ9Ik0xMi4yODU3IDcuMjg1NTNMOCAzTDMuNzE0MjkgNy4yODU3M004IDNWMTMiIHN0cm9rZS13aWR0aD0iMS4zMzMzMyIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIiBzdHJva2U9IndoaXRlIi8+CjwvZz4KPC9zdmc+Cg==" width="16" height="16" alt="" />
+                <svg class="send-stop" viewBox="0 0 12 12" aria-hidden="true"><rect width="12" height="12" rx="1" fill="#fff"/></svg>
               </button>
             </div>
             <input class="composer-file-input" id="composerFile" type="file" multiple tabindex="-1" aria-hidden="true">
@@ -1685,7 +1689,27 @@
       if (!annoQueues[id]) annoQueues[id] = [];
       return annoQueues[id];
     }
+    function annoPauseEntry() {
+      if (activeId !== "annoPause") return null;
+      return (annoFollow.annoPause || []).find(entry => entry.composerAction) || null;
+    }
     function syncSend() {
+      const pause = annoPauseEntry();
+      const arrow = send.querySelector(".send-arrow");
+      const stop = send.querySelector(".send-stop");
+      if (pause) {
+        const running = !!pause.retrying;
+        send.classList.toggle("is-stop", running);
+        send.disabled = false;
+        send.setAttribute("aria-label", running ? "暂停修改" : "继续修改");
+        if (arrow) arrow.hidden = running;
+        if (stop) stop.hidden = !running;
+        return;
+      }
+      send.classList.remove("is-stop");
+      send.setAttribute("aria-label", "发送");
+      if (arrow) arrow.hidden = false;
+      if (stop) stop.hidden = true;
       const queued = annoQueue().length;
       send.disabled = !canSend() || (!prompt.value.trim() && !composerFiles.length && !queued);
     }
@@ -3202,7 +3226,7 @@ const roastPhotos = {green: "data:image/jpeg;base64,/9j/4QCARXhpZgAASUkqAAgAAAAF
       sentFiles[conv]=[];
       annoFollow[conv]=[
         {type:"user",text:"",tags:marks.map(spec=>({index:spec.no,page:"V1 · 第"+(spec.slide+1)+"页",note:spec.text})),extra:"",quotes:[],files:[]},
-        {type:"assistant",text:reply,failText:reply,results,retry:true,retrying:false,thoughts,thoughtDuration:pause?"12秒":partial?"18秒":"16秒",thoughtOpen:false,retryLabel:pause?"继续修改":"重新生成",retryBusy:pause?"正在继续修改…":"正在重新生成…",busyText:pause?"正在继续按标注修改…":"正在重新按标注修改…"}
+        {type:"assistant",text:reply,failText:reply,results,retry:!pause,composerAction:pause,retrying:false,thoughts,thoughtDuration:pause?"12秒":partial?"18秒":"16秒",thoughtOpen:false,retryLabel:"重新生成",retryBusy:pause?"正在继续修改…":"正在重新生成…",busyText:pause?"正在继续按标注修改…":"正在重新按标注修改…"}
       ];
       annotateOn=true;
       annoCollapsed=true;
@@ -4385,8 +4409,41 @@ const roastPhotos = {green: "data:image/jpeg;base64,/9j/4QCARXhpZgAASUkqAAgAAAAF
       selectConv(btn.dataset.conv);
     });
     prompt.addEventListener("input", syncSend);
+    function resumePausedAnno() {
+      const item = annoPauseEntry();
+      if (!item || item.retrying) return;
+      item.retrying = true;
+      item.text = item.busyText || "正在继续按标注修改…";
+      paintThread(false);
+      syncSend();
+      clearTimeout(item.resumeTimer);
+      item.resumeTimer = setTimeout(() => {
+        item.retrying = false;
+        item.text = item.failText || item.text;
+        if (activeId === "annoPause") {
+          paintThread(false);
+          syncSend();
+          const thread = document.getElementById("thread");
+          if (thread) thread.scrollTop = thread.scrollHeight;
+        }
+      }, 900);
+    }
+    function stopPausedAnno() {
+      const item = annoPauseEntry();
+      if (!item || !item.retrying) return;
+      clearTimeout(item.resumeTimer);
+      item.retrying = false;
+      item.text = item.failText || "修改已暂停。预览里不再保留这些标注。";
+      paintThread(false);
+      syncSend();
+    }
     document.getElementById("composer").addEventListener("submit", event => {
       event.preventDefault();
+      const pause = annoPauseEntry();
+      if (pause) {
+        if (pause.retrying) { stopPausedAnno(); return; }
+        if (!prompt.value.trim() && !composerFiles.length && !annoQueue().length) { resumePausedAnno(); return; }
+      }
       if (annoQueue().length) {
         const text = prompt.value.trim();
         const files = composerFiles.slice();
@@ -5580,7 +5637,7 @@ const roastPhotos = {green: "data:image/jpeg;base64,/9j/4QCARXhpZgAASUkqAAgAAAAF
         { id: "s15", group: "scene", title: "框还开着就发送", body: "【前置】标注框还开着，队列里已经有标注。\n【期望】这时发送，只会发出已经入队的标注。正在写、还没入队的那一条不发出。\n【验收】未入队的草稿会在退出标注时删掉，不会出现在发出的内容里。\n【当前】演示已按这个处理。" },
         { id: "s16", group: "scene", title: "删掉队列中间的一条", body: "【前置】队列里有多条标注，删掉中间的一条。\n【期望】这一条从队列和页面上一起去掉。后面的序号按当前位置重算。\n【验收】被删的标注不再显示。剩下的序号连续，数字会往前移。\n【当前】演示已按这个处理。" },
         { id: "s17", group: "scene", title: "旧版本上标注", body: "【前置】打开一份已经生成完的旧版本。\n【期望】在旧版上标注并发送，相当于在旧版上做了修改，生成一个新版。修改后窗口上展示的是新版。\n【验收】旧版留在历史里。当前窗口换成新版，不另开窗口。\n【当前】演示已按这个处理。" },
-        { id: "s18", group: "scene", title: "发送标注修改后暂停修改", body: "【前置】标注已经发送，修改正在进行。\n【期望】暂停修改后，不另开版本。已发送的标注不留在 PPT 预览里。\n【验收】暂停后，预览页、缩略图和队列里都没有这些序号。对话里仍能看到已发送的标注标签。\n【当前】演示已按这个处理。暂停后预览里不再保留标注，不另开版本。" },
+        { id: "s18", group: "scene", title: "发送标注修改后暂停修改", body: "【前置】标注已经发送，修改正在进行。\n【期望】暂停修改后，不另开版本。已发送的标注不留在 PPT 预览里。\n【验收】暂停后，预览页、缩略图和队列里都没有这些序号。对话里仍能看到已发送的标注标签。\n【当前】演示已按这个处理。暂停后预览里不再保留标注，不另开版本。对话里不放继续按钮。输入框右侧在暂停时是继续，修改进行中变成暂停。" },
         { id: "s19", group: "scene", title: "序号很密，或贴着预览图边缘", body: "【前置】页面上有多条标注，序号靠得很近，或贴着预览图的上边、左边。\n【期望】靠得太近的序号会互相盖住。预览图里靠近上边或左边的序号，会被裁掉一截。悬停序号，或在队列里点击序号定位到某一条时，这一条的序号会露到最前面。点队列里的文字会打开这条标注来编辑。\n【验收】悬停或从队列点击序号定位时，对应序号在最前面。点文字会进入编辑。贴着上边或左边的序号仍会被裁掉一截。\n【当前】演示已按这个处理。" },
         { id: "s20", group: "scene", status: "待开发确认方案", title: "前后两个标注框选修改同一个内容", body: "【前置】前后两个标注框选的是同一个内容，并一起发送。\n【期望】发送需求后，按照标签顺序执行修改。\n【验收】多条标注一次发出后，修改按标注序号依次进行。\n【当前】待确认：发送多个标注修改后，AI 是否会按照标注顺序一次执行修改需求。" },
         { id: "s21", group: "scene", title: "多标注修改-修改失败", body: "【前置】PPT 已生成结束，一次发送了多条标注修改，结果全部失败。\n【期望】不生成新版本，窗口仍停在当前版本。标注功能不退出。失败的标注不留在 PPT 预览里。对话说明这次修改失败，并提供重新生成。\n【验收】预览页和缩略图上不再有这些序号，队列里也没有。重新生成不会把失败标注画回预览，也不会另开版本。\n【当前】演示已按这个处理。对话写明修改失败、原文件还在，下面左侧是描边的重新生成。" },
