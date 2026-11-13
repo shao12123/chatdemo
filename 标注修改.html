@@ -1098,8 +1098,16 @@
     .oo-app .hp-film-image .hp-film-placeholder small{display:block}
     .oo-app .hp-film button[aria-current=page] .hp-film-image{border-color:#0a59f7;box-shadow:none}
     .oo-app .hp-film button[aria-current=page]>span:first-child{color:#0a59f7}
-    .oo-main{flex:1;min-width:0;min-height:0;order:1;display:flex;flex-direction:column;background:#FBFBFB;overflow:hidden}
+    .oo-main{position:relative;flex:1;min-width:0;min-height:0;order:1;display:flex;flex-direction:column;background:#FBFBFB;overflow:hidden}
     .oo-app .hp-canvas{flex:1;min-width:0;min-height:0;overflow:hidden;background:#FBFBFB;padding:18px 18px 12px;align-items:center;justify-content:center;container-type:size;container-name:oocanvas}
+    .oo-app .hp-canvas.is-zoomed{overflow:auto;align-items:safe center;justify-content:safe center;scrollbar-gutter:stable}
+    .hp-zoom{position:absolute;top:8px;right:8px;z-index:8;display:flex;align-items:center;gap:2px;height:30px;padding:4px;border:1px solid #e5e8ec;border-radius:99px;background:#fff;box-sizing:border-box}
+    .hp-zoom button{width:20px;height:20px;padding:0;border:0;border-radius:4px;background:transparent;color:#333;display:grid;place-items:center}
+    .hp-zoom button[data-hp-scale="in"]{color:rgba(0,0,0,.6)}
+    .hp-zoom button:hover:not(:disabled){background:#f2f3f5}
+    .hp-zoom button:disabled{opacity:.35}
+    .hp-zoom button svg{display:block}
+    .hp-zoom [data-hp-zoom-label]{min-width:44px;height:20px;padding:0 6px;border-radius:4px;color:#000;font:400 12px/20px var(--font);text-align:center;font-variant-numeric:tabular-nums}
     .oo-app .hp-slide-zoom,.oo-app .hp-preview-placeholder{position:relative;overflow:hidden;border-radius:6px;box-shadow:0 0 0 1px #e5e6eb,0 8px 18px #0000000f;margin:0;flex:none;width:min(100cqw,920px,calc(100cqh * 16 / 9));max-width:none;height:auto;aspect-ratio:16/9;isolation:isolate}
     .oo-app .hp-slide-zoom img{position:absolute;inset:0;width:100%;height:100%;aspect-ratio:auto;object-fit:contain}
     .oo-app .hp-slide-caption{display:none}
@@ -2824,7 +2832,7 @@ const roastPhotos = {green: "data:image/jpeg;base64,/9j/4QCARXhpZgAASUkqAAgAAAAF
     const HP_REVISE_MS = 30000;
     const hp = {
       recoveryCard:false,recoveryDetails:false,scenario:'normal',scenarioPending:false,adjusted:false,serial:0,timers:new Set(),notice:'',status:'idle',choice:'standard',thoughtOpen:true,rolesOpen:true,rolesShown:0,steps:[],pack:null,
-      active:'pptx',slide:0,filmScroll:0,gridScroll:0,view:'grid',userBrowsing:false,duration:'',error:'',finishedAt:null,progressHidden:false,progressHideTimer:null,notesDrafts:{},notesHeight:80,versions:[],historyOpen:false,historyId:'',versionCheckpoint:false,
+      active:'pptx',slide:0,zoom:100,filmScroll:0,gridScroll:0,view:'grid',userBrowsing:false,duration:'',error:'',finishedAt:null,progressHidden:false,progressHideTimer:null,notesDrafts:{},notesHeight:80,versions:[],historyOpen:false,historyId:'',versionCheckpoint:false,
       pages:[],queue:[],activeJobs:0,concurrency:4,runId:0,finalizing:false,settle:null,clockMs:0,clockStart:null,reviseStarted:0,
       docs:{pptx:{title:'红楼梦介绍.pptx',open:false,max:false,scroll:0},creative:{title:'视觉方向',open:false,max:false,scroll:0},layout:{title:'页面版式',open:false,max:false,scroll:0},code:{title:'文件结构',open:false,max:false,scroll:0}}
     };
@@ -3365,16 +3373,51 @@ const roastPhotos = {green: "data:image/jpeg;base64,/9j/4QCARXhpZgAASUkqAAgAAAAF
       if(typeof ResizeObserver!=='function')return;
       const host=document.getElementById('hpCanvas');
       if(!host){if(hpNotesWidthObserver){hpNotesWidthObserver.disconnect();hpNotesWidthObserver=null;}return;}
-      if(!hpNotesWidthObserver)hpNotesWidthObserver=new ResizeObserver(()=>hpSyncNotesWidth());
+      if(!hpNotesWidthObserver)hpNotesWidthObserver=new ResizeObserver(()=>{hpSyncNotesWidth();if(hp.zoom!==100&&annotateOn){placeAnnoLayer();placeAnnoPop();}});
       hpNotesWidthObserver.disconnect();
       hpNotesWidthObserver.observe(host);
+      if(!host.dataset.zoomScroll){
+        host.dataset.zoomScroll='1';
+        host.addEventListener('scroll',()=>{if(hp.zoom===100||!annotateOn)return;placeAnnoLayer();placeAnnoPop();},{passive:true});
+      }
+    }
+    function hpFitSlideWidth(canvas){
+      const style=getComputedStyle(canvas);
+      const padX=parseFloat(style.paddingLeft)+parseFloat(style.paddingRight);
+      const padY=parseFloat(style.paddingTop)+parseFloat(style.paddingBottom);
+      const contentW=canvas.clientWidth-padX;
+      const contentH=canvas.clientHeight-padY;
+      if(contentW<=0||contentH<=0)return 0;
+      return Math.min(contentW,contentH*16/9,920);
+    }
+    function hpSizeSlide(){
+      const canvas=document.getElementById('hpCanvas');
+      const slide=canvas?.querySelector('.hp-slide-zoom, .hp-preview-placeholder');
+      const label=document.querySelector('.hp-zoom [data-hp-zoom-label]');
+      if(label)label.textContent=hp.zoom+'%';
+      document.querySelectorAll('.hp-zoom [data-hp-scale="out"]').forEach(button=>{button.disabled=hp.zoom<=50;});
+      document.querySelectorAll('.hp-zoom [data-hp-scale="in"]').forEach(button=>{button.disabled=hp.zoom>=200;});
+      if(!canvas||!slide)return 0;
+      const fit=hpFitSlideWidth(canvas);
+      canvas.classList.toggle('is-zoomed',hp.zoom>100);
+      if(!fit||hp.zoom===100)slide.style.width='';
+      else slide.style.width=Math.max(80,Math.round(fit*hp.zoom/100))+'px';
+      return fit;
+    }
+    function hpApplySlideZoom(){
+      hpSyncNotesWidth();
+      placeAnnoLayer();
+      placeAnnoPop();
+      placeAnnoBatch();
     }
     function hpSyncNotesWidth(){
       const main=document.querySelector('.oo-app .oo-main');
+      const fit=hpSizeSlide();
       const slide=document.querySelector('#hpCanvas .hp-slide-zoom, #hpCanvas .hp-preview-placeholder');
       const notes=document.getElementById('hpNotes');
       if(!main||!notes)return;
-      const width=slide?Math.round(slide.getBoundingClientRect().width):0;
+      let width=slide?Math.round(slide.getBoundingClientRect().width):0;
+      if(hp.zoom>100&&fit>0)width=Math.round(fit);
       if(width>0){
         main.style.setProperty('--hp-slide-width',width+'px');
         notes.style.width=width+'px';
@@ -3402,6 +3445,7 @@ const roastPhotos = {green: "data:image/jpeg;base64,/9j/4QCARXhpZgAASUkqAAgAAAAF
         <div class="oo-body">
           <div class="oo-main">
             <div class="hp-canvas" id="hpCanvas">${hpCanvasHtml()}</div>
+            <div class="hp-zoom" role="group" aria-label="幻灯片缩放"><button type="button" data-hp-scale="out" aria-label="缩小幻灯片"${hp.zoom<=50?' disabled':''}><svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><path d="M2.5 7h9" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg></button><span data-hp-zoom-label>${hp.zoom}%</span><button type="button" data-hp-scale="in" aria-label="放大幻灯片"${hp.zoom>=200?' disabled':''}><svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><path d="M7 2.5v9M2.5 7h9" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg></button></div>
             ${hpNotesHtml()}
           </div>
           <nav class="hp-film" data-hp-film aria-label="幻灯片列表">${film}</nav>
@@ -3613,6 +3657,7 @@ const roastPhotos = {green: "data:image/jpeg;base64,/9j/4QCARXhpZgAASUkqAAgAAAAF
       if('hpView' in d){const next=['grid','preview'].includes(d.hpView)?d.hpView:(hp.view==='grid'?'preview':'grid');hpRemember();hp.userBrowsing=true;if(next!==hp.view){if(annotateOn)clearUnsentAnno();hp.view=next;hpRenderStage();if(annotateOn)renderAnno();}hpPaintViewSwitch();hpUpdateViewer();return;}
       if(d.hpSelect!=null){const i=Number(d.hpSelect);if(hp.pages[i]&&hp.pages[i].status!=='deleting')hpSelectSlide(i);return;}
       if(d.hpSlide!=null){hpSelectSlide(Number(d.hpSlide));return;}
+      if(d.hpScale){event.stopPropagation();const next=hp.zoom+(d.hpScale==='in'?10:-10);hp.zoom=Math.max(50,Math.min(200,next));hpApplySlideZoom();return;}
       if(d.hpZoom!=null){hpLightbox(Number(d.hpZoom));return;}
       if(d.pptZoom){hpLightbox(hp.pages.findIndex(s=>s.file===d.pptZoom));return;}
     }
