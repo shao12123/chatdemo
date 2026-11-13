@@ -28,6 +28,13 @@
       "file": "三个路线方案-PRD.html",
       "owner": "共同维护",
       "summary": "PRD：前端 / 后端职责、数据契约、验收标准；顶部可打开交互 Demo（一日通勤、跨天旅行两个示例），可复制 Markdown 给 AGENT"
+    },
+    {
+      "id": "gen-fault",
+      "title": "生成异常与恢复",
+      "file": "生成异常与恢复-PRD.html",
+      "owner": "共同维护",
+      "summary": "PRD：异常分级与恢复规则、全站错误卡片、断线续传事件与接口、前后端职责与验收；顶部可打开交互 Demo（12 个场景 + 故障模拟面板），可复制 Markdown 给 AGENT"
     }
   ]
 }

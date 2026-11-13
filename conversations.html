@@ -284,19 +284,23 @@
     .msg-pager { display: inline-flex; align-items: center; gap: 2px; margin-right: 6px; color: #667085; font-size: 12px; line-height: 18px; }
     .msg-pager button:disabled { opacity: .35; cursor: default; }
     .msg-notice p { margin: 0; display: flex; align-items: flex-start; gap: 8px; }
-    .msg-tone { flex: none; display: inline-flex; margin-top: 4px; color: #e84026; }
+    .msg-tone { flex: none; display: inline-flex; margin-top: 3px; color: #e84026; }
     .act-primary { display: inline-flex; align-items: center; justify-content: center; height: 30px; padding: 0 12px; border: 1px solid #84acfb; border-radius: 8px; background: linear-gradient(180deg, #4a85ff 0%, #3370ff 100%); color: #fff; font-size: 14px; font-weight: 400; line-height: 22px; }
     .act-primary:hover { background: linear-gradient(90deg, rgba(10, 89, 247, .5), rgba(10, 89, 247, .5)), linear-gradient(180deg, #4a85ff 0%, #3370ff 100%); }
     .act-secondary { display: inline-flex; align-items: center; justify-content: center; height: 30px; padding: 0 12px; border: 1px solid #eceef2; border-radius: 8px; background: #fff; color: #1f2329; font-size: 13px; font-weight: 650; line-height: 20px; }
     .act-secondary:hover { background: #f7f8fa; }
     .msg-notice-actions { display: flex; gap: 8px; margin-top: 12px; }
-    .net-wrap { align-self: stretch; display: flex; flex-direction: column; gap: 8px; }
-    .net-card { display: flex; flex-direction: column; gap: 8px; padding: 14px 16px 12px; border: 1px solid #e4e7ec; border-radius: 12px; background: #fff; }
-    .net-main { margin: 0; display: flex; align-items: flex-start; gap: 10px; color: #1c2330; font-size: 14px; line-height: 22px; }
+    /* 全站错误卡片：浅灰底、无描边、圆角 14，和提示块同一族；图标是块内唯一的颜色 */
+    :root { --err-card: #eef0f3; --err-text: #000000; --err-text-2: rgba(0, 0, 0, .6); --err-icon: #e84026; --err-ok: #64bb5c; --err-x-hover: rgba(0, 0, 0, .06); }
+    html.theme-dark { --err-card: #191a1d; --err-text: #ffffff; --err-text-2: rgba(255, 255, 255, .6); --err-icon: #e84026; --err-ok: #5ba854; --err-x-hover: rgba(255, 255, 255, .08); }
+    .net-wrap { align-self: flex-start; width: min(680px, 100%); display: flex; flex-direction: column; gap: 8px; }
+    .net-card { display: flex; flex-direction: column; gap: 8px; padding: 12px 16px; border: 0; border-radius: 14px; background: var(--err-card); }
+    .net-main { margin: 0; display: flex; align-items: flex-start; gap: 8px; color: var(--err-text); font-size: 14px; line-height: 22px; }
+    .net-main .msg-tone { color: var(--err-icon); }
     .net-actions { display: flex; justify-content: flex-end; align-items: center; gap: 8px; }
-    .net-x { width: 22px; height: 22px; border: 0; border-radius: 4px; background: transparent; color: #667085; display: inline-flex; align-items: center; justify-content: center; }
-    .net-x:hover { background: rgba(9, 11, 14, .06); color: #1c2330; }
-    .net-status { margin: 0; color: #98a2b3; font-size: 13px; line-height: 20px; }
+    .net-x { width: 22px; height: 22px; border: 0; border-radius: 4px; background: transparent; color: var(--err-text-2); display: inline-flex; align-items: center; justify-content: center; }
+    .net-x:hover { background: var(--err-x-hover); color: var(--err-text); }
+    .net-status { margin: 0; color: var(--err-text-2); font-size: 13px; line-height: 20px; }
     .composer { flex-wrap: wrap; }
     .composer-files { flex: 1 0 100%; display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 8px; }
     .composer-files[hidden] { display: none; }
@@ -2299,7 +2303,7 @@
       left: "M631.168 225.834667a42.666667 42.666667 0 1 1 60.330667 60.330666L465.664 512l225.834667 225.834667a42.666667 42.666667 0 1 1-60.330667 60.330666l-256-256a42.666667 42.666667 0 0 1 0-60.330666l256-256z",
       right: "M375.168 225.834667a42.666667 42.666667 0 0 1 60.330667 0l256 256a42.666667 42.666667 0 0 1 0 60.330666l-256 256a42.666667 42.666667 0 1 1-60.330667-60.330666L601.002667 512 375.168 286.165333a42.666667 42.666667 0 0 1 0-60.330666z",
       pause: "M298.666667 128a42.666667 42.666667 0 0 1 42.666666 42.666667v682.666666a42.666667 42.666667 0 1 1-85.333333 0V170.666667a42.666667 42.666667 0 0 1 42.666667-42.666667z m426.666666 0a42.666667 42.666667 0 0 1 42.666667 42.666667v682.666666a42.666667 42.666667 0 1 1-85.333333 0V170.666667a42.666667 42.666667 0 0 1 42.666666-42.666667z",
-      error: "M438.144 127.744c31.829333-54.997333 109.781333-56.746667 144.512-5.162667l3.2 5.162667 395.349333 682.837333c32.896 56.874667-8.149333 128.085333-73.898666 128.085334H116.693333c-65.706667 0-106.794667-71.210667-73.898666-128.085334L438.186667 127.744zM116.693333 853.333333h790.613334L512 170.496 116.736 853.333333zM512 682.666667a53.333333 53.333333 0 1 1 0 106.666666 53.333333 53.333333 0 0 1 0-106.666666z m0-298.666667a42.666667 42.666667 0 0 1 42.666667 42.666667v170.666666a42.666667 42.666667 0 0 1-85.333334 0v-170.666666a42.666667 42.666667 0 0 1 42.666667-42.666667z",
+      error: "M512.042 42.667C771.226 42.689 981.357 252.85 981.357 512.042C981.331 771.213 771.213 981.331 512.042 981.357C252.85 981.357 42.689 771.226 42.667 512.042C42.667 252.836 252.836 42.667 512.042 42.667ZM662.854 361.167C646.195 344.513 619.204 344.523 602.541 361.167L511.979 451.667L421.479 361.167C404.818 344.515 377.827 344.513 361.167 361.167C344.516 377.827 344.516 404.819 361.167 421.479L451.667 511.979L361.167 602.541C344.523 619.204 344.513 646.195 361.167 662.854C377.825 679.488 404.824 679.488 421.479 662.854L511.979 572.292L602.541 662.854C619.204 679.482 646.202 679.494 662.854 662.854C679.501 646.202 679.482 619.205 662.854 602.541L572.292 511.979L662.854 421.479C679.488 404.824 679.488 377.825 662.854 361.167Z",
       doc: "M597.333333 42.666667l1.706667 0.042666a145.066667 145.066667 0 0 1 101.162667 42.581334l153.002666 153.002666 4.949334 5.162667A145.066667 145.066667 0 0 1 896 341.333333v512a128 128 0 0 1-128 128H256a128 128 0 0 1-128-128V170.666667a128 128 0 0 1 128-128h341.333333zM256 128a42.666667 42.666667 0 0 0-42.666667 42.666667v682.666666a42.666667 42.666667 0 0 0 42.666667 42.666667h512a42.666667 42.666667 0 0 0 42.666667-42.666667V384h-170.666667a85.333333 85.333333 0 0 1-85.333333-85.333333V128H256z m426.666667 554.666667a42.666667 42.666667 0 1 1 0 85.333333H341.333333a42.666667 42.666667 0 1 1 0-85.333333h341.333334z m0-170.666667a42.666667 42.666667 0 1 1 0 85.333333H341.333333a42.666667 42.666667 0 1 1 0-85.333333h341.333334z m-256-170.666667a42.666667 42.666667 0 1 1 0 85.333334H341.333333a42.666667 42.666667 0 0 1 0-85.333334h85.333334z m213.333333-42.666666h152.917333L640 145.749333V298.666667z",
       pdf: "M599.04 42.709333a145.066667 145.066667 0 0 1 101.162667 42.581334l153.002666 153.002666 4.949334 5.162667A145.066667 145.066667 0 0 1 896 341.333333v512a128 128 0 0 1-128 128H256a128 128 0 0 1-128-128V170.666667a128 128 0 0 1 128-128h341.333333l1.706667 0.042666zM256 128a42.666667 42.666667 0 0 0-42.666667 42.666667v682.666666a42.666667 42.666667 0 0 0 42.666667 42.666667h512a42.666667 42.666667 0 0 0 42.666667-42.666667V384h-170.666667a85.333333 85.333333 0 0 1-85.333333-85.333333V128H256z m298.709333 298.666667a128 128 0 0 1 0.128 255.872L426.666667 682.666667V768a42.666667 42.666667 0 1 1-85.333334 0v-298.666667c0-13.226667 5.973333-25.088 15.445334-32.896 0.469333-0.426667 0.981333-0.725333 1.450666-1.109333a42.538667 42.538667 0 0 1 13.226667-6.826667c0.64-0.213333 1.322667-0.341333 2.005333-0.512l2.048-0.469333 1.109334-0.170667c2.389333-0.426667 4.864-0.682667 7.381333-0.682666h170.709333z m-127.914666 170.624l127.957333-0.085334A42.624 42.624 0 0 0 554.709333 512h-128l0.085334 85.290667zM640 298.666667h152.917333L640 145.749333V298.666667z",
       md: "M599.04 42.709333a145.066667 145.066667 0 0 1 101.162667 42.581334l153.002666 153.002666 4.949334 5.162667A145.066667 145.066667 0 0 1 896 341.333333v512a128 128 0 0 1-128 128H256a128 128 0 0 1-128-128V170.666667a128 128 0 0 1 128-128h341.333333l1.706667 0.042666zM256 128a42.666667 42.666667 0 0 0-42.666667 42.666667v682.666666a42.666667 42.666667 0 0 0 42.666667 42.666667h512a42.666667 42.666667 0 0 0 42.666667-42.666667V384h-170.666667a85.333333 85.333333 0 0 1-85.333333-85.333333V128H256z m64 354.858667c0-45.866667 59.050667-64.512 85.376-26.88L512 608.256l106.624-152.32 2.56-3.370667c27.392-33.024 82.816-14.165333 82.816 30.293334V768a42.666667 42.666667 0 1 1-85.333333 0v-163.328l-68.224 97.450667a46.933333 46.933333 0 0 1-76.885334 0L405.333333 604.672V768a42.666667 42.666667 0 1 1-85.333333 0v-285.141333zM640 298.666667h152.917333L640 145.749333V298.666667z",
@@ -2377,7 +2381,7 @@
         ? (m.resume && !m.resume.used ? `<button class="act-primary" type="button" data-resume="${index}">重试</button>` : "")
         : `<button class="act-secondary" type="button" data-net-now="${index}">立即重试</button>`;
       const status = !failed && m.status ? `<p class="net-status">${esc(m.status)}</p>` : "";
-      return `<div class="net-wrap"><div class="net-card${failed ? " failed" : ""}"><p class="net-main"><i class="msg-tone">${iconSvg("error")}</i><span>${esc(text)}</span></p><div class="net-actions">${actions}<button class="net-x" type="button" data-net-close="${index}" aria-label="关闭">${iconSvg("closeSm")}</button></div></div>${status}</div>`;
+      return `<div class="net-wrap"><div class="net-card${failed ? " failed" : ""}"><p class="net-main"><i class="msg-tone">${iconSvg("error", 16)}</i><span>${esc(text)}</span></p><div class="net-actions">${actions}<button class="net-x" type="button" data-net-close="${index}" aria-label="关闭">${iconSvg("closeSm")}</button></div></div>${status}</div>`;
     }
     const WEEKDAY = "日一二三四五六";
     function startOfDay(date) {
@@ -2472,7 +2476,7 @@
         return `<div class="msg assistant rich" data-msg="${index}">${shown}</div>` + (m.actions && !m.typing ? msgActionsHtml(session, m, index) : "");
       }
       if (m.role === "resume" || m.tone === "error") {
-        const tone = m.tone === "error" ? `<i class="msg-tone">${iconSvg("error")}</i>` : "";
+        const tone = m.tone === "error" ? `<i class="msg-tone">${iconSvg("error", 16)}</i>` : "";
         const action = m.resume && !m.resume.used ? `<div class="msg-notice-actions"><button class="act-primary" type="button" data-resume="${index}">${esc(m.label)}</button></div>` : "";
         return `<div class="msg assistant msg-notice${m.tone === "error" ? " msg-error" : ""}"><p>${tone}<span>${esc(m.text || "")}</span></p>${action}</div>`;
       }
@@ -3631,7 +3635,7 @@
       session.tag = null;
       paperPaint(session);
     }
-    const RECONNECT_TRIES = 3;
+    const RECONNECT_TRIES = 5;
     const RECONNECT_WAIT = 5;
     async function paperReconnect(session, item, row, doc, blocks, res, phaseRun, phaseDone) {
       const atHead = !blocks[res.written] || blocks[res.written].kind === "h";
@@ -6128,12 +6132,12 @@
       {
         id: "f-netcard", cat: "feature", status: "已实现", anchor: ".net-card",
         title: "断网提示卡片",
-        body: "【用途】网络断开时告诉用户发生了什么、已写的内容在不在、接下来会怎样。\n【展示条件】写文档过程中网络断开时出现，位置在文档卡片下方。\n【交互】重连中：卡片下方 8px 处显示灰字倒计时「正在检查网络… 5 秒后重试」，自动重连 3 次；「立即重试」跳过倒计时；× 只关闭卡片。3 次都失败：卡片变成「多次重连没有成功。已写好的 N 节保留在文档里。」，给出「重试」，点击从中断的那一节接着写。\n【规范】不提供「检查网络」入口；关闭卡片后页面上不再保留重试入口；关闭按钮没有悬停气泡。\n【验收】重连期间不判定失败；3 次失败后思考区标题为「生成中断」。\n【实现情况】已实现（断网为模拟）。"
+        body: "【用途】网络断开时告诉用户发生了什么、已写的内容在不在、接下来会怎样。\n【展示条件】写文档过程中网络断开时出现，位置在文档卡片下方。\n【交互】重连中：卡片下方 8px 处显示灰字倒计时「正在检查网络… 5 秒后重试」，自动重连 5 次；「立即重试」跳过倒计时；× 只关闭卡片。5 次都失败：卡片变成「多次重连没有成功。已写好的 N 节保留在文档里。」，给出「重试」，点击从中断的那一节接着写。\n【样式】全站「错误卡片」：浅灰底 #EEF0F3（深色 #191A1D）、无描边、圆角 14px、内边距 12px 16px、最宽 680px；左侧 16px 圆形叉号 #E84026 是唯一的颜色；「重试」在卡内右下。详见《生成异常与恢复》Demo。\n【规范】不提供「检查网络」入口；关闭卡片后页面上不再保留重试入口；关闭按钮没有悬停气泡。\n【验收】重连期间不判定失败；5 次失败后思考区标题为「生成中断」。\n【实现情况】已实现（断网为模拟）。"
       },
       {
         id: "f-resume", cat: "feature", status: "已实现", anchor: ".msg-notice .act-primary, .net-card .act-primary",
         title: "继续生成 / 重试",
-        body: "【展示条件】写文档时停止 → 消息里出现「继续生成」；断网重连 3 次失败 → 卡片里出现「重试」。\n【交互】点击后从中断的那一节接着写，已写内容不变；用过之后按钮消失。\n【验收】接着写完后文档章节齐全、不重复。"
+        body: "【展示条件】写文档时停止 → 消息里出现「继续生成」；断网重连 5 次失败 → 卡片里出现「重试」。\n【交互】点击后从中断的那一节接着写，已写内容不变；用过之后按钮消失。\n【验收】接着写完后文档章节齐全、不重复。"
       },
       {
         id: "f-tabs", cat: "feature", status: "已实现", anchor: "#docTabs",
@@ -6172,8 +6176,8 @@
       },
       {
         id: "s-error", cat: "scene", status: "已实现", scenes: ["paper-error"],
-        title: "生成中断：自动重连 3 次后失败，手动重试",
-        body: "实现状态：已实现\n【前置】生成文档过程中网络断开。\n【流程】网络断开 → 自动重连 3 次，每次倒计时 5 秒，「立即重试」可跳过倒计时 → 全部失败后判定中断 → 用户点「重试」。\n【状态】写入中 → 连接中断，正在重连（第 1～3 次）→ 生成中断 → 重新连接 → 写入文档 → 已完成。\n【验收】已写好的部分始终保留；重试后从中断的那一节接着写，最终章节齐全；重连期间不能出现「已完成」，也不能停止；关闭提示卡片后不再保留重试入口。\n【当前 / 缺口】断网为模拟，固定在写到第 3 节时触发；网络在重连期间恢复的情况待补充；服务繁忙、额度不足、内容过长等其他错误类型待补充。"
+        title: "生成中断：自动重连 5 次后失败，手动重试",
+        body: "实现状态：已实现\n【前置】生成文档过程中网络断开。\n【流程】网络断开 → 自动重连 5 次，每次倒计时 5 秒，「立即重试」可跳过倒计时 → 全部失败后判定中断 → 用户点「重试」。\n【状态】写入中 → 连接中断，正在重连（第 1～5 次）→ 生成中断 → 重新连接 → 写入文档 → 已完成。\n【验收】已写好的部分始终保留；重试后从中断的那一节接着写，最终章节齐全；重连期间不能出现「已完成」，也不能停止；关闭提示卡片后不再保留重试入口。\n【当前 / 缺口】断网为模拟，固定在写到第 3 节时触发；网络在重连期间恢复的情况待补充；服务繁忙、额度不足、内容过长等其他错误类型待补充。"
       },
       {
         id: "s-slow", cat: "scene", status: "已实现（部分路径）", scenes: ["paper-slow"],
