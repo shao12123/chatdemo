@@ -806,10 +806,11 @@
     .anno-bar .anno-batch-main { flex: none; margin: 0; padding: 0; gap: 8px; }
     .anno-bar .anno-batch-main > span.anno-count-num,
     .anno-bar .anno-batch-main > .anno-batch-copy { flex: none; }
-    .anno-bar .anno-count-num { width: 28px; height: 28px; min-width: 28px; box-sizing: border-box; border: 1px solid #fff; border-radius: 99px; background: #b5cdfd; color: #0a59f7; font: 400 12px/16px var(--font); display: grid; place-items: center; }
+    .anno-bar .anno-count-num { width: 28px; height: 28px; min-width: 28px; box-sizing: border-box; border: 1px solid #fff; border-radius: 99px; background: linear-gradient(180deg, #4a85ff 0%, #3370ff 100%); color: #fff; font: 400 12px/16px var(--font); display: grid; place-items: center; }
     .anno-bar .anno-batch-copy { display: inline-flex; align-items: center; gap: 2px; }
     .anno-bar .anno-batch .chev { color: rgba(0, 0, 0, 0.4); }
-    .anno-bar .anno-batch-go { height: 28px; padding: 0 12px; border-radius: 99px; }
+    .anno-bar .anno-batch-go { height: 28px; box-sizing: border-box; padding: 0 12px; border: 1px solid #84acfb; border-radius: 99px; background: linear-gradient(180deg, #4a85ff 0%, #3370ff 100%); color: #fff; }
+    .anno-bar .anno-batch-go:hover:not(:disabled) { background: linear-gradient(90deg, rgba(10, 89, 247, 0.5), rgba(10, 89, 247, 0.5)), linear-gradient(180deg, #4a85ff 0%, #3370ff 100%); }
     .anno-bar .anno-store-list { position: absolute; left: 50%; bottom: calc(100% + 8px); width: 320px; transform: translateX(-50%); }
     .anno-draft { position: absolute; z-index: 2; border: 1px dashed #3370ff; background: transparent; pointer-events: none; border-radius: 12px; box-sizing: border-box; }
     .anno-pop { position: absolute; z-index: 6; width: 286px; pointer-events: auto; cursor: default; }
@@ -5619,7 +5620,7 @@ const roastPhotos = {green: "data:image/jpeg;base64,/9j/4QCARXhpZgAASUkqAAgAAAAF
       const key = "moreai-ppt-annotation-v1";
       const defaults = [
         { id: "f1", num: "1", group: "feature", title: "多个标注一起发送修改", body: "【用途】多处修改先入队，再一次发给 Agent。\n【行为】打开标注后可跨页框选并入队。换页不丢，编号整稿连续，单页不限数量。卡片上的发送只入队并留下序号，不进对话。点胶囊右侧的「修改」，或在输入框写下「修改标注内容」这类要求后发送，都会把全部标注一次发出，输入的文字和附件一并带上。" },
-        { id: "f2", num: "2", group: "feature", title: "存储标注的胶囊和标注列表", body: "【用途】开启标注后，用底部胶囊查看未发送的标注。\n【行为】一进入标注模式，备注内容隐藏，但原来的备注高度还留着，上面的 PPT 不挪位置。白色胶囊叠在这块区域底部，底边距离屏幕底部 20px，缩放窗口时不挡住上面的 PPT。左边是数量，中间是「几个标注」，展开箭头跟在这句话后面。右侧按钮文案是「修改」。有标注时点箭头向上展开队列，再点收起。没有标注时「修改」不可用。每行显示序号和修改要求。" },
+        { id: "f2", num: "2", group: "feature", title: "存储标注的胶囊和标注列表", body: "【用途】开启标注后，用底部胶囊查看未发送的标注。\n【行为】一进入标注模式，备注内容隐藏，但原来的备注高度还留着，上面的 PPT 不挪位置。白色胶囊叠在这块区域底部，底边距离屏幕底部 20px，缩放窗口时不挡住上面的 PPT。左边是数量，中间是「几个标注」，展开箭头跟在这句话后面。右侧「修改」是一级按钮，左侧数量圆标的底色和这个按钮相同。有标注时点箭头向上展开队列，再点收起。没有标注时「修改」不可用。每行显示序号和修改要求。" },
         { id: "f3", num: "3", group: "feature", title: "点击标注修改内容", body: "【行为】点击页上的标注序号，展开标注框，即可修改内容。再发送会更新队列里的这一条。" },
         { id: "f4", num: "4", group: "feature", title: "预览图上也展示标注", body: "【行为】右侧预览图按大图上的位置，展示标注功能留下的标注。" },
         { id: "s7", group: "scene", title: "没点发送就关闭", body: "【前置】标注框已打开，修改要求还没点发送。\n【期望】关掉标注框或换页，这条草稿不保留。已经进队列的还在。正在改一条已入队的标注时，没再点发送就关掉，内容回到入队时的那一版。\n【验收】未发送的不出现在胶囊和页上序号里。只关框或换页时，已入队的序号和内容不变。\n【当前】演示已按这个处理。" },
