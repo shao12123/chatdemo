@@ -23,18 +23,11 @@
       "summary": "PPT 标注修改：多标注发送、失败与部分失败、暂停后预览不保留标注"
     },
     {
-      "id": "route-plan",
-      "title": "三个路线方案",
-      "file": "三个路线方案.html",
-      "owner": "共同维护",
-      "summary": "线上内容改 UI：行程对比大卡 · 文字 + 表格 · 地图入口 · 多轮换方案；含一日通勤与跨天旅行两个示例"
-    },
-    {
       "id": "route-plan-prd",
-      "title": "行程对比 PRD",
+      "title": "行程对比方案",
       "file": "三个路线方案-PRD.html",
       "owner": "共同维护",
-      "summary": "前端 / 后端职责、数据契约、验收标准、待确认问题；附交互 Demo 链接，可复制 Markdown 给 AGENT"
+      "summary": "PRD：前端 / 后端职责、数据契约、验收标准；顶部可打开交互 Demo（一日通勤、跨天旅行两个示例），可复制 Markdown 给 AGENT"
     }
   ]
 }
