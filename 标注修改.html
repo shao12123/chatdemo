@@ -809,7 +809,7 @@
     @property --anno-glow { syntax: "<angle>"; inherits: true; initial-value: 0deg; }
     @keyframes anno-glow-flow { to { --anno-glow: 360deg; } }
     .anno-bar .anno-batch { position: relative; left: auto; top: auto; width: 280px; height: 38px; box-sizing: border-box; transform: none; justify-content: flex-start; gap: 8px; padding: 4px; border: 1px solid #e5e8ec; border-radius: 99px; background: #fff; box-shadow: none; color: #000; font-size: 14px; line-height: 22px; isolation: isolate; --anno-glow: 0deg; animation: anno-glow-flow 12s linear infinite; }
-    .anno-bar .anno-batch::before { content: ""; position: absolute; inset: -10px; border-radius: inherit; pointer-events: none; z-index: 0; background: conic-gradient(from var(--anno-glow), #dae6fe 0deg, #b5cdfd 90deg, #c59dff 180deg, #ba89fe 250deg, #dae6fe 360deg); filter: blur(10px); opacity: 0.9; }
+    .anno-bar .anno-batch::before { content: ""; position: absolute; inset: -6px; border-radius: inherit; pointer-events: none; z-index: 0; background: conic-gradient(from var(--anno-glow), #6c9bfa 0deg, #6c9bfa 120deg, #b5cdfd 156deg, #e4d4ff 176deg, #b5cdfd 196deg, #6c9bfa 240deg, #6c9bfa 360deg); filter: blur(6px); opacity: 0.85; }
     .anno-bar .anno-batch::after { content: ""; position: absolute; inset: 0; border-radius: inherit; background: #fff; pointer-events: none; z-index: 1; }
     .anno-bar .anno-batch > * { position: relative; z-index: 2; }
     @media (prefers-reduced-motion: reduce) { .anno-bar .anno-batch { animation: none; } }
