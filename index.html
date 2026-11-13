@@ -43,7 +43,8 @@
       transition: border-color .15s, transform .15s, box-shadow .15s;
     }
     .card:hover { border-color: #b9cdfb; transform: translateY(-1px); box-shadow: 0 12px 28px rgba(28, 35, 48, .08); }
-    .card h2 { margin: 0 0 6px; font-size: 17px; }
+    .card h2 { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin: 0 0 6px; font-size: 17px; }
+    .card .tag { padding: 1px 8px; border-radius: 999px; background: #fff4e5; color: #b54708; font-size: 12px; font-weight: 600; line-height: 20px; }
     .card p { margin: 0; color: var(--muted); font-size: 13px; }
     .card .row { display: flex; justify-content: space-between; gap: 12px; align-items: baseline; margin-top: 10px; font-size: 12px; color: var(--muted); }
     .card .row span { color: var(--brand); font-weight: 600; }
@@ -62,7 +63,7 @@
       <div class="meta" id="versionMeta">正在读取版本…</div>
     </header>
     <ul class="list" id="demoList" aria-live="polite"></ul>
-    <p class="hint">多人协作：各做各的 HTML，在 <code>demos.json</code> 登记一条；同一文件请先拉再改。正式说明以仓库默认内容为准。</p>
+    <p class="hint">多人协作：各做各的 HTML，在 <code>demos.json</code> 登记一条（可选 <code>status</code> 字段标注状态，如「本期暂不开发」）；同一文件请先拉再改。正式说明以仓库默认内容为准。</p>
     <p class="err" id="loadErr" hidden></p>
   </main>
   <script>
@@ -89,7 +90,7 @@
         list.innerHTML = demos.map(demo => `
           <li>
             <a class="card" href="${esc(demo.file)}" target="_blank" rel="noopener noreferrer">
-              <h2>${esc(demo.title || demo.id)}</h2>
+              <h2>${esc(demo.title || demo.id)}${demo.status ? `<span class="tag">${esc(demo.status)}</span>` : ""}</h2>
               <p>${esc(demo.summary || "")}</p>
               <div class="row"><span>打开 →</span><em>${esc(demo.owner || "未署名")}</em></div>
             </a>
