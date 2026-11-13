@@ -1647,20 +1647,20 @@
     .thread-host { position: relative; flex: 1; min-height: 0; display: flex; flex-direction: column; }
     .thread-host > .thread { flex: 1; min-height: 0; }
     .paper-think { align-self: stretch; gap: 8px; max-width: min(660px, 100%); color: inherit; }
-    /* 行程对比语义色：浅色 / 深色两套，组件只引用变量 */
+    /* 行程对比语义色：按《华为项目-规范》色彩规则取值，组件只引用变量 */
     :root {
-      --rt-text-1: #1c2330; --rt-text-2: #344054; --rt-text-3: #667085; --rt-text-4: #98a2b3;
-      --rt-card: #f5f6f8; --rt-block: #e9ecf1; --rt-table: #ffffff; --rt-table-head: #f7f8fa; --rt-dot: #ffffff;
-      --rt-line: #eceef2; --rt-line-soft: #f0f1f4; --rt-divider: #e4e7ec; --rt-hover-line: #b9cdfb;
-      --rt-pick-bg: #e7f8ef; --rt-pick-fg: #067647; --rt-tip-icon: #d4920b; --rt-brand: #0a59f7;
-      --rt-plan-1: #3b6de0; --rt-plan-2: #d9822b; --rt-plan-3: #2f8f6a;
+      --rt-text-1: #000000; --rt-text-2: rgba(0, 0, 0, .6); --rt-text-3: rgba(0, 0, 0, .6); --rt-text-4: rgba(0, 0, 0, .4);
+      --rt-card: #eef0f3; --rt-block: #ffffff; --rt-table: #ffffff; --rt-table-head: #eef0f3; --rt-dot: #ffffff;
+      --rt-line: #d8d9dd; --rt-line-soft: #e3e4e7; --rt-divider: #e3e4e7; --rt-hover-line: #3b7af9;
+      --rt-pick-bg: #e9f5e7; --rt-pick-fg: #64bb5c; --rt-tip-icon: #ed6f21; --rt-brand: #0a59f7;
+      --rt-plan-1: #0a59f7; --rt-plan-2: #8c3bfe; --rt-plan-3: #00a7ad;
     }
     html.theme-dark {
-      --rt-text-1: #e6e8ec; --rt-text-2: #c3c8d1; --rt-text-3: #8f97a6; --rt-text-4: #6b7280;
-      --rt-card: #1d2026; --rt-block: #272b33; --rt-table: #16181d; --rt-table-head: #20232a; --rt-dot: #272b33;
-      --rt-line: #2f333b; --rt-line-soft: #262a31; --rt-divider: #30343c; --rt-hover-line: #3d5a99;
-      --rt-pick-bg: rgba(52, 199, 123, .16); --rt-pick-fg: #5fd69a; --rt-tip-icon: #f2b544; --rt-brand: #5b93ff;
-      --rt-plan-1: #6e98ff; --rt-plan-2: #f0a156; --rt-plan-3: #4fc196;
+      --rt-text-1: #ffffff; --rt-text-2: rgba(255, 255, 255, .6); --rt-text-3: rgba(255, 255, 255, .6); --rt-text-4: rgba(255, 255, 255, .4);
+      --rt-card: #191a1d; --rt-block: #111216; --rt-table: #111216; --rt-table-head: #191a1d; --rt-dot: #111216;
+      --rt-line: #434448; --rt-line-soft: #292b2e; --rt-divider: #292b2e; --rt-hover-line: #2762c6;
+      --rt-pick-bg: #122211; --rt-pick-fg: #5ba854; --rt-tip-icon: #db6b42; --rt-brand: #317af7;
+      --rt-plan-1: #317af7; --rt-plan-2: #7f45e2; --rt-plan-3: #00afaf;
     }
     /* 路线方案回复：卡片一层、块一层；颜色只给方案时间线、推荐标记、主按钮 */
     .msg.rt-reply { align-self: stretch; max-width: 100%; display: flex; flex-direction: column; gap: 12px; }
@@ -1730,31 +1730,35 @@
     .rm-num { flex: none; width: 22px; height: 22px; margin-top: 1px; border-radius: 50%; background: var(--rt-text-1); color: var(--rt-table); display: inline-grid; place-items: center; font-size: 11px; font-weight: 700; }
     .rm-gap { margin: 0 0 0 10px; padding: 4px 0 4px 22px; border-left: 2px solid var(--rt-divider); color: var(--rt-text-3); font-size: 12px; line-height: 18px; }
     .rt-next { display: flex; flex-direction: column; align-items: flex-start; gap: 8px; }
-    /* Demo 外壳的深色模式：只覆盖写死颜色的区域 */
+    /* Demo 外壳：按规范的 @bg / @text / @component 取值 */
+    :root {
+      --page: #eef0f3; --card: #ffffff; --card-line: #e3e4e7; --ink: #000000; --secondary: rgba(0, 0, 0, .6); --label: rgba(0, 0, 0, .4); --placeholder: rgba(0, 0, 0, .4);
+      --brand: #0a59f7; --brand-soft: #f3f7ff;
+    }
     html.theme-dark {
       color-scheme: dark;
-      --page: #0e1014; --card: #16181d; --card-line: #24272e; --ink: #e6e8ec; --secondary: #a3a9b4; --label: #8a919e; --placeholder: #6b7280;
-      --brand: #5b93ff; --brand-soft: rgba(91, 147, 255, .14); --chip: rgba(255, 255, 255, .06); --chip-line: #2a2e36; --avatar: #24324d;
+      --page: #090b0e; --card: #111216; --card-line: #292b2e; --ink: #ffffff; --secondary: rgba(255, 255, 255, .6); --label: rgba(255, 255, 255, .4); --placeholder: rgba(255, 255, 255, .4);
+      --brand: #317af7; --brand-soft: #0a1831; --chip: rgba(255, 255, 255, .06); --chip-line: #292b2e; --avatar: #0f254a;
     }
-    html.theme-dark .rail { background: #121419; }
+    html.theme-dark .rail { background: #111216; }
     html.theme-dark .plan-doc { background: var(--card); }
-    html.theme-dark .composer { background: #1d2026; border-color: #2a2e36; box-shadow: none; }
+    html.theme-dark .composer { background: #191a1d; border-color: #434448; box-shadow: none; }
     html.theme-dark .composer input { color: var(--ink); }
-    html.theme-dark .msg.user { background: #22304d; }
+    html.theme-dark .msg.user { background: #0a1831; }
     html.theme-dark .think-name, html.theme-dark .chat-head h2, html.theme-dark .exec-item.run .exec-copy > span { color: var(--ink); }
-    html.theme-dark .exec { background: var(--card); border-color: #2a2e36; }
-    html.theme-dark .exec-list { background: #1f2228; }
-    html.theme-dark .exec-item:not(:last-child)::before { background: #3a3f48; }
-    html.theme-dark .msg-act:hover, html.theme-dark .conv:hover, html.theme-dark .hist-fold:hover, html.theme-dark .new-chat:hover { background: rgba(255, 255, 255, .08); color: var(--ink); }
-    html.theme-dark .hover-tip { background: #22252b; border-color: #33363d; color: #e6e8ec; }
-    html.theme-dark .qnav-card { background: #1d2026; border-color: #2a2e36; }
-    html.theme-dark .qnav-row.is-peek { background: #262a31; }
+    html.theme-dark .exec { background: var(--card); border-color: #292b2e; }
+    html.theme-dark .exec-list { background: #191a1d; }
+    html.theme-dark .exec-item:not(:last-child)::before { background: #434448; }
+    html.theme-dark .msg-act:hover, html.theme-dark .conv:hover, html.theme-dark .hist-fold:hover, html.theme-dark .new-chat:hover { background: #292b2e; color: var(--ink); }
+    html.theme-dark .hover-tip { background: #191a1d; border-color: #434448; color: var(--ink); }
+    html.theme-dark .qnav-card { background: #191a1d; border-color: #434448; }
+    html.theme-dark .qnav-row.is-peek { background: #292b2e; }
     html.theme-dark .qnav-row:hover, html.theme-dark .qnav-row.is-current { color: var(--ink); }
-    html.theme-dark .qnav-rail i, html.theme-dark .qnav-dash { background: #3a3f48; }
+    html.theme-dark .qnav-rail i, html.theme-dark .qnav-dash { background: #434448; }
     html.theme-dark .qnav-rail i.is-current, html.theme-dark .qnav-row.is-current .qnav-dash, html.theme-dark .qnav-row:hover .qnav-dash { background: var(--ink); }
-    html.theme-dark .dn-switch { background: #1f2228; border-color: #2a2e36; }
-    html.theme-dark .dn-switch button[aria-pressed="true"] { background: #2f333b; color: var(--ink); box-shadow: none; }
-    html.theme-dark .act-secondary { background: #1f2228; border-color: #2f333b; color: var(--ink); }
+    html.theme-dark .dn-switch { background: #191a1d; border-color: #434448; }
+    html.theme-dark .dn-switch button[aria-pressed="true"] { background: #292b2e; color: var(--ink); box-shadow: none; }
+    html.theme-dark .act-secondary { background: #191a1d; border-color: #434448; color: var(--ink); }
     html.theme-dark .rail img, html.theme-dark .icon-btn img, html.theme-dark .strip-btn img, html.theme-dark .hist-fold img, html.theme-dark .new-chat img, html.theme-dark .more img, html.theme-dark .add img, html.theme-dark .doc-chrome img, html.theme-dark .tool img, html.theme-dark .doc-tab img { filter: invert(.86) hue-rotate(180deg); }
     html.theme-dark .rm-mini, html.theme-dark .rm-big { filter: brightness(.82) contrast(1.05); }
     .chat-head-tools .theme-switch { margin-right: 8px; }
@@ -4508,7 +4512,7 @@
         "status": "已实现",
         "anchor": "",
         "title": "行程对比：深浅模式颜色 token",
-        "body": "【用途】行程对比的所有组件同时支持浅色和深色模式。Demo 右上角「浅色 / 深色」可切换查看。\n【规则】\n1、组件里不写十六进制色值，只引用 token；跟随产品主题切换，不单独做开关。\n2、深色模式下，方案色、推荐标签、提示图标、品牌色都提亮一档，保证在深底上可辨认；推荐标签底改用半透明绿。\n3、层级关系两种模式一致：卡片底 < 块底 的明度差保持，文字四级由深到浅（浅色）/ 由亮到暗（深色）。\n4、文字一级、二级在对应底色上的对比度不低于 4.5:1；三级不低于 3:1。\n【Token】\n文字一级　--rt-text-1：浅 #1c2330 / 深 #e6e8ec（结论句、方案标题、时间、路段、表格正文）\n文字二级　--rt-text-2：浅 #344054 / 深 #c3c8d1（副标题、适用说明、小结、提示正文）\n文字三级　--rt-text-3：浅 #667085 / 深 #8f97a6（组件小标签、表头、次要信息、复制图标）\n文字四级　--rt-text-4：浅 #98a2b3 / 深 #6b7280（圆点、弱提示）\n卡片底　--rt-card：浅 #f5f6f8 / 深 #1d2026（对比卡、出行提示）\n块底　--rt-block：浅 #e9ecf1 / 深 #272b33（对比卡里的方案块）\n表格底　--rt-table：浅 #ffffff / 深 #16181d（表格、地图入口卡）\n表头底　--rt-table-head：浅 #f7f8fa / 深 #20232a（表头）\n时间线圆点填充　--rt-dot：浅 #ffffff / 深 #272b33（对比卡时间线圆点）\n描边　--rt-line：浅 #eceef2 / 深 #2f333b（表格边框、地图入口卡边框）\n弱分割线　--rt-line-soft：浅 #f0f1f4 / 深 #262a31（表格行分割）\n分割线　--rt-divider：浅 #e4e7ec / 深 #30343c（方案之间、明细分割）\n悬停描边　--rt-hover-line：浅 #b9cdfb / 深 #3d5a99（地图入口卡悬停）\n推荐标签底　--rt-pick-bg：浅 #e7f8ef / 深 rgba(52,199,123,.16)（「推荐」标签）\n推荐标签字　--rt-pick-fg：浅 #067647 / 深 #5fd69a（「推荐」标签）\n提示图标　--rt-tip-icon：浅 #d4920b / 深 #f2b544（出行提示灯泡）\n品牌色　--rt-brand：浅 #0a59f7 / 深 #5b93ff（链接、悬停态）\n方案一　--rt-plan-1：浅 #3b6de0 / 深 #6e98ff（对比卡时间线）\n方案二　--rt-plan-2：浅 #d9822b / 深 #f0a156（对比卡时间线）\n方案三　--rt-plan-3：浅 #2f8f6a / 深 #4fc196（对比卡时间线）"
+        "body": "【用途】行程对比的所有组件同时支持浅色和深色模式，颜色取自 Figma《【25】华为项目-规范》的色彩规则与色板。Demo 右上角「浅色 / 深色」可切换查看。\n【规则】\n1、组件里不写十六进制色值，只引用 token；跟随产品主题切换，不单独做开关。\n2、文字只用规范四级：主要 100%、次要 60%、占位 40%、禁用 20%。第三级文字（表头、标签、补充说明）也用次要 60%，靠字号、字重和第二级区分；40% 只用于圆点等弱元素。\n3、两层结构用「次要容器 + 容器」：对比卡、出行提示用次要容器底，方案块用容器底。\n4、方案标识色用无功能语义的 Brand / Purple / Cyan；「推荐」标签用成功色；提示灯泡用警示色。\n5、规范内部冲突以色阶名为准：深色次要容器取 Gray12 #191A1D；深色警示色取规则表 #DB6B42；主文字取 100%。\n6、外壳：页面底 Gray1 / Gray14，聊天区 #FFFFFF / Gray13，悬停 Gray1 / Gray11。\n【Token】（浅 / 深，括号内为规范 token 与用途）\n文字一级　--rt-text-1：浅 #000000 / 深 #FFFFFF（@text-color-primary；结论句、方案标题、时间、路段、表格正文）\n文字二级　--rt-text-2：浅 #000000 60% / 深 #FFFFFF 60%（@text-color-secondary；副标题、适用说明、小结、提示正文）\n文字三级　--rt-text-3：浅 #000000 60% / 深 #FFFFFF 60%（@text-color-secondary；组件小标签、表头、次要信息、复制图标）\n文字四级　--rt-text-4：浅 #000000 40% / 深 #FFFFFF 40%（@text-color-placeholder；圆点、弱提示）\n卡片底　--rt-card：浅 Gray1 #EEF0F3 / 深 Gray12 #191A1D（@bg-color-secondarycontainer；对比卡、出行提示）\n块底　--rt-block：浅 #FFFFFF / 深 Gray13 #111216（@bg-color-container；对比卡里的方案块）\n表格底　--rt-table：浅 #FFFFFF / 深 Gray13 #111216（@bg-color-container；表格、地图入口卡）\n表头底　--rt-table-head：浅 Gray1 #EEF0F3 / 深 Gray12 #191A1D（@bg-color-secondarycontainer；表头）\n时间线圆点填充　--rt-dot：浅 #FFFFFF / 深 Gray13 #111216（@bg-color-container；对比卡时间线圆点）\n描边　--rt-line：浅 Gray4 #D8D9DD / 深 Gray10 #434448（@component-border；表格边框、地图入口卡边框）\n弱分割线　--rt-line-soft：浅 Gray3 #E3E4E7 / 深 Gray11 #292B2E（@component-stroke；表格行分割）\n分割线　--rt-divider：浅 Gray3 #E3E4E7 / 深 Gray11 #292B2E（@component-stroke；方案之间、明细分割）\n悬停描边　--rt-hover-line：浅 Brand3 #3B7AF9 / 深 Brand3 #2762C6（@brand-color-hover；地图入口卡悬停）\n推荐标签底　--rt-pick-bg：浅 #E9F5E7 / 深 #122211（色板 Green10 / Green9；「推荐」标签）\n推荐标签字　--rt-pick-fg：浅 Green1 #64BB5C / 深 Green1 #5BA854（@success-color；「推荐」标签）\n提示图标　--rt-tip-icon：浅 Orange1 #ED6F21 / 深 Orange1 #DB6B42（@warning-color；出行提示灯泡）\n品牌色　--rt-brand：浅 Brand1 #0A59F7 / 深 Brand1 #317AF7（@brand-color；链接、悬停态）\n方案一　--rt-plan-1：浅 #0A59F7 / 深 #317AF7（色板 Brand1；对比卡时间线）\n方案二　--rt-plan-2：浅 #8C3BFE / 深 #7F45E2（色板 Purple1；对比卡时间线）\n方案三　--rt-plan-3：浅 #00A7AD / 深 #00AFAF（色板 Cyan1；对比卡时间线）"
       },
       {
         "id": "f-text",
