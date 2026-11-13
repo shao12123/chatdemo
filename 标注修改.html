@@ -792,18 +792,11 @@
     .anno-batch .chev svg { width: 14px; height: 14px; display: block; }
     .anno-batch-main.is-open .chev svg { transform: rotate(180deg); }
     .anno-batch .anno-mini { width: 28px; height: 28px; }
-    @property --anno-flow { syntax: "<angle>"; initial-value: 0deg; inherits: false; }
-    .oo-main.is-anno-on { position: relative; }
-    .oo-main.is-anno-on::before,
-    .oo-main.is-anno-on::after { content: ""; position: absolute; inset: 0; pointer-events: none; }
-    .oo-main.is-anno-on::before { z-index: 6; padding: 1px; background: conic-gradient(from var(--anno-flow), #0a59f7 0deg, #6c9bfa 70deg, #8c3bfe 150deg, #ba89fe 210deg, #3b7af9 270deg, #af76fe 320deg, #0a59f7 360deg); opacity: 0.85; filter: blur(12px); -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor; mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); mask-composite: exclude; animation: anno-flow 8s linear infinite; }
-    .oo-main.is-anno-on::after { z-index: 7; box-shadow: inset 0 0 0 1px #0a59f7, inset 0 0 18px 0 rgba(10, 89, 247, 0.22), inset 0 0 42px 0 rgba(140, 59, 254, 0.16); animation: anno-breathe 4.8s ease-in-out infinite; }
+    .oo-main.is-anno-on { position: relative; border-bottom-left-radius: 23px; }
+    .oo-main.is-anno-on::after { content: ""; position: absolute; inset: 0; z-index: 7; pointer-events: none; border-radius: 0 0 0 23px; box-shadow: inset 0 0 0 1px #0a59f7; }
     .anno-store.is-notch { z-index: 30; width: max-content; max-width: min(560px, calc(100vw - 32px)); align-items: center; gap: 8px; }
     .anno-store.is-notch .anno-batch { width: auto; height: 34px; padding: 0 6px 0 2px; border: 1px solid #0a59f7; border-top: 0; border-radius: 0 0 18px 18px; background: #fff; box-shadow: 0 10px 24px rgba(10, 89, 247, 0.14); }
     .anno-store.is-notch .anno-store-list { width: 320px; }
-    @keyframes anno-flow { to { --anno-flow: 360deg; } }
-    @keyframes anno-breathe { 50% { box-shadow: inset 0 0 0 1px #0a59f7, inset 0 0 26px 0 rgba(140, 59, 254, 0.24), inset 0 0 56px 0 rgba(10, 89, 247, 0.14); } }
-    @media (prefers-reduced-motion: reduce) { .oo-main.is-anno-on::before, .oo-main.is-anno-on::after { animation: none; } }
     .anno-draft { position: absolute; z-index: 2; border: 1px dashed #3370ff; background: transparent; pointer-events: none; border-radius: 12px; box-sizing: border-box; }
     .anno-pop { position: absolute; z-index: 6; width: 286px; pointer-events: auto; cursor: default; }
     .plan-doc.is-marking .anno-pop,
