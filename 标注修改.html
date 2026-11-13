@@ -2861,8 +2861,8 @@ const roastPhotos = {green: "data:image/jpeg;base64,/9j/4QCARXhpZgAASUkqAAgAAAAF
     }
     function hpStart(){
       const text=prompt.value.trim();if(!text||hp.status!=='idle')return;
-      sentText.honglou=text;phase.honglou='waiting';hp.status='choosing';
-      hp.steps=['整理《红楼梦》的作者背景、人物、情节与文学特色。'];historyForcedOpen=false;versionOpen=false;editing=false;prompt.value='';hpRefresh(true);
+      historyForcedOpen=false;versionOpen=false;editing=false;
+      hpApplyReadyDemo(text);hpRefresh(true);
     }
     function hpThoughtHtml(){
       const labels={paused:'已暂停',choosing:'已整理内容方向',preparing:'正在准备',generating:'正在生成页面',checking:'正在检查页面',assembling:'正在组装 PPTX',partial:'部分页面待重试',error:'组装未完成',done:'已思考'};
@@ -3096,6 +3096,34 @@ const roastPhotos = {green: "data:image/jpeg;base64,/9j/4QCARXhpZgAASUkqAAgAAAAF
       hp.notice=s.notice;hp.error=s.error;hp.rolesShown=s.rolesShown;hp.finishedAt=s.finishedAt;hp.progressHidden=s.progressHidden;hp.userBrowsing=s.userBrowsing;hp.choice=s.choice;hp.scenario=s.scenario;
       hp.queue=[];hp.activeJobs=0;hp.finalizing=false;hp.reviseStarted=0;
       annotateOn=!!s.annotateOn;
+    }
+    function hpApplyReadyDemo(text){
+      hpDismissLightbox();
+      hp.runId++;hp.timers.forEach(clearTimeout);hp.timers.clear();clearTimeout(hp.progressHideTimer);
+      hp.choice="standard";hp.scenario="normal";hp.scenarioPending=false;hp.adjusted=false;
+      hp.recoveryCard=false;hp.recoveryDetails=false;hp.notice="";hp.error="";hp.pack=null;hp.coverPreview="";
+      const size=hpSize();
+      const pages=PPT_SLIDES.map((spec,i)=>{
+        const page=hpCreatePage(spec,PPT_PAGE_CONTENT[i]);
+        page.status="ready";page.full=pptSlideUrl(spec,size.w,size.h);page.thumb=pptSlideUrl(spec,768,432);page.width=size.w;page.height=size.h;page.notes=PPT_PAGE_CONTENT[i];
+        return page;
+      });
+      const version={id:"hv-ready-v1",at:Date.now()-68000,name:"红楼梦介绍.pptx-V1",baseName:"红楼梦介绍.pptx",pages:hpClonePages(pages,false),slide:0,source:"generate",tabOpen:true};
+      hp.pages=hpClonePages(pages,false);
+      hp.notesDrafts={};hp.pages.forEach(p=>{if(p.notes)hp.notesDrafts[p.id]=p.notes;});
+      hp.versions=[version];hp.historyId=version.id;hp.historyOpen=false;hp.slide=0;hp.view="preview";hp.userBrowsing=true;
+      hp.status="done";hp.thoughtOpen=false;hp.steps=["已确定十页内容，统一使用墨色、米白与朱红的视觉风格。"];hp.duration="1分8秒";
+      hp.rolesShown=PPT_ROLES.length;hp.finishedAt=Date.now();hp.progressHidden=true;hp.queue=[];hp.activeJobs=0;hp.finalizing=false;hp.reviseStarted=0;hp.clockMs=68000;hp.clockStart=null;
+      const jsonText=JSON.stringify(hpManifest(),null,2);
+      hp.pack={size,slides:hp.pages.map(p=>{const {controller,...rest}=p;return rest;}),jsonText,jsonBytes:pptBytes(jsonText)};
+      hp.pack.pptxBytes=buildHonglouPptx(hp.pack);
+      hp.active="pptx";hp.docs.pptx.open=true;panels.honglou=true;
+      phase.honglou="done";
+      sentText.honglou=text||"帮我生成一份介绍《红楼梦》的 PPT。";
+      sentFiles.honglou=[];
+      annoFollow.honglou=[];
+      annotateOn=false;annoCollapsed=true;annoQueueOpen=false;annoDrag=null;annoFrontId=null;
+      prompt.value="";
     }
     function hpFailScene(id){
       const value=id==null?activeId:id;
@@ -3545,7 +3573,7 @@ const roastPhotos = {green: "data:image/jpeg;base64,/9j/4QCARXhpZgAASUkqAAgAAAAF
         return;
       }
       if('hpProgressClose' in d){hp.progressHidden=true;clearTimeout(hp.progressHideTimer);const bubble=document.getElementById('hpProgress');if(bubble)bubble.hidden=true;return;}
-      if('hpReplay' in d){hpDismissLightbox();hp.timers.forEach(clearTimeout);hp.timers.clear();clearTimeout(hp.progressHideTimer);hp.runId++;hp.recoveryCard=false;hp.recoveryDetails=false;hp.status='choosing';phase.honglou='waiting';hp.notice='';hp.error='';hp.pack=null;hp.pages=[];hp.queue=[];hp.activeJobs=0;hp.versions=[];hp.historyOpen=false;hp.historyId='';hp.versionCheckpoint=false;panels.honglou=false;hpRefresh(true);return;}
+      if('hpReplay' in d){hpApplyReadyDemo(sentText.honglou);hpRefresh(true);return;}
       if('hpRecoveryDetails' in d){hp.recoveryDetails=!hp.recoveryDetails;hpRefresh();return;}
       if('hpConfirm' in d){hpGenerate();return;}
       if('hpRetry' in d){hpRetryPage();return;}
@@ -4211,6 +4239,7 @@ const roastPhotos = {green: "data:image/jpeg;base64,/9j/4QCARXhpZgAASUkqAAgAAAAF
       hpRemember();if(!pptConv(id))hpDismissLightbox();
       digestRememberScroll();
       activeId = id;
+      if (id === "honglou" && phase.honglou === "idle" && hp.status === "idle") hpApplyReadyDemo(demo.prompt);
       document.querySelectorAll("[data-conv]").forEach(btn => btn.classList.toggle("current", btn.dataset.conv === id));
       document.getElementById("convTitle").textContent = demo.title;
       const idle = id === "roast" ? roastPhase === "idle" : phase[id] === "idle";
