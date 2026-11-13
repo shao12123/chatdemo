@@ -229,6 +229,8 @@
       align-items: center;
       justify-content: space-between;
     }
+    .anno-scheme { margin-left: auto; display: flex; align-items: center; }
+    .anno-scheme select { height: 32px; padding: 0 28px 0 12px; border: 1px solid #e5e8ec; border-radius: 8px; background: #fff url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'><path d='M2.5 4.5 6 8l3.5-3.5' fill='none' stroke='%231f2329' stroke-width='1.2' stroke-linecap='round' stroke-linejoin='round'/></svg>") no-repeat right 8px center; color: #1f2329; font: 400 14px/20px var(--font); appearance: none; cursor: pointer; }
     .chat-head h2 {
       margin: 0;
       min-width: 0;
@@ -802,6 +804,18 @@
     .anno-batch .anno-mini { width: 28px; height: 28px; }
     .oo-main.is-anno-on { position: relative; border-bottom-left-radius: 23px; }
     .oo-main.is-anno-on::after { content: ""; position: absolute; inset: 0; z-index: 7; pointer-events: none; border-radius: 0 0 0 23px; box-shadow: inset 0 0 0 1px #0a59f7; }
+    html.is-anno-scheme-2 .oo-main.is-anno-on::after { box-shadow: inset 0 0 0 1px #548bf9; }
+    .anno-store.is-notch { z-index: 30; width: max-content; max-width: min(560px, calc(100vw - 32px)); align-items: center; gap: 0; }
+    .anno-store.is-notch .anno-batch { order: 1; width: auto; height: 36px; padding: 0 4px 0 8px; gap: 8px; border: 1px solid #548bf9; border-top: 0; border-radius: 0 0 18px 18px; background: #548bf9; box-shadow: none; color: #fff; }
+    .anno-store.is-notch .anno-batch-main { margin: 0; padding: 0; gap: 8px; color: #fff; }
+    .anno-store.is-notch .anno-batch-main > span.anno-count-num,
+    .anno-store.is-notch .anno-batch-main > span.anno-batch-copy,
+    .anno-store.is-notch .anno-batch-main > span.chev { flex: none; }
+    .anno-store.is-notch .anno-batch-main > span.chev { margin-left: auto; color: #fff; }
+    .anno-store.is-notch .anno-count-num { width: 28px; height: 28px; min-width: 28px; box-sizing: border-box; border: 0; border-radius: 99px; background: #e6eefe; color: #0a59f7; font: 400 14px/20px var(--font); display: grid; place-items: center; }
+    .anno-store.is-notch .anno-batch-split { width: 1px; height: 16px; flex: none; align-self: center; background: rgba(255, 255, 255, 0.45); }
+    .anno-store.is-notch .anno-batch-go { height: 28px; box-sizing: border-box; padding: 0 12px; border: 0; border-radius: 99px; background: #fff; color: #0a59f7; }
+    .anno-store.is-notch .anno-store-list { order: 2; position: static; left: auto; bottom: auto; width: 280px; margin-top: 8px; transform: none; }
     .oo-main.is-anno-on .hp-notes { visibility: hidden; pointer-events: none; }
     .anno-bar { display: none; width: 100%; min-height: 38px; box-sizing: border-box; justify-content: center; align-items: flex-end; position: relative; z-index: 20; pointer-events: none; }
     .oo-main.is-anno-on .anno-bar { display: flex; position: absolute; left: 0; right: 0; bottom: 0; min-height: 0; }
@@ -1472,6 +1486,7 @@
         <section class="chat-pane">
           <header class="chat-head">
             <h2 id="convTitle">新对话</h2>
+            <label class="anno-scheme"><select id="annoScheme" aria-label="方案切换"><option value="1">方案1</option><option value="2">方案2</option></select></label>
             <button class="more" id="chatExpandPreview" type="button" aria-label="展开右侧预览区" title="展开右侧预览区" hidden><svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M19.5 2C20.8807 2 22 3.1193 22 4.5V19.5C22 20.8807 20.8807 22 19.5 22H4.5C3.1193 22 2 20.8807 2 19.5V4.5C2 3.11929 3.11929 2 4.5 2H19.5ZM4.5 4C4.22386 4 4 4.22386 4 4.5V19.5C4 19.7762 4.22385 20 4.5 20H19.5C19.7762 20 20 19.7762 20 19.5V4.5C20 4.22385 19.7762 4 19.5 4H4.5ZM17 6C17.5523 6 18 6.44772 18 7V17C18 17.5523 17.5523 18 17 18H13C12.4477 18 12 17.5523 12 17V7C12 6.44772 12.4477 6 13 6H17Z" fill="#000" fill-opacity="0.6"/></svg></button>
           </header>
           <div class="thread" id="thread"></div>
@@ -1617,6 +1632,7 @@
     let annoDrag = null;
     let annoCollapsed = false;
     let annoQueueOpen = false;
+    let annoScheme = "1";
     let annoShownCount = null;
     let annoShownKey = "";
     let annoFrontId = null;
@@ -4595,6 +4611,11 @@ const roastPhotos = {green: "data:image/jpeg;base64,/9j/4QCARXhpZgAASUkqAAgAAAAF
     document.getElementById("chatExpandPreview")?.addEventListener("click", () => {
       openCurrentPreview();
     });
+    document.getElementById("annoScheme")?.addEventListener("change", event => {
+      annoScheme = event.target.value === "2" ? "2" : "1";
+      document.documentElement.classList.toggle("is-anno-scheme-2", annoScheme === "2");
+      renderAnno();
+    });
     document.getElementById("histClose").addEventListener("click", () => {
       historyManualClosed = true;
       historyForcedOpen = false;
@@ -4860,9 +4881,33 @@ const roastPhotos = {green: "data:image/jpeg;base64,/9j/4QCARXhpZgAASUkqAAgAAAAF
     function placeAnnoBatch() {
       syncAnnoFrame();
       const bar = document.getElementById("annoBar");
+      const layer = document.getElementById("annoLayer");
       const fresh = document.querySelector("#annoLayer .anno-store");
       const store = fresh || document.querySelector("#annoBar .anno-store");
       const main = document.querySelector(".oo-app .oo-main");
+      if (store && main && pptConv() && hp.view !== "grid" && annotateOn && annoScheme === "2") {
+        if (layer && store.parentElement !== layer) layer.appendChild(store);
+        store.classList.add("is-notch");
+        const rect = main.getBoundingClientRect();
+        store.style.position = "fixed";
+        store.style.left = (rect.left + rect.width / 2) + "px";
+        store.style.top = rect.top + "px";
+        store.style.width = "";
+        store.style.transform = "translateX(-50%)";
+        store.style.zIndex = "30";
+        if (bar) {
+          bar.style.paddingBottom = "";
+          if (!bar.contains(store)) bar.replaceChildren();
+        }
+        hpSyncNotesWidth();
+        placeAnnoLayer();
+        placeAnnoPop();
+        return;
+      }
+      if (store) {
+        store.classList.remove("is-notch");
+        store.style.zIndex = "";
+      }
       if (bar && store && main && pptConv() && hp.view !== "grid" && annotateOn) {
         if (store.parentElement !== bar) bar.replaceChildren(store);
         store.style.cssText = "";
@@ -5659,7 +5704,7 @@ const roastPhotos = {green: "data:image/jpeg;base64,/9j/4QCARXhpZgAASUkqAAgAAAAF
       const key = "moreai-ppt-annotation-v1";
       const defaults = [
         { id: "f1", num: "1", group: "feature", title: "多个标注一起发送修改", body: "【用途】多处修改先入队，再一次发给 Agent。\n【行为】打开标注后可跨页框选并入队。换页不丢，编号整稿连续，单页不限数量。卡片上的发送只入队并留下序号，不进对话。点胶囊右侧的「修改」，或在输入框写下「修改标注内容」这类要求后发送，都会把全部标注一次发出，输入的文字和附件一并带上。" },
-        { id: "f2", num: "2", group: "feature", title: "存储标注的胶囊和标注列表", body: "【用途】开启标注后，用底部胶囊查看未发送的标注。\n【行为】一进入标注模式，备注内容隐藏，但原来的备注高度还留着，上面的 PPT 不挪位置。白色胶囊叠在这块区域底部，底边距离屏幕底部 20px，缩放窗口时不挡住上面的 PPT。胶囊外圈整圈露着浅色辉光，绕着胶囊缓慢旋转。左边是数量，中间是「几个标注」。展开箭头在分割线左侧，分割线右边是一级按钮「修改」。左侧数量圆标是浅蓝底、品牌色数字，样式和浅色按钮一致。有标注时点箭头向上展开队列，列表和胶囊都是 280 宽，再点收起。新标注进队列时，左侧数字向上滚到新数量，胶囊再上下弹一下，像 Mac 软件更新完成后图标在程序坞里跳动。没有标注时「修改」不可用。每行显示序号和修改要求。未悬停时行的左右留白一致；悬停出现编辑和删除，按钮下用渐变盖住文字。" },
+        { id: "f2", num: "2", group: "feature", title: "存储标注的胶囊和标注列表", body: "【用途】开启标注后，用底部胶囊查看未发送的标注。\n【行为】一进入标注模式，备注内容隐藏，但原来的备注高度还留着，上面的 PPT 不挪位置。白色胶囊叠在这块区域底部，底边距离屏幕底部 20px，缩放窗口时不挡住上面的 PPT。胶囊外圈整圈露着浅色辉光，绕着胶囊缓慢旋转。左边是数量，中间是「几个标注」。展开箭头在分割线左侧，分割线右边是一级按钮「修改」。左侧数量圆标是浅蓝底、品牌色数字，样式和浅色按钮一致。有标注时点箭头向上展开队列，列表和胶囊都是 280 宽，再点收起。新标注进队列时，左侧数字向上滚到新数量，胶囊再上下弹一下，像 Mac 软件更新完成后图标在程序坞里跳动。没有标注时「修改」不可用。每行显示序号和修改要求。未悬停时行的左右留白一致；悬停出现编辑和删除，按钮下用渐变盖住文字。对话标题右侧可切换方案。方案2是顶部刘海，预览描边和刘海底色都是 #548BF9。" },
         { id: "f3", num: "3", group: "feature", title: "点击标注修改内容", body: "【行为】点击页上的标注序号，展开标注框，即可修改内容。再发送会更新队列里的这一条。" },
         { id: "f4", num: "4", group: "feature", title: "预览图上也展示标注", body: "【行为】右侧预览图按大图上的位置，展示标注功能留下的标注。" },
         { id: "s7", group: "scene", title: "没点发送就关闭", body: "【前置】标注框已打开，修改要求还没点发送。\n【期望】关掉标注框或换页，这条草稿不保留。已经进队列的还在。正在改一条已入队的标注时，没再点发送就关掉，内容回到入队时的那一版。\n【验收】未发送的不出现在胶囊和页上序号里。只关框或换页时，已入队的序号和内容不变。\n【当前】演示已按这个处理。" },
