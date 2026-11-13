@@ -4794,9 +4794,11 @@ const roastPhotos = {green: "data:image/jpeg;base64,/9j/4QCARXhpZgAASUkqAAgAAAAF
       const list = pack.marks;
       if (!list.some(mark => mark.id === activeAnno)) activeAnno = list[list.length - 1]?.id || null;
       const showPop = annotateOn && !annoCollapsed;
+      const drawing = !!(annoDrag && annoDrag.moved);
       const boxes = list.map(mark => {
         if (!annotateOn && !mark.queued) return "";
         const editing = showPop && activeAnno === mark.id;
+        if ((showPop || drawing) && !editing) return "";
         const showIndex = !!mark.queued || editing;
         const index = showIndex ? annoBadgeNo(mark) : 0;
         const front = annoFrontId === mark.id ? " is-front" : "";
