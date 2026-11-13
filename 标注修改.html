@@ -931,16 +931,22 @@
     .anno-revision-card ol { margin: 0; padding-left: 18px; }
     .anno-revision-card li { margin: 4px 0; font-size: 13px; line-height: 20px; }
     .anno-revision-card li span { display: block; color: var(--label); font-size: 12px; line-height: 18px; }
+    .msg-user-block { align-self: stretch; display: flex; flex-direction: column; align-items: flex-end; gap: 4px; max-width: 100%; }
+    .msg-user-block .msg.user { width: max-content; max-width: 100%; background: rgba(218, 230, 254, 0.5); color: #1e293b; border-radius: 8px; padding: 8px 16px; }
+    .msg-user-block .msg-tags { width: 100%; max-width: 100%; min-width: 0; margin: 0; flex-wrap: nowrap; justify-content: flex-end; gap: 4px; overflow: hidden; }
+    .msg-anno-list { margin: 0; padding-left: 21px; }
+    .msg-anno-list li { margin: 0; }
     .msg.user.has-quote { white-space: normal; }
     .msg-quotes { display: flex; flex-direction: column; align-items: stretch; gap: 4px; margin: 0 0 6px; }
     .msg-quotes:last-child { margin-bottom: 0; }
     .msg-quote { display: flex; align-items: stretch; gap: 6px; max-width: 100%; padding: 2px 8px; border-radius: 4px; background: rgba(255,255,255,.55); color: #4e5969; font-size: 12px; line-height: 20px; }
     .msg-quote::before { content: ""; width: 2px; border-radius: 1px; background: #7ea0f8; flex: none; }
     .msg-quote span { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-    .msg-tags { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin: 0 0 8px; }
+    .msg-tags { display: flex; flex-wrap: wrap; align-items: center; gap: 4px; margin: 0 0 8px; }
     .msg-tags:last-child { margin-bottom: 0; }
-    .msg-tag { display: inline-flex; align-items: center; gap: 4px; height: 24px; padding: 0 8px 0 4px; border: 1px solid #dee0e3; border-radius: 999px; background: #f5f6f7; color: #1f2329; font-size: 12px; line-height: 20px; white-space: nowrap; }
-    .msg-tag b { display: grid; place-items: center; width: 16px; height: 16px; border: 1px solid #e5e6eb; border-radius: 99px; background: #fff; color: #4e5969; font-size: 10px; font-weight: 500; line-height: 16px; }
+    .msg-tag { display: inline-flex; align-items: center; gap: 6px; height: 22px; box-sizing: border-box; padding: 0 8px 0 3px; border: 0; border-radius: 999px; background: #e9ebee; color: rgba(0, 0, 0, 0.6); font-size: 12px; line-height: 20px; font-weight: 400; white-space: nowrap; flex: none; }
+    .msg-tag.is-more { padding: 0 8px; }
+    .msg-tag b { display: grid; place-items: center; width: 16px; height: 16px; border: 0; border-radius: 999px; background: #fff; color: rgba(0, 0, 0, 0.6); font-size: 12px; font-weight: 400; line-height: 16px; }
     .msg-note { white-space: pre-wrap; }
     .anno-fail-card { display: flex; flex-direction: column; align-items: flex-start; gap: 8px; max-width: 440px; margin-top: 8px; }
     .anno-fail-thought { width: min(420px, 100%); font-size: 13px; line-height: 22px; }
@@ -4364,6 +4370,7 @@ const roastPhotos = {green: "data:image/jpeg;base64,/9j/4QCARXhpZgAASUkqAAgAAAAF
       const thread = document.getElementById("thread");
       if (activeId === "roast") {
         thread.innerHTML = roastPhase !== "idle" ? roastThreadHtml(pending) : "";
+        requestAnimationFrame(fitMsgTags);
         return;
       }
       if (!activeId || !phase[activeId] || phase[activeId] === "idle") {
@@ -4372,6 +4379,26 @@ const roastPhotos = {green: "data:image/jpeg;base64,/9j/4QCARXhpZgAASUkqAAgAAAAF
       }
       const body = activeId === "recovery" ? rfBody() : pptConv() ? hpBody() : pending ? "" : demoBody(activeId);
       thread.innerHTML = `<div class="messages-inner"><div class="msg user">${esc(sentText[activeId] || "")}${msgFilesHtml(sentFiles[activeId])}</div>${body}${annoThreadHtml(activeId)}</div>`;
+      requestAnimationFrame(fitMsgTags);
+    }
+    function fitMsgTags() {
+      document.querySelectorAll("[data-msg-tags]").forEach(row => {
+        row.querySelectorAll(".msg-tag.is-more").forEach(node => node.remove());
+        const tags = [...row.querySelectorAll(".msg-tag")];
+        tags.forEach(tag => { tag.hidden = false; });
+        if (!tags.length || row.scrollWidth <= row.clientWidth + 1) return;
+        const chip = document.createElement("span");
+        chip.className = "msg-tag is-more";
+        row.appendChild(chip);
+        let hidden = 0;
+        for (let i = tags.length - 1; i >= 0; i -= 1) {
+          tags[i].hidden = true;
+          hidden += 1;
+          chip.textContent = "+" + hidden;
+          if (row.scrollWidth <= row.clientWidth + 1) break;
+        }
+        if (!hidden) chip.remove();
+      });
     }
     function selectConv(id) {
       const demo = demoById(id);
@@ -4810,16 +4837,17 @@ const roastPhotos = {green: "data:image/jpeg;base64,/9j/4QCARXhpZgAASUkqAAgAAAAF
         const quotes = (item.quotes || []).map(quote => `<div class="msg-quote" title="${esc(quote.full)}"><span>${esc(quote.short)}</span></div>`).join("");
         const tags = item.tags || [];
         const quoteBlock = tags.length
-          ? `<div class="msg-tags">${tags.map(tag => `<span class="msg-tag" title="${esc(tag.page)}">${tag.index ? `<b>${tag.index}</b>` : ""}<span>${esc(tag.page)}</span></span>`).join("")}</div>`
+          ? `<div class="msg-tags" data-msg-tags>${tags.map(tag => `<span class="msg-tag" title="${esc(tag.page)}">${tag.index ? `<b>${tag.index}</b>` : ""}<span>${esc(tag.page)}</span></span>`).join("")}</div>`
           : quotes ? `<div class="msg-quotes">${quotes}</div>` : "";
-        const numbered = tags.map(tag => `${tag.index}. ${tag.note || "未填写"}`).join("\n");
-        const noteBody = !tags.length
-          ? (item.text || "")
-          : tags.length === 1
-            ? [tags[0].note, item.extra].filter(Boolean).join("\n")
-            : [numbered, item.extra].filter(Boolean).join("\n");
-        const note = noteBody ? `<div class="msg-note">${esc(noteBody)}</div>` : "";
-        return `<div class="msg user has-quote">${quoteBlock}${note}${msgFilesHtml(item.files)}</div>`;
+        const listItems = tags.map(tag => `<li>${esc(tag.note || "未填写")}</li>`);
+        if (item.extra) listItems.push(`<li>${esc(item.extra)}</li>`);
+        const note = tags.length
+          ? `<ol class="msg-anno-list">${listItems.join("")}</ol>`
+          : item.text ? `<div class="msg-note">${esc(item.text)}</div>` : "";
+        const files = msgFilesHtml(item.files);
+        return tags.length
+          ? `<div class="msg-user-block">${quoteBlock}<div class="msg user">${note}${files}</div></div>`
+          : `<div class="msg user has-quote">${quoteBlock}${note}${files}</div>`;
       }).join("");
     }
     function paintAnnoRevision() {
@@ -5696,6 +5724,7 @@ const roastPhotos = {green: "data:image/jpeg;base64,/9j/4QCARXhpZgAASUkqAAgAAAAF
       placeAnnoPop();
       placeAnnoBatch();
       hpSyncNotesWidth();
+      fitMsgTags();
     });
     document.getElementById("doc").addEventListener("scroll", () => {
       if (!annotateOn) return;
