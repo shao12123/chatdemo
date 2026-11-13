@@ -4824,7 +4824,7 @@ const roastPhotos = {green: "data:image/jpeg;base64,/9j/4QCARXhpZgAASUkqAAgAAAAF
       const queue = annoQueue();
       const storeList = annoQueueOpen ? `<div class="anno-store-list">${queue.map((item, index) => {
         const body = item.text || "";
-        return `<div class="anno-store-item" data-anno-jump="${item.id}"><span class="n">${item.no || index + 1}</span><span class="req">${esc(body)}</span><span class="ops"><button class="edit" type="button" data-anno-queue-edit="${item.id}" aria-label="编辑"><svg viewBox="0 0 1024 1024" aria-hidden="true"><path fill="currentColor" d="M917.333333 853.333333a42.666667 42.666667 0 0 1 0 85.333334h-768a42.666667 42.666667 0 1 1 0-85.333334h768zM615.808 128a85.376 85.376 0 0 1 120.746667 0L832 223.573333a85.333333 85.333333 0 0 1 0 120.661334l-398.592 398.762666A85.333333 85.333333 0 0 1 373.077333 768H277.333333a85.333333 85.333333 0 0 1-85.333333-85.333333v-95.018667a85.333333 85.333333 0 0 1 24.96-60.288L615.808 128zM277.333333 587.690667V682.666667h95.744l398.592-398.762667-95.488-95.573333-398.848 399.36z"/></svg></button><button class="del" type="button" data-anno-queue-remove="${item.id}" aria-label="删除">${annoIcon.del}</button></span></div>`;
+        return `<div class="anno-store-item" data-anno-jump="${item.id}"><span class="n" data-anno-locate="${item.id}" title="定位" aria-label="定位">${item.no || index + 1}</span><span class="req">${esc(body)}</span><span class="ops"><button class="edit" type="button" data-anno-queue-edit="${item.id}" aria-label="编辑"><svg viewBox="0 0 1024 1024" aria-hidden="true"><path fill="currentColor" d="M917.333333 853.333333a42.666667 42.666667 0 0 1 0 85.333334h-768a42.666667 42.666667 0 1 1 0-85.333334h768zM615.808 128a85.376 85.376 0 0 1 120.746667 0L832 223.573333a85.333333 85.333333 0 0 1 0 120.661334l-398.592 398.762666A85.333333 85.333333 0 0 1 373.077333 768H277.333333a85.333333 85.333333 0 0 1-85.333333-85.333333v-95.018667a85.333333 85.333333 0 0 1 24.96-60.288L615.808 128zM277.333333 587.690667V682.666667h95.744l398.592-398.762667-95.488-95.573333-398.848 399.36z"/></svg></button><button class="del" type="button" data-anno-queue-remove="${item.id}" aria-label="删除">${annoIcon.del}</button></span></div>`;
       }).join("")}</div>` : "";
       const store = queue.length && annoPageMode()
         ? `<div class="anno-store">${storeList}<div class="anno-batch"><button class="anno-batch-main${annoQueueOpen ? " is-open" : ""}" type="button" data-anno-queue-toggle aria-expanded="${annoQueueOpen ? "true" : "false"}" aria-label="${annoQueueOpen ? "收起标注" : "展开标注"}"><span class="chev"><svg viewBox="0 0 14 14" aria-hidden="true"><path d="M3.5 5.25 7 8.75l3.5-3.5" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span>${queue.length}个标注，发送后修改</span></button><button class="anno-mini" type="button" data-send-queued aria-label="发送全部标注">${annoIcon.up}</button></div></div>`
@@ -4903,12 +4903,17 @@ const roastPhotos = {green: "data:image/jpeg;base64,/9j/4QCARXhpZgAASUkqAAgAAAAF
       }));
       layer.querySelectorAll("[data-anno-jump]").forEach(row => row.addEventListener("click", event => {
         if (event.target.closest("[data-anno-queue-remove], [data-anno-queue-edit]")) return;
-        const item = annoQueue().find(entry => entry.id === +row.dataset.annoJump);
-        if (!item) return;
-        annoFrontId = item.markId;
-        annoCollapsed = true;
-        if (item.slide != null && pptConv() && item.slide !== annoSlideIndex()) hpSelectSlide(item.slide);
-        else renderAnno();
+        const id = +row.dataset.annoJump;
+        if (event.target.closest("[data-anno-locate]")) {
+          const item = annoQueue().find(entry => entry.id === id);
+          if (!item) return;
+          annoFrontId = item.markId;
+          annoCollapsed = true;
+          if (item.slide != null && pptConv() && item.slide !== annoSlideIndex()) hpSelectSlide(item.slide);
+          else renderAnno();
+          return;
+        }
+        editQueuedAnno(id);
       }));
       layer.querySelectorAll(".anno-index").forEach(badge => badge.addEventListener("mousedown", event => {
         if (!annotateOn) return;
@@ -5483,7 +5488,7 @@ const roastPhotos = {green: "data:image/jpeg;base64,/9j/4QCARXhpZgAASUkqAAgAAAAF
         { id: "s16", group: "scene", title: "删掉队列中间的一条", body: "【前置】队列里有多条标注，删掉中间的一条。\n【期望】这一条从队列和页面上一起去掉。后面的序号按当前位置重算。\n【验收】被删的标注不再显示。剩下的序号连续，数字会往前移。\n【当前】演示已按这个处理。" },
         { id: "s17", group: "scene", title: "旧版本上标注", body: "【前置】打开一份已经生成完的旧版本。\n【期望】在旧版上标注并发送，相当于在旧版上做了修改，生成一个新版。修改后窗口上展示的是新版。\n【验收】旧版留在历史里。当前窗口换成新版，不另开窗口。\n【当前】演示已按这个处理。" },
         { id: "s18", group: "scene", title: "发送标注修改后暂停修改", body: "【前置】标注已经发送，修改正在进行。\n【期望】暂停修改后，不另开版本。已发送的标注不留在 PPT 预览里。\n【验收】暂停后，预览页、缩略图和队列里都没有这些序号。对话里仍能看到已发送的标注标签。\n【当前】演示已按这个处理。暂停后预览里不再保留标注，不另开版本。" },
-        { id: "s19", group: "scene", title: "序号很密，或贴着预览图边缘", body: "【前置】页面上有多条标注，序号靠得很近，或贴着预览图的上边、左边。\n【期望】靠得太近的序号会互相盖住。预览图里靠近上边或左边的序号，会被裁掉一截。悬停序号，或在队列里点击定位到某一条时，这一条的序号会露到最前面。\n【验收】悬停或从队列定位时，对应序号在最前面。贴着上边或左边的序号仍会被裁掉一截。\n【当前】演示已按这个处理。" },
+        { id: "s19", group: "scene", title: "序号很密，或贴着预览图边缘", body: "【前置】页面上有多条标注，序号靠得很近，或贴着预览图的上边、左边。\n【期望】靠得太近的序号会互相盖住。预览图里靠近上边或左边的序号，会被裁掉一截。悬停序号，或在队列里点击序号定位到某一条时，这一条的序号会露到最前面。点队列里的文字会打开这条标注来编辑。\n【验收】悬停或从队列点击序号定位时，对应序号在最前面。点文字会进入编辑。贴着上边或左边的序号仍会被裁掉一截。\n【当前】演示已按这个处理。" },
         { id: "s20", group: "scene", status: "待开发确认方案", title: "前后两个标注框选修改同一个内容", body: "【前置】前后两个标注框选的是同一个内容，并一起发送。\n【期望】发送需求后，按照标签顺序执行修改。\n【验收】多条标注一次发出后，修改按标注序号依次进行。\n【当前】待确认：发送多个标注修改后，AI 是否会按照标注顺序一次执行修改需求。" },
         { id: "s21", group: "scene", title: "多标注修改-修改失败", body: "【前置】PPT 已生成结束，一次发送了多条标注修改，结果全部失败。\n【期望】不生成新版本，窗口仍停在当前版本。标注功能不退出。失败的标注不留在 PPT 预览里。对话说明这次修改失败，并提供重新生成。\n【验收】预览页和缩略图上不再有这些序号，队列里也没有。重新生成不会把失败标注画回预览，也不会另开版本。\n【当前】演示已按这个处理。对话写明修改失败、原文件还在，下面左侧是描边的重新生成。" },
         { id: "s22", group: "scene", title: "部分标注生成失败", body: "【前置】一次发送了多条标注修改，其中一部分生成成功，一部分失败。\n【期望】不另开版本，窗口仍停在当前版本。成功的标注和失败的标注都不留在 PPT 预览里。对话说明哪些标注失败，并提供重新生成。\n【验收】预览页和缩略图上不再有失败标注的序号，队列里也没有。对话里仍能看到失败的标注标签。重新生成不会把失败标注画回预览，也不会另开版本。\n【当前】演示已按这个处理。对话先写失败说明，中间是失败的标注标签，下面左侧是描边的重新生成。" }
