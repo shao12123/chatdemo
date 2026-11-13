@@ -13,6 +13,13 @@
       "file": "高频主题汇总.html",
       "owner": "共同维护",
       "summary": "MoreAI 推送卡片统一规范 · 高频主题汇总等 7 条推送 · 消息目录 · 说明模式"
+    },
+    {
+      "id": "chat-info-card",
+      "title": "Chat信息展示卡片",
+      "file": "Chat信息展示卡片.html",
+      "owner": "张宏尧",
+      "summary": "PPT 标注修改：多标注发送、失败与部分失败、暂停后预览不保留标注"
     }
   ]
 }
