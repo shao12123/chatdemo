@@ -55,6 +55,7 @@
   <header class="bar">
     <h1>行程对比回复 UI 改版 PRD</h1>
     <a class="btn-primary" href="三个路线方案.html" target="_blank" rel="noopener">打开交互 Demo ↗</a>
+    <button class="btn-ghost" type="button" id="downloadDemo">下载 Demo.html</button>
     <button class="btn-ghost" type="button" id="downloadTool">下载 TOOL.md</button>
     <button class="btn-ghost" type="button" id="copyTool">复制 TOOL</button>
     <button class="btn-ghost" type="button" id="copyMd">复制 PRD Markdown</button>
@@ -1007,6 +1008,30 @@ This tool only declares that this turn’s itinerary should use Intelligent UI. 
     });
     document.getElementById("copyTool").addEventListener("click", () => {
       copyText(toolSource, "已复制 TOOL，可直接贴进 Agent");
+    });
+    document.getElementById("downloadDemo").addEventListener("click", async () => {
+      const name = "三个路线方案.html";
+      try {
+        const res = await fetch(name);
+        if (!res.ok) throw new Error(String(res.status));
+        const blob = await res.blob();
+        const link = document.createElement("a");
+        link.href = URL.createObjectURL(blob);
+        link.download = name;
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+        setTimeout(() => URL.revokeObjectURL(link.href), 2000);
+        notify("已开始下载 Demo.html");
+      } catch (e) {
+        const link = document.createElement("a");
+        link.href = name;
+        link.download = name;
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+        notify("已尝试下载 Demo.html");
+      }
     });
     const links = [...document.querySelectorAll("nav.toc a")];
     const heads = links.map(a => document.getElementById(a.getAttribute("href").slice(1)));

@@ -27,7 +27,7 @@
       "title": "行程对比方案",
       "file": "三个路线方案-PRD.html",
       "owner": "共同维护",
-      "summary": "PRD + Agent TOOL（可下载 TOOL.md）：行程规划触发判定、边界清单、正反例；前端职责、数据契约、验收；可打开交互 Demo"
+      "summary": "PRD + Agent TOOL（可下载 Demo.html / TOOL.md / PRD.md）：行程规划触发判定与边界清单；前端职责、数据契约、验收；可打开交互 Demo"
     },
     {
       "id": "gen-fault",
@@ -49,6 +49,13 @@
       "file": "映射对照场景.html",
       "owner": "张宏尧",
       "summary": "中英词句对照：悬停两边一起高亮，复制成功按钮变对勾 2 秒，复制失败场景弹出错误提示"
+    },
+    {
+      "id": "code-review-brief",
+      "title": "大模型代码评审",
+      "file": "大模型代码评审.html",
+      "owner": "共同维护",
+      "summary": "论文总结报告卡 · 按章节对原文 · Chat 内结构化摘要"
     }
   ]
 }

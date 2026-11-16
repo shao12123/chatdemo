@@ -1,5 +1,5 @@
 {
-  "version": "2026.11.16-71",
-  "updatedAt": "2026-11-16 17:35",
-  "note": "行程对比 PRD 页可下载/复制 TOOL.md；触发边界 v0.5"
+  "version": "2026.11.16-73",
+  "updatedAt": "2026-11-16 17:56",
+  "note": "行程对比 PRD 顶栏增加下载 Demo.html"
 }
