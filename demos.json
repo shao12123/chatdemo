@@ -37,6 +37,13 @@
       "summary": "PRD：异常分级与恢复规则、全站错误卡片、断线续传事件与接口、前后端职责与验收；顶部可打开交互 Demo（12 个场景 + 故障模拟面板），可复制 Markdown 给 AGENT"
     },
     {
+      "id": "doc-summary",
+      "title": "文档分析与总结",
+      "file": "文档分析与总结-PRD.html",
+      "owner": "共同维护",
+      "summary": "PRD：总结壳族与模块闸门、信号映射、数据契约与验收；顶部可打开交互 Demo（8 个 case），可复制 Markdown 给 AGENT"
+    },
+    {
       "id": "ai-face",
       "title": "AI形象优化",
       "file": "AI形象优化.html",
