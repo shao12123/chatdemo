@@ -806,7 +806,7 @@
     .wx {
       align-self: flex-start;
       width: max-content;
-      max-width: 100%;
+      max-width: min(436px, 100%);
       --day: 40px;
       border-radius: 12px;
       padding: 18px 18px 14px;
@@ -815,6 +815,7 @@
       font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "PingFang SC", "Hiragino Sans GB", var(--font);
       -webkit-font-smoothing: antialiased;
     }
+    .wx:has(.wx-scroll.is-more) { padding-bottom: 8px; }
     .wx-sun {
       background:
         radial-gradient(130% 70% at 50% -24%, rgba(255,255,255,.5), transparent 56%),
@@ -894,10 +895,10 @@
       height: var(--day, 40px);
       align-items: flex-end;
       justify-content: center;
-      padding-bottom: 8px;
+      padding-bottom: 0;
       color: #fff;
-      font-size: 14px;
-      line-height: 20px;
+      font-size: 12px;
+      line-height: 12px;
       font-weight: 650;
       letter-spacing: .04em;
       pointer-events: none;
@@ -911,7 +912,8 @@
     .wx-fog .wx-more { color: #1d1d1f; background: linear-gradient(to bottom, rgba(188, 197, 206, 0) 0%, #bcc5ce 48%); }
     .wx-scroll.is-more .wx-more { display: flex; }
     .ask {
-      width: min(438px, 100%);
+      width: 436px;
+      max-width: 100%;
       margin-top: 12px;
       padding: 16px 8px;
       border: 1px solid #eef0f3;
