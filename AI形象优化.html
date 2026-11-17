@@ -2025,6 +2025,24 @@
       const view = Number.isInteger(win.view) ? win.view : versions.length - 1;
       return versions[view]?.blocks || versions[versions.length - 1]?.blocks || [];
     }
+    function formatDocMemory(bytes) {
+      const value = Math.max(0, Number(bytes) || 0);
+      if (value >= 1024 * 1024) {
+        const mb = value / (1024 * 1024);
+        return (mb >= 10 ? mb.toFixed(1) : mb.toFixed(2)).replace(/\.0+$/, "").replace(/(\.\d)0$/, "$1") + "MB";
+      }
+      if (value >= 1024) {
+        const kb = value / 1024;
+        return (kb >= 10 ? kb.toFixed(1) : kb.toFixed(2)).replace(/\.0+$/, "").replace(/(\.\d)0$/, "$1") + "KB";
+      }
+      return value + "B";
+    }
+    function docMemory(win) {
+      const text = win?.draftHtml
+        ? String(win.draftHtml).replace(/<[^>]*>/g, "")
+        : artifactBlocks(win).map(block => String(block.text || "").trim()).filter(Boolean).join("\n\n");
+      return formatDocMemory(new TextEncoder().encode(text).length);
+    }
     function downloadArtifact(session, winId) {
       const win = (session.windows || []).find(item => item.id === winId);
       if (!win || win.mode === "compare") return;
@@ -2379,7 +2397,7 @@
           const thumb = `<span class="cmp-thumb" aria-hidden="true"><span class="sheet"><i></i><i></i><i></i></span><span class="sheet alt"><i></i><i></i><i></i></span></span>`;
           return `<button class="artifact cmp${on ? " on" : ""}" type="button" data-artifact="${esc(m.winId)}">${thumb}<span class="artifact-copy"><b>${esc(m.name)}</b><small class="${writing ? "live" : ""}">${esc(status)}</small></span></button>`;
         }
-        const status = writing ? "编写中" : "可编辑";
+        const status = writing ? "编写中" : docMemory(win);
         const mark = `<span class="artifact-mark" aria-hidden="true"><img src="doc-icon.svg" width="16" height="16" alt=""></span>`;
         const down = `<img src="artifact-download.svg" width="14" height="14" alt="">`;
         return `<div class="artifact${on ? " on" : ""}"><button class="artifact-open" type="button" data-artifact="${esc(m.winId)}">${mark}<span class="artifact-copy"><b>${esc(m.name)}</b><small class="${writing ? "live" : ""}">${esc(status)}</small></span></button><span class="artifact-actions"><button type="button" data-artifact-download="${esc(m.winId)}" data-tip="下载" aria-label="下载">${down}</button></span></div>`;
