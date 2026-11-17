@@ -409,6 +409,7 @@
 
     .composer {
       position: relative;
+      z-index: 5;
       margin-top: 0;
       margin-bottom: 16px;
       flex: none;
@@ -423,6 +424,7 @@
       border-radius: 20px;
       box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
     }
+    .composer:focus-within { border-color: var(--brand); }
     .composer-files {
       position: relative;
       flex: 1 0 100%;
@@ -540,19 +542,22 @@
     .msg-files { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
     .msg-files .composer-chip-x { display: none; }
     .composer-file-input, .anno-file-input { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); border: 0; }
-    .composer input {
+    .composer textarea {
       flex: 1;
       min-width: 0;
       height: 22px;
+      min-height: 22px;
+      max-height: 88px;
       margin: 0;
       padding: 0 8px;
       border: 0;
+      resize: none;
       outline: none;
       background: transparent;
       color: var(--ink);
       font: 400 14px/22px var(--font);
     }
-    .composer input::placeholder { color: var(--placeholder); }
+    .composer textarea::placeholder { color: var(--placeholder); }
     .composer-tools {
       height: 32px;
       display: flex;
@@ -593,7 +598,9 @@
       align-items: center;
       justify-content: center;
     }
-    .send:disabled { opacity: 0.5; cursor: default; }
+    .send:hover:not(:disabled):not(.is-stop) { background: #1e61ea; }
+    .send:active:not(:disabled):not(.is-stop) { background: #0e4ed9; }
+    .send:disabled { opacity: 0.5; cursor: default; pointer-events: none; }
     .send img { width: 16px; height: 16px; }
     .send .send-stop { display: none; width: 12px; height: 12px; }
     .send.is-stop .send-arrow { display: none; }
@@ -628,7 +635,10 @@
       .avatar { bottom: 10px; }
     }
 
-    .messages-inner { display: flex; flex-direction: column; gap: 8px; }
+    .messages-inner { display: flex; flex-direction: column; gap: 12px; }
+    .messages-inner > .msg.user + .moreai-turn,
+    .messages-inner > .msg-user-block + .moreai-turn { margin-top: 8px !important; }
+    .messages-inner > .hp-think-turn + .moreai-turn { margin-top: -4px !important; }
     .msg { max-width: 86%; font-size: 14px; line-height: 22px; }
     .msg.user { align-self: flex-end; background: #eef2ff; color: var(--ink); border-radius: 8px; padding: 10px 14px; }
     .lead { margin: 8px 0 0; max-width: none; font-size: 15px; line-height: 24px; }
@@ -1718,7 +1728,7 @@
               <div class="composer-file-row" id="composerFileRow"></div>
               <button class="composer-file-nav next" type="button" data-composer-scroll="1" hidden aria-label="向右"><svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M5.2 3.2 9 7l-3.8 3.8" stroke="#1f2329" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
             </div>
-            <input id="prompt" type="text" placeholder="有什么想问的" aria-label="有什么想问的" />
+            <textarea id="prompt" rows="1" placeholder="有什么想问的" aria-label="有什么想问的"></textarea>
             <div class="composer-tools">
               <span class="upload-host" id="composerUpload">
               <button class="add" type="button" aria-label="上传文件">
@@ -1987,6 +1997,12 @@
       if (stop) stop.hidden = true;
       const queued = annoQueue().length;
       send.disabled = !canSend() || (!prompt.value.trim() && !composerFiles.length && !queued);
+      growPrompt();
+    }
+    function growPrompt() {
+      if (!prompt || prompt.tagName !== "TEXTAREA") return;
+      prompt.style.height = "22px";
+      prompt.style.height = Math.min(prompt.scrollHeight, 88) + "px";
     }
     function formatUploadSize(bytes) {
       const value = Number(bytes) || 0;
@@ -4750,6 +4766,11 @@ const roastPhotos = {green: "data:image/jpeg;base64,/9j/4QCARXhpZgAASUkqAAgAAAAF
       selectConv(btn.dataset.conv);
     });
     prompt.addEventListener("input", syncSend);
+    prompt.addEventListener("keydown", event => {
+      if (event.key !== "Enter" || event.shiftKey || event.isComposing) return;
+      event.preventDefault();
+      if (!send.disabled) send.click();
+    });
     function resumePausedAnno() {
       const item = annoPauseEntry();
       if (!item || item.retrying) return;
