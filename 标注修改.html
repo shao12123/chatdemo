@@ -6,7 +6,7 @@
   <title>标注修改</title>
   <style>
     :root {
-      --page: #f6f7fb;
+      --page: #eef0f3;
       --card: #ffffff;
       --card-line: #e3e4e7;
       --ink: #000000;
@@ -35,24 +35,29 @@
       --spin-mask: url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20viewBox%3D%270%200%2024%2024%27%3E%3Cpath%20fill%3D%27black%27%20d%3D%27M21%2012C21%209.75717%2020.1622%207.59512%2018.6514%205.93748C17.1407%204.2801%2015.0659%203.24661%2012.833%203.03904C10.6%202.83157%208.36937%203.46464%206.57912%204.81541C4.78887%206.16631%203.56754%208.13742%203.15432%2010.3418C2.74112%2012.5462%203.16525%2014.8258%204.34475%2016.7334C5.52418%2018.6408%207.37375%2020.0389%209.53029%2020.6543C11.687%2021.2696%2013.9964%2021.0575%2016.0049%2020.0596C18.0132%2019.0616%2019.5764%2017.35%2020.3887%2015.2597C20.5887%2014.745%2021.1688%2014.4894%2021.6836%2014.6894C22.1982%2014.8895%2022.4528%2015.4687%2022.253%2015.9834C21.2602%2018.5385%2019.3494%2020.6308%2016.8946%2021.8506C14.4397%2023.0703%2011.6175%2023.3302%208.98147%2022.5781C6.34573%2021.826%204.08612%2020.1164%202.64455%2017.7851C1.20295%2015.4537%200.683524%2012.6679%201.1885%209.97361C1.69349%207.27945%203.18608%204.87084%205.37404%203.21971C7.56216%201.56858%2010.2882%200.793284%2013.0176%201.04686C15.7471%201.30045%2018.2834%202.5648%2020.1299%204.5908C21.9763%206.61678%2023%209.25886%2023%2012C23%2012.5523%2022.5523%2013%2022%2013C21.4477%2013%2021%2012.5523%2021%2012Z%27%2F%3E%3C%2Fsvg%3E") center / contain no-repeat;
     }
     html.theme-dark {
-      --page: #0f1012;
+      color-scheme: dark;
+      --page: #090b0e;
       --card: #111216;
       --card-line: #292b2e;
       --ink: #ffffff;
       --ink-2: rgba(255, 255, 255, .6);
       --ink-3: rgba(255, 255, 255, .4);
       --ink-4: rgba(255, 255, 255, .2);
+      --secondary: var(--ink-2);
+      --label: var(--ink-3);
+      --placeholder: var(--ink-3);
       --brand: #317af7;
-      --brand-soft: #1a2338;
+      --brand-soft: #0a1831;
+      --send: #317af7;
       --muted-card: #191a1d;
       --err-card: #191a1d;
       --err-text: #ffffff;
       --err-text-2: rgba(255, 255, 255, .6);
       --err-x-hover: rgba(255, 255, 255, .08);
-      --chip: rgba(255, 255, 255, 0.06);
-      --chip-line: #434448;
-      --file-on: #1a2a4a;
-      --avatar: #243456;
+      --chip: rgba(255, 255, 255, .06);
+      --chip-line: #292b2e;
+      --file-on: #0a1831;
+      --avatar: #0f254a;
     }
 
     * { box-sizing: border-box; }
@@ -1460,9 +1465,14 @@
     .demo-version a { color: var(--brand); text-decoration: none; margin-left: 8px; }
     .demo-version a:hover { text-decoration: underline; }
     .theme-switch { display: inline-flex; align-items: center; background: #f2f4f7; border-radius: 8px; padding: 3px; }
-    html.theme-dark .theme-switch { background: #292b2e; }
     .theme-switch button { padding: 4px 10px; border-radius: 6px; font-size: 12px; color: var(--ink-2); line-height: 18px; }
     .theme-switch button[aria-pressed=true] { background: var(--card); color: var(--brand); box-shadow: 0 1px 3px rgba(24, 36, 62, .12); font-weight: 600; }
+    html.theme-dark .theme-switch,
+    html.theme-dark .rev-mode { background: #191a1d; }
+    html.theme-dark .theme-switch button,
+    html.theme-dark .rev-mode button { color: var(--ink-2); }
+    html.theme-dark .theme-switch button[aria-pressed=true],
+    html.theme-dark .rev-mode button[aria-pressed=true] { background: #292b2e; color: var(--brand); box-shadow: none; }
     .hover-tip { position: fixed; z-index: 90; display: none; max-width: 220px; padding: 2px 12px; border: 1px solid #e3e4e7; border-radius: 8px; background: #fff; color: #000; font-size: 12px; line-height: 20px; box-shadow: 0 2px 2px rgba(0, 0, 0, .02), 0 4px 8px rgba(0, 0, 0, .08); pointer-events: none; white-space: nowrap; }
     .hover-tip.show { display: block; }
     html.theme-dark .hover-tip { background: #191a1d; border-color: #434448; color: var(--ink); }
@@ -1547,8 +1557,8 @@
     html.theme-dark .exec-bar,
     html.theme-dark .exec-item { color: var(--ink-3); }
     html.theme-dark .exec { background: var(--card); border-color: var(--card-line); }
-    html.theme-dark .exec-list { background: #1c1d21; }
-    html.theme-dark .exec-item:not(:last-child)::before { background: #3a3c40; }
+    html.theme-dark .exec-list { background: #191a1d; }
+    html.theme-dark .exec-item:not(:last-child)::before { background: #434448; }
     .hp-think-turn { width: 100%; max-width: 100%; align-items: stretch; gap: 8px; margin: 0; }
     .hp-think-turn .hp-thinking { width: 100%; margin-top: 0; }
     .hp-think-turn .hp-thought-body { margin-top: 8px; }
@@ -1611,13 +1621,98 @@
     .msg.user.qnav-flash, [data-qnav-anchor].qnav-flash { animation: qnav-flash 1s ease; }
 
 
+    html.theme-dark .rail { background: #111216; }
+    html.theme-dark .rail img,
+    html.theme-dark .icon-btn img,
+    html.theme-dark .strip-btn img,
+    html.theme-dark .hist-fold img,
+    html.theme-dark .new-chat img,
+    html.theme-dark .more img,
+    html.theme-dark .add img,
+    html.theme-dark .doc-tab img,
+    html.theme-dark .tool img { filter: invert(.86) hue-rotate(180deg); }
+    html.theme-dark .rev-toolbar,
+    html.theme-dark .rev-panel,
+    html.theme-dark .plan-doc { background: var(--card); color: var(--ink); border-color: var(--card-line); }
+    html.theme-dark .rev-toolbar { border-bottom-color: #292b2e; }
+    html.theme-dark .rev-toolbar-title span,
+    html.theme-dark .rev-panel-sub,
+    html.theme-dark .rev-body { color: var(--ink-3); }
+    html.theme-dark .rev-panel-head,
+    html.theme-dark .rev-tabs { border-color: #292b2e; }
+    html.theme-dark .rev-panel-head h2,
+    html.theme-dark .rev-item-heading strong,
+    html.theme-dark .chat-head h2 { color: var(--ink); }
+    html.theme-dark .rev-export,
+    html.theme-dark .rev-input,
+    html.theme-dark .rev-textarea,
+    html.theme-dark .rev-backup-box textarea { background: #191a1d; color: var(--ink); border-color: #434448; }
+    html.theme-dark .rev-close:hover,
+    html.theme-dark .hist-fold:hover,
+    html.theme-dark .new-chat:hover,
+    html.theme-dark .conv:hover,
+    html.theme-dark .msg-act:hover,
+    html.theme-dark .icon-btn:hover,
+    html.theme-dark .tool:hover { background: #292b2e; color: var(--ink); }
+    html.theme-dark .conv.current,
+    html.theme-dark .conv.current:hover { background: var(--brand-soft); color: var(--brand); }
+    html.theme-dark .composer,
+    html.theme-dark .hist-pop,
+    html.theme-dark .plus-menu,
+    html.theme-dark .upload-tip,
+    html.theme-dark .toast,
+    html.theme-dark .anno-store-list { background: #191a1d; border-color: #434448; color: var(--ink); box-shadow: none; }
+    html.theme-dark .composer textarea,
+    html.theme-dark .anno-store-item .req { color: var(--ink); }
+    html.theme-dark .add:hover:not(:disabled),
+    html.theme-dark .add.open,
+    html.theme-dark .plus-menu button:hover { background: rgba(255, 255, 255, .08); color: var(--ink); }
+    html.theme-dark .msg.user,
+    html.theme-dark .msg-user-block .msg.user { background: #0a1831; color: #fff; }
+    html.theme-dark .ppt-card,
+    html.theme-dark .artifact,
+    html.theme-dark .day,
+    html.theme-dark .composer-chip { background: var(--card); border-color: var(--card-line); color: var(--ink); }
+    html.theme-dark .ppt-card:hover,
+    html.theme-dark .artifact:hover { background: #292b2e; }
+    html.theme-dark .ppt-file-copy small,
+    html.theme-dark .artifact-copy small { color: var(--ink-3); }
+    html.theme-dark .doc-tab,
+    html.theme-dark .doc-tab.is-active { background: rgba(255, 255, 255, .06); color: var(--ink); }
+    html.theme-dark .tool { color: var(--ink-2); }
+    html.theme-dark #docEdit.is-active,
+    html.theme-dark #docEdit.is-active:hover { background: var(--brand-soft); color: var(--brand); }
+    html.theme-dark .doc-body,
+    html.theme-dark .hp-editor.oo-app,
+    html.theme-dark .oo-main,
+    html.theme-dark .oo-app .hp-canvas,
+    html.theme-dark .oo-app .hp-film { background: var(--card); color: var(--ink); border-color: var(--card-line); }
+    html.theme-dark .oo-app .hp-notes,
+    html.theme-dark .hp-notes-resize { background: #191a1d; border-color: #292b2e; color: var(--ink-2); }
+    html.theme-dark .hp-notes-body,
+    html.theme-dark .hp-notes-input { color: var(--ink-2); }
+    html.theme-dark .hp-notes-input::placeholder { color: var(--ink-3); }
+    html.theme-dark .oo-app .hp-film button > span:first-child { color: var(--ink-2); }
+    html.theme-dark .oo-app .hp-film button[aria-current=page] > span:first-child { color: var(--brand); }
+    html.theme-dark .oo-app .hp-film button[aria-current=page] .hp-film-image { border-color: var(--brand); }
+    html.theme-dark .qnav-card { background: #191a1d; border-color: #434448; }
+    html.theme-dark .qnav-row { color: var(--ink-2); }
+    html.theme-dark .qnav-row.is-peek { background: #292b2e; }
+    html.theme-dark .qnav-row:hover,
+    html.theme-dark .qnav-row.is-current { color: var(--ink); }
+    html.theme-dark .qnav-rail i,
+    html.theme-dark .qnav-dash { background: #434448; }
+    html.theme-dark .qnav-rail i.is-current,
+    html.theme-dark .qnav-row.is-current .qnav-dash,
+    html.theme-dark .qnav-row:hover .qnav-dash { background: var(--ink); }
+    html.theme-dark .ai-face-orb g { filter: url(#ai-blob-shade-dark); }
     .net-card { border: 0 !important; box-shadow: none; }
     .anno-retry-row, .anno-retry { display: none !important; }
 
   </style>
 </head>
 <body>
-  <svg class="ai-blob-defs" width="0" height="0" aria-hidden="true"><defs><filter id="ai-blob-shade" x="27.9938" y="36.9991" width="104.012" height="85.0068" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB"><feFlood flood-opacity="0" result="BackgroundImageFix"/><feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape"/><feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/><feOffset/><feGaussianBlur stdDeviation="16"/><feComposite in2="hardAlpha" operator="arithmetic" k2="-1" k3="1"/><feColorMatrix type="matrix" values="0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 1 0"/><feBlend mode="normal" in2="shape" result="effect1_innerShadow_0_4"/><feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/><feOffset/><feGaussianBlur stdDeviation="5.5"/><feComposite in2="hardAlpha" operator="arithmetic" k2="-1" k3="1"/><feColorMatrix type="matrix" values="0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 1 0"/><feBlend mode="normal" in2="effect1_innerShadow_0_4" result="effect2_innerShadow_0_4"/></filter></defs></svg>
+  <svg class="ai-blob-defs" width="0" height="0" aria-hidden="true"><defs><filter id="ai-blob-shade" x="27.9938" y="36.9991" width="104.012" height="85.0068" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB"><feFlood flood-opacity="0" result="BackgroundImageFix"/><feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape"/><feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/><feOffset/><feGaussianBlur stdDeviation="16"/><feComposite in2="hardAlpha" operator="arithmetic" k2="-1" k3="1"/><feColorMatrix type="matrix" values="0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 1 0"/><feBlend mode="normal" in2="shape" result="effect1_innerShadow_0_4"/><feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/><feOffset/><feGaussianBlur stdDeviation="5.5"/><feComposite in2="hardAlpha" operator="arithmetic" k2="-1" k3="1"/><feColorMatrix type="matrix" values="0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 1 0"/><feBlend mode="normal" in2="effect1_innerShadow_0_4" result="effect2_innerShadow_0_4"/></filter><filter id="ai-blob-shade-dark" x="27.9938" y="36.9991" width="104.012" height="85.0068" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB"><feFlood flood-opacity="0" result="BackgroundImageFix"/><feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape"/><feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/><feOffset/><feGaussianBlur stdDeviation="16"/><feComposite in2="hardAlpha" operator="arithmetic" k2="-1" k3="1"/><feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 0"/><feBlend mode="normal" in2="shape" result="effect1_innerShadow_0_4"/><feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/><feOffset/><feGaussianBlur stdDeviation="5.5"/><feComposite in2="hardAlpha" operator="arithmetic" k2="-1" k3="1"/><feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 0"/><feBlend mode="normal" in2="effect1_innerShadow_0_4" result="effect2_innerShadow_0_4"/></filter></defs></svg>
   <header class="rev-toolbar" id="revToolbar" aria-label="演示评审工具栏"><div class="rev-toolbar-title">标注修改 <span>PPT 多标注 · 说明供开发与测试参考</span></div><div class="rev-toolbar-actions"><span class="demo-version" id="demoVersion">版本读取中…</span><div class="theme-switch" id="themeSwitch" role="group" aria-label="浅色深色"><button type="button" data-theme-mode="light" aria-pressed="true">浅色</button><button type="button" data-theme-mode="dark" aria-pressed="false">深色</button></div><div class="rev-mode" role="group" aria-label="切换预览和说明"><button type="button" data-rev-mode="preview" aria-pressed="true">预览</button><button type="button" data-rev-mode="annotation" aria-pressed="false">说明</button></div><button type="button" class="rev-export" id="revExport" hidden>导出 HTML</button></div></header>
   <div class="rev-shell">
   <div class="stage" id="stage">
