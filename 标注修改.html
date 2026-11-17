@@ -623,10 +623,10 @@
       .avatar { bottom: 10px; }
     }
 
-    .messages-inner { display: flex; flex-direction: column; gap: 12px; }
+    .messages-inner { display: flex; flex-direction: column; gap: 8px; }
     .msg { max-width: 86%; font-size: 14px; line-height: 22px; }
     .msg.user { align-self: flex-end; background: #eef2ff; color: var(--ink); border-radius: 8px; padding: 10px 14px; }
-    .lead { margin: 20px 0 0; max-width: 440px; font-size: 15px; line-height: 24px; }
+    .lead { margin: 8px 0 0; max-width: none; font-size: 15px; line-height: 24px; }
     .day { align-self: flex-start; width: min(420px, 100%); border: 1px solid #eceef2; border-radius: 16px; background: #fff; padding: 16px 16px 12px; }
     .day-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin-bottom: 14px; }
     .day-head h3 { margin: 0; color: var(--ink); font-size: 15px; line-height: 24px; font-weight: 650; }
@@ -1163,18 +1163,18 @@
     .digest-thinking{width:min(420px,100%);font-size:13px;line-height:22px;margin-top:8px}
     .digest-thought-toggle{display:flex;align-items:center;gap:7px;color:#858e9c;font-size:13px;line-height:22px}
     .digest-thought-steps{margin:10px 0 0 5px;padding-left:14px;border-left:2px solid #eceef2;color:#858e9c}
-    .digest-thought-steps p{margin:0 0 7px}.digest-thinking .lead{margin-top:12px}
+    .digest-thought-steps p{margin:0 0 7px}.digest-thinking .lead{margin-top:8px}
     .digest-result-link{font-size:13px;line-height:22px;color:var(--brand);margin-top:8px;text-align:left}
     .digest-receipt{width:min(420px,100%);margin-top:8px;font-size:14px;line-height:22px}.digest-receipt p{margin:0}
     .digest-view .dv-explore-banner{padding:16px;background:var(--dv-soft);border:1px solid var(--dv-line);border-radius:10px;margin-bottom:22px}
     .digest-view .dv-explore-banner b{font-size:14px;color:var(--dv-accent)}.digest-view .dv-explore-banner p{font-size:12px;color:var(--dv-muted);line-height:21px;margin:6px 0 10px}
     .digest-explore-card .digest-explore-note{margin-top:12px;font-size:12px}
-    .hp-thinking{width:min(420px,100%);font-size:13px;line-height:22px;margin-top:20px}
+    .hp-thinking{width:min(420px,100%);font-size:13px;line-height:22px;margin-top:0}
     .hp-thought-toggle{display:flex;align-items:center;gap:7px;color:#858e9c;font-size:13px;line-height:22px;text-align:left}.hp-thought-toggle small{font-size:12px}
     .hp-thought-body{border-left:2px solid #eceef2;margin:10px 0 0 5px;padding-left:14px;color:#858e9c}.hp-thought-body p{margin:0 0 7px}
     .hp-roles{margin-top:8px;display:grid;gap:5px}.hp-roles button{font-size:13px;color:var(--ink);font-weight:600}.hp-roles button:hover{text-decoration:underline}.hp-roles span{font-size:12px}
     .hp-size-row{display:flex;align-items:center;gap:10px;padding:8px 0;font-size:14px;line-height:22px;cursor:pointer}.hp-size-row input{accent-color:var(--brand);margin:0}.hp-size-row b{font-weight:500}.hp-size-row span{color:#858e9c;font-size:12px}
-    .hp-size-note,.hp-size-summary{font-size:12px;line-height:20px;color:#858e9c;margin:10px 0 0}
+    .hp-size-note,.hp-size-summary{font-size:12px;line-height:20px;color:#858e9c;margin:8px 0 0}
     .hp-scenarios{border:0;border-top:1px solid #e5e8ec;padding:14px 0 0;margin:14px 0 0;display:grid;grid-template-columns:1fr 1fr;gap:8px 12px}.hp-scenarios legend{font-size:12px;line-height:20px;color:#858e9c;padding-right:8px}.hp-scenarios label{font-size:12px;line-height:20px;display:flex;gap:6px;align-items:center;color:#606977;cursor:pointer}.hp-scenarios input{accent-color:#3370ff;margin:0}.hp-scene-again{font-size:12px;line-height:20px;color:#7b8492;text-align:left;margin-top:8px}.hp-scene-again:hover{color:#3370ff}
     .hp-recovery-card{width:min(420px,100%)}.hp-recovery-card .day-head{gap:10px;flex-wrap:wrap}.hp-recovery-status{display:inline-flex;align-items:center;height:20px;padding:0 8px;border-radius:8px;background:#e5e8ec;color:rgba(0,0,0,.6);font-size:12px;font-weight:400;line-height:20px;white-space:nowrap}.hp-recovery-status.complete{background:#e0f1de;color:#0f8204}.hp-recovery-status.running{background:#dae6fe;color:#3370ff}.hp-recovery-status.failed{background:#fce2de;color:#e84026}.hp-recovery-status.wait{background:#eef1f4;color:#858e9c}.hp-recovery-count{display:block;font-size:14px;font-weight:500;margin-top:3px}.hp-recovery-meter{height:5px;background:#e5e8ec;border-radius:8px;margin:12px 0;overflow:hidden}.hp-recovery-meter i{display:block;height:100%;background:#3370ff;border-radius:8px;transition:width .2s}.hp-recovery-card p{font-size:13px;line-height:22px;color:#858e9c;margin:0}.hp-recovery-details{font-size:12px;line-height:20px;color:#858e9c;margin-top:12px}.hp-recovery-card ul{padding-left:18px;color:#858e9c;font-size:11px;line-height:20px;margin:8px 0 0}
     .artifact.honglou-file{margin-top:4px}
@@ -1451,15 +1451,77 @@
     .hover-tip { position: fixed; z-index: 90; display: none; max-width: 220px; padding: 2px 12px; border: 1px solid #e3e4e7; border-radius: 8px; background: #fff; color: #000; font-size: 12px; line-height: 20px; box-shadow: 0 2px 2px rgba(0, 0, 0, .02), 0 4px 8px rgba(0, 0, 0, .08); pointer-events: none; white-space: nowrap; }
     .hover-tip.show { display: block; }
     html.theme-dark .hover-tip { background: #191a1d; border-color: #434448; color: var(--ink); }
-    .moreai-turn { align-self: stretch; display: flex; flex-direction: column; align-items: flex-start; gap: 8px; width: min(680px, 100%); }
-    .moreai-head { display: flex; align-items: center; gap: 10px; }
-    .moreai-avatar { width: 28px; height: 28px; border-radius: 50%; background: linear-gradient(180deg, #7aa7ff 0%, #0a59f7 100%); box-shadow: inset 0 0 0 1px rgba(255,255,255,.25); flex: none; position: relative; overflow: hidden; }
-    .moreai-avatar::before, .moreai-avatar::after { content: ""; position: absolute; width: 4px; height: 4px; border-radius: 50%; background: #fff; top: 10px; }
-    .moreai-avatar::before { left: 8px; }
-    .moreai-avatar::after { right: 8px; }
-    .moreai-face { position: absolute; left: 9px; bottom: 7px; width: 10px; height: 5px; border: 1.5px solid #fff; border-top: 0; border-radius: 0 0 10px 10px; box-sizing: border-box; }
-    .moreai-meta { display: flex; flex-direction: column; gap: 0; min-width: 0; }
-    .moreai-meta b { color: var(--ink); font-size: 14px; font-weight: 650; line-height: 22px; }
+    html.theme-dark .think-name { color: var(--ink); }
+    .ai-face { position: relative; width: 38.86px; height: 50px; flex: none; pointer-events: none; }
+    .ai-face-rig { position: absolute; inset: 0; transform-origin: 24px 29px; }
+    .ai-face-art { position: absolute; left: 8.83px; top: 9.83px; width: 50.0452px; height: 50.0452px; transform: scale(0.6, 0.6071); transform-origin: top left; }
+    .ai-face-orb { position: absolute; left: 0; top: 0; display: block; }
+    .ai-gaze { position: absolute; left: 13.5px; top: 19.57px; }
+    .ai-face-features { display: block; clip-path: inset(64% 0 0 0); }
+    .ai-blink { position: absolute; left: 0; top: 0; transform-origin: 50% 21.5%; }
+    .ai-face-eyes { display: block; clip-path: inset(0 0 52% 0); }
+    .think-dots { display: inline-flex; align-items: center; gap: 3px; height: 22px; margin-left: 2px; }
+    .think-dots i { width: 4px; height: 4px; border-radius: 50%; background: #8b93a7; animation: think-dot 1.05s infinite ease-in-out; }
+    .think-dots i:nth-child(2) { animation-delay: .16s; }
+    .think-dots i:nth-child(3) { animation-delay: .32s; }
+    @keyframes think-dot { 0%, 70%, 100% { transform: translateY(0); opacity: .28; } 35% { transform: translateY(-3px); opacity: 1; } }
+    .ai-dizzy { visibility: hidden; }
+    .ai-face[data-state="error"] .ai-dizzy { visibility: visible; }
+    .ai-spin { transform-origin: 0 0; animation: ai-spin 2.4s linear infinite; }
+    .ai-spin.back { animation-direction: reverse; }
+    .ai-face[data-state="done"] .ai-face-rig { animation: ai-hop .85s cubic-bezier(.23,1,.32,1); }
+    .ai-face[data-state="error"] .ai-face-rig { animation: ai-wobble 1.05s cubic-bezier(.45,0,.55,1); }
+    @keyframes ai-hop {
+      0% { transform: none; }
+      12% { transform: translateY(2px) scale(1.08, .9); }
+      40% { transform: translateY(-6px) scale(.94, 1.08); }
+      62% { transform: translateY(0) scale(1.04, .96); }
+      82% { transform: translateY(-2px) scale(.99, 1.02); }
+      100% { transform: none; }
+    }
+    @keyframes ai-wobble {
+      0% { transform: none; }
+      16% { transform: translateX(-4px) rotate(-8deg); }
+      32% { transform: translateX(3px) rotate(6deg); }
+      48% { transform: translateX(-2px) rotate(-4deg); }
+      64% { transform: translateX(2px) rotate(2deg); }
+      80% { transform: translateX(-1px) rotate(-1deg); }
+      100% { transform: none; }
+    }
+    @keyframes ai-spin { to { transform: rotate(360deg); } }
+    @media (prefers-reduced-motion: reduce) {
+      .ai-face-rig, .ai-spin, .think-dots i, .think-wait i, .exec-spin, .trace-spin, .think-shine { animation: none; }
+      .think-shine { color: #98a2b3; background: none; }
+      .ai-face-features { transition: none; }
+      .think-dots i { opacity: .7; }
+    }
+
+    .think-head { display: flex; flex-direction: column; align-items: flex-start; gap: 6px; border: 0; background: transparent; padding: 0; text-align: left; cursor: pointer; width: 100%; }
+    .think-row { display: flex; align-items: center; gap: 12px; margin-left: -8px; }
+    .think-name { color: var(--ink); font-size: 15px; line-height: 22px; font-weight: 600; }
+    .think-status { display: flex; align-items: center; gap: 4px; min-height: 20px; color: var(--ink-3); font-size: 13px; line-height: 20px; }
+    .think-status small { color: var(--ink-3); font-size: 13px; line-height: 20px; }
+    .think-chev { flex: none; color: var(--ink-3); display: inline-flex; }
+    .hp-think-turn { width: 100%; max-width: 100%; align-items: stretch; gap: 8px; margin: 0; }
+    .hp-think-turn .hp-thinking { width: 100%; margin-top: 0; }
+    .hp-think-turn .hp-thought-body { margin-top: 8px; }
+    .messages-inner > .moreai-turn,
+    .messages-inner > .net-wrap,
+    .messages-inner > .hp-think-turn { align-self: stretch; width: 100%; max-width: 100%; }
+    .moreai-turn { align-self: stretch; display: flex; flex-direction: column; align-items: stretch; gap: 8px; width: 100%; max-width: 100%; }
+    .net-wrap { align-self: stretch !important; width: 100% !important; max-width: 100% !important; display: flex; flex-direction: column; gap: 8px; }
+    .net-card { width: 100%; box-sizing: border-box; }
+    .messages-inner > .hp-size-summary,
+    .messages-inner > .lead,
+    .messages-inner > .artifact,
+    .messages-inner > .hp-think-turn,
+    .messages-inner > .moreai-turn,
+    .messages-inner > .net-wrap { margin-top: 0 !important; margin-bottom: 0 !important; }
+    .hp-size-summary { margin: 0 !important; }
+    .lead { margin-top: 0 !important; }
+    .hp-thinking { margin-top: 0 !important; }
+    .qnav-card { top: 12px; }
+
     .msg-actions { display: flex; align-items: center; gap: 2px; margin-top: 2px; color: var(--ink-2); }
     .msg-act { width: 28px; height: 28px; border: 0; border-radius: 6px; background: transparent; color: inherit; display: inline-flex; align-items: center; justify-content: center; }
     .msg-act:hover { background: rgba(9, 11, 14, .06); color: var(--ink); }
@@ -1469,7 +1531,7 @@
     .moreai-turn:hover .msg-time, .msg-actions:hover .msg-time { opacity: 1; }
     .stream-caret { display: inline-block; width: 2px; height: 1em; margin-left: 1px; vertical-align: -2px; background: var(--brand); animation: stream-blink 1s steps(1) infinite; }
     @keyframes stream-blink { 50% { opacity: 0; } }
-    .net-wrap { align-self: stretch; width: min(680px, 100%); display: flex; flex-direction: column; gap: 8px; }
+    .net-wrap { align-self: stretch; width: 100%; max-width: 100%; display: flex; flex-direction: column; gap: 8px; }
     .net-card { display: flex; flex-direction: column; gap: 8px; padding: 12px 16px; border: 0; border-radius: 14px; background: var(--err-card); }
     .net-main { margin: 0; display: flex; align-items: flex-start; gap: 8px; color: var(--err-text); font-size: 14px; line-height: 22px; }
     .net-main .msg-tone { flex: none; display: inline-flex; margin-top: 3px; color: var(--err-icon); }
@@ -1502,10 +1564,6 @@
     .msg.user.qnav-flash, [data-qnav-anchor].qnav-flash { animation: qnav-flash 1s ease; }
 
 
-    .hp-think-turn { margin-bottom: 4px; }
-    .hp-think-turn .hp-thinking { width: 100%; }
-    .moreai-head { margin-bottom: 2px; }
-    .net-wrap { align-self: flex-start; }
     .net-card { border: 0 !important; box-shadow: none; }
     .anno-retry-row, .anno-retry { display: none !important; }
 
@@ -3092,7 +3150,11 @@ const roastPhotos = {green: "data:image/jpeg;base64,/9j/4QCARXhpZgAASUkqAAgAAAAF
     function hpThoughtHtml(){
       const labels={paused:'已暂停',choosing:'已整理内容方向',preparing:'正在准备',generating:'正在生成页面',checking:'正在检查页面',assembling:'正在组装 PPTX',partial:'部分页面待重试',error:'组装未完成',done:'已思考'};
       const progress=hp.pages.length&&hp.status!=='done'?`<p>整页图片已生成 ${hpReady()} / ${hp.pages.length} 页${hp.activeJobs?'，'+hp.activeJobs+' 页正在生成':''}。</p>`:'';
-      return `<div class="moreai-turn hp-think-turn">${moreaiHeadHtml()}<section class="hp-thinking" id="hpThought"><button class="hp-thought-toggle" data-hp-thought aria-expanded="${hp.thoughtOpen}"><span aria-hidden="true">${hp.thoughtOpen?'⌄':'›'}</span>${labels[hp.status]||'思考中'}${hp.duration?`<small>· 用时 ${hp.duration}</small>`:''}</button>${hp.thoughtOpen?`<div class="hp-thought-body">${hp.steps.map(x=>`<p>${esc(x)}</p>`).join('')}${progress}${hp.rolesShown?`<button class="hp-thought-toggle" data-hp-roles aria-expanded="${hp.rolesOpen}">${hp.rolesOpen?'⌄':'›'} 参与角色 · ${hp.rolesShown}</button>${hp.rolesOpen?`<div class="hp-roles">${PPT_ROLES.slice(0,hp.rolesShown).map(r=>`<div><button data-hp-open="${r.key}">${r.name}</button><span> · ${r.job}</span></div>`).join('')}</div>`:''}`:''}</div>`:''}</section></div>`;
+      const working=!['done','paused','error','partial'].includes(hp.status);
+      const faceState=hp.status==='error'?'error':(working?'thinking':'idle');
+      const head=moreaiThinkHeadHtml({label:labels[hp.status]||'思考中',time:hp.duration,open:hp.thoughtOpen,state:faceState,done:!working,attrs:'data-hp-thought',toggle:true});
+      const body=hp.thoughtOpen?`<div class="hp-thought-body">${hp.steps.map(x=>`<p>${esc(x)}</p>`).join('')}${progress}${hp.rolesShown?`<button class="hp-thought-toggle" type="button" data-hp-roles aria-expanded="${hp.rolesOpen}">${hp.rolesOpen?'⌄':'›'} 参与角色 · ${hp.rolesShown}</button>${hp.rolesOpen?`<div class="hp-roles">${PPT_ROLES.slice(0,hp.rolesShown).map(r=>`<div><button data-hp-open="${r.key}">${r.name}</button><span> · ${r.job}</span></div>`).join('')}</div>`:''}`:''}</div>`:'';
+      return `<div class="moreai-turn hp-think-turn" id="hpThought">${head}${body}</div>`;
     }
     function hpBody(){
       const size=hpSize();
@@ -4530,6 +4592,7 @@ const roastPhotos = {green: "data:image/jpeg;base64,/9j/4QCARXhpZgAASUkqAAgAAAAF
       thread.innerHTML = `<div class="messages-inner"><div class="msg user" data-qnav-anchor="u-root" data-qnav-title="${firstTitle}">${esc(sentText[activeId] || "")}${msgFilesHtml(sentFiles[activeId])}</div>${body}${annoThreadHtml(activeId)}</div>`;
       requestAnimationFrame(fitMsgTags);
       paintQnav();
+      requestAnimationFrame(() => { try { mountAiFaces(); } catch (err) {} });
     }
     function fitMsgTags() {
       document.querySelectorAll("[data-msg-tags]").forEach(row => {
@@ -4967,9 +5030,204 @@ const roastPhotos = {green: "data:image/jpeg;base64,/9j/4QCARXhpZgAASUkqAAgAAAAF
       }
       return annoClip(text) || annoClip(annoPageLabel()) || { full: "标注的位置", short: "标注的位置" };
     }
-    function moreaiHeadHtml() {
-      return `<div class="moreai-head"><span class="moreai-avatar" aria-hidden="true"><i class="moreai-face"></i></span><div class="moreai-meta"><b>MoreAI</b></div></div>`;
+const DESIGN_MOUTH = "M6.61285 13.736C7.26704 14.5537 9.06605 16.1892 11.0286 16.1892C13.4818 16.1892 15.1173 14.5537 15.935 13.736";
+    const FACE_MOUTH = { idle: DESIGN_MOUTH, thinking: DESIGN_MOUTH, streaming: DESIGN_MOUTH, done: DESIGN_MOUTH, error: DESIGN_MOUTH };
+    const FACE_EXPR = {
+      idle: { l: [1, 1, 0], r: [1, 1, 0] },
+      thinking: { l: [1, 1, 0], r: [1, 1, 0] },
+      streaming: { l: [1.05, 0.55, 0], r: [1.05, 0.55, 0] },
+      done: { l: [1.25, 1, 0], r: [1.25, 1, 0] },
+      error: { l: [1, 1, 0], r: [1, 1, 0] }
+    };
+    const FACE_EYE = { l: [2.453, 3.434], r: [20.116, 4.416] };
+    const thinkLook = { x: -5.2, y: -6.6, next: 0, step: 0, blinkAt: 0 };
+    const THINK_POSES = [
+      { x: -5.2, y: -6.6, hold: 1200 },
+      { x: 5.2, y: -6.6, hold: 1200 },
+      { x: 0, y: 0, hold: 980, blink: true }
+    ];
+    const faceScheme = "1";
+    const faceReduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const faceSprings = new WeakMap();
+    const facePointer = { x: 0, y: 0, on: false };
+    const faceBlink = { phase: "wait", t0: 0, dur: 0, double: false, next: 0 };
+    let faceRaf = 0;
+    function aiFaceHtml(state) {
+      return `<span class="ai-face" data-scheme="1" data-state="${state}"><span class="ai-face-rig"><span class="ai-face-art"><img class="ai-face-orb" src="data:image/svg+xml;base64,PHN2ZyBwcmVzZXJ2ZUFzcGVjdFJhdGlvPSJub25lIiBvdmVyZmxvdz0idmlzaWJsZSIgc3R5bGU9ImRpc3BsYXk6IGJsb2NrOyIgd2lkdGg9IjUwLjA0NTIiIGhlaWdodD0iNTAuMDQ1MiIgdmlld0JveD0iMCAwIDUwLjA0NTIgNTAuMDQ1MiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGcgaWQ9Ikdyb3VwIDE3MDc0ODEzODYiPgo8bWFzayBpZD0ibWFzazBfMF84IiBzdHlsZT0ibWFzay10eXBlOmFscGhhIiBtYXNrVW5pdHM9InVzZXJTcGFjZU9uVXNlIiB4PSIwIiB5PSIwIiB3aWR0aD0iNTEiIGhlaWdodD0iNTEiPgo8ZyBpZD0iRWxsaXBzZSAxNTQwIj4KPGNpcmNsZSBjeD0iMjUuMDIyNiIgY3k9IjI1LjAyMjYiIHI9IjI1LjAyMjYiIGZpbGw9InVybCgjcGFpbnQwX2xpbmVhcl8wXzgpIi8+CjxjaXJjbGUgY3g9IjI1LjAyMjYiIGN5PSIyNS4wMjI2IiByPSIyNS4wMjI2IiBmaWxsPSJ1cmwoI3BhaW50MV9yYWRpYWxfMF84KSIvPgo8Y2lyY2xlIGN4PSIyNS4wMjI2IiBjeT0iMjUuMDIyNiIgcj0iMjUuMDIyNiIgZmlsbD0idXJsKCNwYWludDJfcmFkaWFsXzBfOCkiLz4KPC9nPgo8L21hc2s+CjxnIG1hc2s9InVybCgjbWFzazBfMF84KSI+CjxnIGlkPSJFbGxpcHNlIDE1NDMiPgo8Y2lyY2xlIGN4PSIyNS4wMjI2IiBjeT0iMjUuMDIyNiIgcj0iMjUuMDIyNiIgZmlsbD0idXJsKCNwYWludDNfbGluZWFyXzBfOCkiLz4KPGNpcmNsZSBjeD0iMjUuMDIyNiIgY3k9IjI1LjAyMjYiIHI9IjI1LjAyMjYiIGZpbGw9InVybCgjcGFpbnQ0X3JhZGlhbF8wXzgpIiBmaWxsLW9wYWNpdHk9IjAuNCIvPgo8Y2lyY2xlIGN4PSIyNS4wMjI2IiBjeT0iMjUuMDIyNiIgcj0iMjUuMDIyNiIgZmlsbD0idXJsKCNwYWludDVfcmFkaWFsXzBfOCkiLz4KPC9nPgo8ZyBpZD0iRWxsaXBzZSAxNTQyIiBvcGFjaXR5PSIwLjUiIGZpbHRlcj0idXJsKCNmaWx0ZXIwX2ZfMF84KSI+CjxlbGxpcHNlIGN4PSIzOC4yOTkiIGN5PSIzNi4xNTYyIiByeD0iMjQuMTg2OSIgcnk9IjguOTMzNzMiIHRyYW5zZm9ybT0icm90YXRlKDIuMjA2MjEgMzguMjk5IDM2LjE1NjIpIiBmaWxsPSJ1cmwoI3BhaW50Nl9saW5lYXJfMF84KSIvPgo8L2c+CjxnIGlkPSJFbGxpcHNlIDE1NDEiIG9wYWNpdHk9IjAuNCIgZmlsdGVyPSJ1cmwoI2ZpbHRlcjFfZl8wXzgpIj4KPGVsbGlwc2UgY3g9IjI0LjQxNDMiIGN5PSIyNS42NDQxIiByeD0iMjQuODg5MyIgcnk9IjEzLjE1NjQiIHRyYW5zZm9ybT0icm90YXRlKDMwIDI0LjQxNDMgMjUuNjQ0MSkiIGZpbGw9InVybCgjcGFpbnQ3X3JhZGlhbF8wXzgpIi8+CjwvZz4KPC9nPgo8L2c+CjxkZWZzPgo8ZmlsdGVyIGlkPSJmaWx0ZXIwX2ZfMF84IiB4PSI0LjQzNDA3IiB5PSIxNy40ODY0IiB3aWR0aD0iNjcuNzI5OSIgaGVpZ2h0PSIzNy4zMzk1IiBmaWx0ZXJVbml0cz0idXNlclNwYWNlT25Vc2UiIGNvbG9yLWludGVycG9sYXRpb24tZmlsdGVycz0ic1JHQiI+CjxmZUZsb29kIGZsb29kLW9wYWNpdHk9IjAiIHJlc3VsdD0iQmFja2dyb3VuZEltYWdlRml4Ii8+CjxmZUJsZW5kIG1vZGU9Im5vcm1hbCIgaW49IlNvdXJjZUdyYXBoaWMiIGluMj0iQmFja2dyb3VuZEltYWdlRml4IiByZXN1bHQ9InNoYXBlIi8+CjxmZUdhdXNzaWFuQmx1ciBzdGREZXZpYXRpb249IjQuODQ2NzQiIHJlc3VsdD0iZWZmZWN0MV9mb3JlZ3JvdW5kQmx1cl8wXzgiLz4KPC9maWx0ZXI+CjxmaWx0ZXIgaWQ9ImZpbHRlcjFfZl8wXzgiIHg9Ii02LjEyNzk1IiB5PSIwLjc3MTI2NSIgd2lkdGg9IjYxLjA4NDQiIGhlaWdodD0iNDkuNzQ1NiIgZmlsdGVyVW5pdHM9InVzZXJTcGFjZU9uVXNlIiBjb2xvci1pbnRlcnBvbGF0aW9uLWZpbHRlcnM9InNSR0IiPgo8ZmVGbG9vZCBmbG9vZC1vcGFjaXR5PSIwIiByZXN1bHQ9IkJhY2tncm91bmRJbWFnZUZpeCIvPgo8ZmVCbGVuZCBtb2RlPSJub3JtYWwiIGluPSJTb3VyY2VHcmFwaGljIiBpbjI9IkJhY2tncm91bmRJbWFnZUZpeCIgcmVzdWx0PSJzaGFwZSIvPgo8ZmVHYXVzc2lhbkJsdXIgc3RkRGV2aWF0aW9uPSI0IiByZXN1bHQ9ImVmZmVjdDFfZm9yZWdyb3VuZEJsdXJfMF84Ii8+CjwvZmlsdGVyPgo8bGluZWFyR3JhZGllbnQgaWQ9InBhaW50MF9saW5lYXJfMF84IiB4MT0iNDAuOTM3NyIgeTE9IjMuNzcxNzkiIHgyPSIxMS45NTkzIiB5Mj0iNDUuMTY5NSIgZ3JhZGllbnRVbml0cz0idXNlclNwYWNlT25Vc2UiPgo8c3RvcCBzdG9wLWNvbG9yPSIjNjRGNUZGIi8+CjxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iIzBBNTlGNyIvPgo8L2xpbmVhckdyYWRpZW50Pgo8cmFkaWFsR3JhZGllbnQgaWQ9InBhaW50MV9yYWRpYWxfMF84IiBjeD0iMCIgY3k9IjAiIHI9IjEiIGdyYWRpZW50VW5pdHM9InVzZXJTcGFjZU9uVXNlIiBncmFkaWVudFRyYW5zZm9ybT0idHJhbnNsYXRlKDMzLjAyNjIgNy41NDM1OCkgcm90YXRlKDEyMy44NzkpIHNjYWxlKDQ2LjUzOTIpIj4KPHN0b3Agc3RvcC1jb2xvcj0id2hpdGUiLz4KPHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSJ3aGl0ZSIgc3RvcC1vcGFjaXR5PSIwIi8+CjwvcmFkaWFsR3JhZGllbnQ+CjxyYWRpYWxHcmFkaWVudCBpZD0icGFpbnQyX3JhZGlhbF8wXzgiIGN4PSIwIiBjeT0iMCIgcj0iMSIgZ3JhZGllbnRVbml0cz0idXNlclNwYWNlT25Vc2UiIGdyYWRpZW50VHJhbnNmb3JtPSJ0cmFuc2xhdGUoMzguMTc3OSA2Ljg5OTYyKSByb3RhdGUoMTIzLjk4MSkgc2NhbGUoNjUuMzQ0MikiPgo8c3RvcCBvZmZzZXQ9IjAuNTgzNDM2IiBzdG9wLWNvbG9yPSJ3aGl0ZSIgc3RvcC1vcGFjaXR5PSIwIi8+CjxzdG9wIG9mZnNldD0iMC44NTYzNzIiIHN0b3AtY29sb3I9IiM4QzNCRkUiLz4KPC9yYWRpYWxHcmFkaWVudD4KPGxpbmVhckdyYWRpZW50IGlkPSJwYWludDNfbGluZWFyXzBfOCIgeDE9IjQwLjkzNzciIHkxPSIzLjc3MTc5IiB4Mj0iMTEuOTU5MyIgeTI9IjQ1LjE2OTUiIGdyYWRpZW50VW5pdHM9InVzZXJTcGFjZU9uVXNlIj4KPHN0b3Agc3RvcC1jb2xvcj0iI0ZBRDhGRiIvPgo8c3RvcCBvZmZzZXQ9IjEiIHN0b3AtY29sb3I9IiNCMEE5RkYiLz4KPC9saW5lYXJHcmFkaWVudD4KPHJhZGlhbEdyYWRpZW50IGlkPSJwYWludDRfcmFkaWFsXzBfOCIgY3g9IjAiIGN5PSIwIiByPSIxIiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSIgZ3JhZGllbnRUcmFuc2Zvcm09InRyYW5zbGF0ZSgzMy4wMjYyIDcuNTQzNTgpIHJvdGF0ZSgxMjMuODc5KSBzY2FsZSg0Ni41MzkyKSI+CjxzdG9wIHN0b3AtY29sb3I9IndoaXRlIi8+CjxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0id2hpdGUiIHN0b3Atb3BhY2l0eT0iMCIvPgo8L3JhZGlhbEdyYWRpZW50Pgo8cmFkaWFsR3JhZGllbnQgaWQ9InBhaW50NV9yYWRpYWxfMF84IiBjeD0iMCIgY3k9IjAiIHI9IjEiIGdyYWRpZW50VW5pdHM9InVzZXJTcGFjZU9uVXNlIiBncmFkaWVudFRyYW5zZm9ybT0idHJhbnNsYXRlKDM4LjE3NzkgNi44OTk2Mikgcm90YXRlKDEyMy45ODEpIHNjYWxlKDY1LjM0NDIpIj4KPHN0b3Agb2Zmc2V0PSIwLjU1NzY5MiIgc3RvcC1jb2xvcj0iI0VDQjhGRiIgc3RvcC1vcGFjaXR5PSIwIi8+CjxzdG9wIG9mZnNldD0iMC44MzI4MjUiIHN0b3AtY29sb3I9IiNGMEM4RkYiLz4KPC9yYWRpYWxHcmFkaWVudD4KPGxpbmVhckdyYWRpZW50IGlkPSJwYWludDZfbGluZWFyXzBfOCIgeDE9IjM4LjI5OSIgeTE9IjI3LjIyMjQiIHgyPSIzOC4yOTkiIHkyPSI0NS4wODk5IiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+CjxzdG9wIHN0b3AtY29sb3I9IiNFQ0UxRkYiLz4KPHN0b3Agb2Zmc2V0PSIwLjg2OTc2OCIgc3RvcC1jb2xvcj0iI0JBNDNGRiIvPgo8L2xpbmVhckdyYWRpZW50Pgo8cmFkaWFsR3JhZGllbnQgaWQ9InBhaW50N19yYWRpYWxfMF84IiBjeD0iMCIgY3k9IjAiIHI9IjEiIGdyYWRpZW50VHJhbnNmb3JtPSJtYXRyaXgoMzIuNzc3NiAtMi4xMTcxNiAwLjQ3MzE3NSAyMy40MTA3IDIwLjc3NjYgMTQuNDgwNykiIGdyYWRpZW50VW5pdHM9InVzZXJTcGFjZU9uVXNlIj4KPHN0b3Agb2Zmc2V0PSIwLjU1MjEyMSIgc3RvcC1jb2xvcj0id2hpdGUiIHN0b3Atb3BhY2l0eT0iMCIvPgo8c3RvcCBvZmZzZXQ9IjEiIHN0b3AtY29sb3I9IndoaXRlIi8+CjwvcmFkaWFsR3JhZGllbnQ+CjwvZGVmcz4KPC9zdmc+Cg==" alt="" width="50.0452" height="50.0452" draggable="false"><span class="ai-gaze"><img class="ai-face-features" src="data:image/svg+xml;base64,PHN2ZyBwcmVzZXJ2ZUFzcGVjdFJhdGlvPSJub25lIiBvdmVyZmxvdz0idmlzaWJsZSIgc3R5bGU9ImRpc3BsYXk6IGJsb2NrOyIgd2lkdGg9IjIyLjU2OTYiIGhlaWdodD0iMTYuMTg4OCIgdmlld0JveD0iMCAwIDIyLjU2OTYgMTYuMTg4OCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGcgaWQ9Ikdyb3VwIDE3MDc0ODE0MjQiPgo8cGF0aCBpZD0iUmVjdGFuZ2xlIDM0NjI0MDk1IiBkPSJNMi40NTMyIDAuODg2ODI3QzMuNDUyNTIgMC44ODY4MjcgNC4yNjI2MyAxLjY5Njk0IDQuMjYyNjMgMi42OTYyNlY0LjY1ODgyQzQuMjYyNjMgNS42NTgxNCAzLjQ1MjUyIDYuNDY4MjUgMi40NTMyIDYuNDY4MjVDMS40NTM4OCA2LjQ2ODI1IDAuNjQzNzc0IDUuNjU4MTQgMC42NDM3NzQgNC42NTg4MlYyLjY5NjI2QzAuNjQzNzc0IDEuNjk2OTQgMS40NTM4OCAwLjg4NjgyNyAyLjQ1MzIgMC44ODY4MjdaIiBmaWxsPSIjMTExMTExIiBzdHJva2Utd2lkdGg9IjEuMjg3NTUiIHN0cm9rZT0iIzExMTExMSIvPgo8cGF0aCBpZD0iUmVjdGFuZ2xlIDM0NjI0MDk2IiBkPSJNMjAuMTE2NCAwLjQ5MDY0MUMyMS4yMDAzIDAuNDkwNjQxIDIyLjA3OSAxLjM2OTMxIDIyLjA3OSAyLjQ1MzJWNC40MTU3N0MyMi4wNzkgNS40OTk2NiAyMS4yMDAzIDYuMzc4MzMgMjAuMTE2NCA2LjM3ODMzQzE5LjAzMjUgNi4zNzgzMyAxOC4xNTM4IDUuNDk5NjYgMTguMTUzOCA0LjQxNTc3VjIuNDUzMkMxOC4xNTM4IDEuMzY5MzEgMTkuMDMyNSAwLjQ5MDY0MSAyMC4xMTY0IDAuNDkwNjQxWiIgZmlsbD0iIzExMTExMSIgc3Ryb2tlLXdpZHRoPSIwLjk4MTI4MSIgc3Ryb2tlPSIjMTExMTExIi8+CjxwYXRoIGlkPSJWZWN0b3IgMTQzIiBkPSJNNi42MTI4NSAxMi43NTQzQzcuMjY3MDQgMTMuNTcyMSA5LjA2NjA1IDE1LjIwNzUgMTEuMDI4NiAxNS4yMDc1QzEzLjQ4MTggMTUuMjA3NSAxNS4xMTczIDEzLjU3MjEgMTUuOTM1IDEyLjc1NDMiIHN0cm9rZS13aWR0aD0iMS45NjI1NiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2U9IiMxMTExMTEiLz4KPC9nPgo8L3N2Zz4K" alt="" width="22.5696" height="16.1888" draggable="false"><span class="ai-blink"><img class="ai-face-eyes" src="data:image/svg+xml;base64,PHN2ZyBwcmVzZXJ2ZUFzcGVjdFJhdGlvPSJub25lIiBvdmVyZmxvdz0idmlzaWJsZSIgc3R5bGU9ImRpc3BsYXk6IGJsb2NrOyIgd2lkdGg9IjIyLjU2OTYiIGhlaWdodD0iMTYuMTg4OCIgdmlld0JveD0iMCAwIDIyLjU2OTYgMTYuMTg4OCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGcgaWQ9Ikdyb3VwIDE3MDc0ODE0MjQiPgo8cGF0aCBpZD0iUmVjdGFuZ2xlIDM0NjI0MDk1IiBkPSJNMi40NTMyIDAuODg2ODI3QzMuNDUyNTIgMC44ODY4MjcgNC4yNjI2MyAxLjY5Njk0IDQuMjYyNjMgMi42OTYyNlY0LjY1ODgyQzQuMjYyNjMgNS42NTgxNCAzLjQ1MjUyIDYuNDY4MjUgMi40NTMyIDYuNDY4MjVDMS40NTM4OCA2LjQ2ODI1IDAuNjQzNzc0IDUuNjU4MTQgMC42NDM3NzQgNC42NTg4MlYyLjY5NjI2QzAuNjQzNzc0IDEuNjk2OTQgMS40NTM4OCAwLjg4NjgyNyAyLjQ1MzIgMC44ODY4MjdaIiBmaWxsPSIjMTExMTExIiBzdHJva2Utd2lkdGg9IjEuMjg3NTUiIHN0cm9rZT0iIzExMTExMSIvPgo8cGF0aCBpZD0iUmVjdGFuZ2xlIDM0NjI0MDk2IiBkPSJNMjAuMTE2NCAwLjQ5MDY0MUMyMS4yMDAzIDAuNDkwNjQxIDIyLjA3OSAxLjM2OTMxIDIyLjA3OSAyLjQ1MzJWNC40MTU3N0MyMi4wNzkgNS40OTk2NiAyMS4yMDAzIDYuMzc4MzMgMjAuMTE2NCA2LjM3ODMzQzE5LjAzMjUgNi4zNzgzMyAxOC4xNTM4IDUuNDk5NjYgMTguMTUzOCA0LjQxNTc3VjIuNDUzMkMxOC4xNTM4IDEuMzY5MzEgMTkuMDMyNSAwLjQ5MDY0MSAyMC4xMTY0IDAuNDkwNjQxWiIgZmlsbD0iIzExMTExMSIgc3Ryb2tlLXdpZHRoPSIwLjk4MTI4MSIgc3Ryb2tlPSIjMTExMTExIi8+CjxwYXRoIGlkPSJWZWN0b3IgMTQzIiBkPSJNNi42MTI4NSAxMi43NTQzQzcuMjY3MDQgMTMuNTcyMSA5LjA2NjA1IDE1LjIwNzUgMTEuMDI4NiAxNS4yMDc1QzEzLjQ4MTggMTUuMjA3NSAxNS4xMTczIDEzLjU3MjEgMTUuOTM1IDEyLjc1NDMiIHN0cm9rZS13aWR0aD0iMS45NjI1NiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2U9IiMxMTExMTEiLz4KPC9nPgo8L3N2Zz4K" alt="" width="22.5696" height="16.1888" draggable="false"></span></span></span></span></span>`;
     }
+    function faceEase(t, out) {
+      return out ? 1 - Math.pow(1 - t, 3) : t * t;
+    }
+    function faceBlinkScale(now, thinking) {
+      if (faceReduced) return 1;
+      if (!faceBlink.next) faceBlink.next = now + (thinking ? Infinity : 900);
+      if (faceBlink.phase === "wait") {
+        if (now < faceBlink.next) return 1;
+        faceBlink.phase = "close";
+        faceBlink.t0 = now;
+        faceBlink.dur = thinking ? 80 : 70;
+        faceBlink.thinking = thinking;
+      }
+      const p = Math.min(1, (now - faceBlink.t0) / faceBlink.dur);
+      const slow = !!faceBlink.thinking;
+      if (faceBlink.phase === "close") {
+        if (p >= 1) {
+          faceBlink.phase = "open";
+          faceBlink.t0 = now;
+          faceBlink.dur = faceBlink.double ? 70 : (slow ? 130 : 160);
+          return 0.08;
+        }
+        return 1 + (0.08 - 1) * faceEase(p, false);
+      }
+      if (p >= 1) {
+        if (faceBlink.double && !slow) {
+          faceBlink.double = false;
+          faceBlink.phase = "close";
+          faceBlink.t0 = now;
+          faceBlink.dur = 70;
+          return 1;
+        }
+        faceBlink.phase = "wait";
+        faceBlink.double = !slow && Math.random() < 0.25;
+        faceBlink.next = slow ? Infinity : now + 2800 + Math.random() * 2800;
+        return 1;
+      }
+      return 0.08 + 0.92 * faceEase(p, true);
+    }
+    function armHop(el) {
+      if (el.dataset.state !== "done" || el.dataset.hop === "1") return;
+      el.dataset.hop = "1";
+      let settled = false;
+      const finish = () => {
+        if (settled || el.dataset.state !== "done") return;
+        settled = true;
+        el.dataset.state = "idle";
+        const next = el.querySelector(".ai-mouth");
+        if (next) next.setAttribute("d", FACE_MOUTH.idle);
+      };
+      el.addEventListener("animationend", finish, { once: true });
+      setTimeout(finish, 980);
+    }
+    function mountAiFaces() {
+      document.querySelectorAll(".ai-face").forEach(el => {
+        const mouth = el.querySelector(".ai-mouth");
+        if (mouth) mouth.setAttribute("d", FACE_MOUTH[el.dataset.state] || FACE_MOUTH.idle);
+        if (el.dataset.state === "thinking") delete el.dataset.hop;
+        armHop(el);
+      });
+      if (!facePointer.bound) {
+        facePointer.bound = true;
+        window.addEventListener("pointermove", event => {
+          facePointer.x = event.clientX;
+          facePointer.y = event.clientY;
+          facePointer.on = true;
+        });
+        window.addEventListener("pointerleave", () => { facePointer.on = false; });
+      }
+      if (!faceRaf && document.querySelector(".ai-face")) faceRaf = requestAnimationFrame(tickAiFaces);
+    }
+    function tickAiFaces(now) {
+      const faces = [...document.querySelectorAll(".ai-face")];
+      if (!faces.length) { faceRaf = 0; return; }
+      const blink = faceBlinkScale(now, faces.some(el => el.dataset.state === "thinking"));
+      faces.forEach(el => {
+        const state = el.dataset.state || "idle";
+        const expr = FACE_EXPR[state] || FACE_EXPR.idle;
+        const spring = faceSprings.get(el) || { x: 0, y: 0, t: now, state, shut: state === "done" ? 0.36 : 1 };
+        if (spring.state !== state) {
+          if (spring.state === "thinking") {
+            spring.settle = now + 780;
+            if (faceBlink.phase === "wait") faceBlink.next = now + 1400 + Math.random() * 1800;
+          }
+          if (state === "thinking") {
+            thinkLook.step = 1;
+            thinkLook.x = THINK_POSES[0].x;
+            thinkLook.y = THINK_POSES[0].y;
+            thinkLook.next = now + THINK_POSES[0].hold;
+            thinkLook.blinkAt = 0;
+            if (faceBlink.phase === "wait") faceBlink.next = Infinity;
+          }
+          spring.state = state;
+        }
+        let tx = 0;
+        let ty = 0;
+        let tracked = false;
+        if (!faceReduced && state !== "error" && state !== "thinking" && facePointer.on) {
+          const rect = el.getBoundingClientRect();
+          const dx = facePointer.x - (rect.left + rect.width / 2);
+          const dy = facePointer.y - (rect.top + rect.height / 2);
+          const dist = Math.hypot(dx, dy);
+          const near = 112;
+          if (dist < near) {
+            const edge = dist > near - 36 ? (near - dist) / 36 : 1;
+            const reach = Math.min(1, dist / 72) * 4.5 * edge;
+            const angle = Math.atan2(dy, dx);
+            tx = Math.cos(angle) * reach;
+            ty = Math.sin(angle) * reach;
+            if (ty < 0) ty = Math.max(-7.4, ty * 1.65);
+            tracked = true;
+          }
+        }
+        if (!tracked && !faceReduced && state === "thinking") {
+          if (!thinkLook.next || now >= thinkLook.next) {
+            const pose = THINK_POSES[thinkLook.step % THINK_POSES.length];
+            thinkLook.x = pose.x;
+            thinkLook.y = pose.y;
+            thinkLook.step += 1;
+            thinkLook.next = now + pose.hold;
+            thinkLook.blinkAt = pose.blink ? now + 360 : 0;
+          }
+          if (thinkLook.blinkAt && now >= thinkLook.blinkAt && faceBlink.phase === "wait") {
+            faceBlink.next = now;
+            faceBlink.thinking = true;
+            thinkLook.blinkAt = 0;
+          }
+          tx = thinkLook.x;
+          ty = thinkLook.y;
+        }
+        const dt = Math.min(48, Math.max(0, now - (spring.t || now)));
+        spring.t = now;
+        const settling = spring.settle && now < spring.settle;
+        const thinkingHome = state === "thinking" && !tx && !ty;
+        const k = 1 - Math.exp(-dt / (thinkingHome ? 180 : state === "thinking" ? 320 : (settling ? 460 : 110)));
+        spring.x += (tx - spring.x) * (dt ? k : 0);
+        spring.y += (ty - spring.y) * (dt ? k : 0);
+        const shutTarget = state === "done" ? 0.36 : 1;
+        if (spring.shut == null) spring.shut = shutTarget;
+        const shutK = 1 - Math.exp(-dt / (state === "done" ? 180 : 280));
+        spring.shut += (shutTarget - spring.shut) * (dt ? shutK : 0);
+        faceSprings.set(el, spring);
+        const gazeTf = `translate(${spring.x.toFixed(3)}px, ${spring.y.toFixed(3)}px)`;
+        el.querySelectorAll(".ai-gaze").forEach(gaze => { gaze.style.transform = gazeTf; });
+        const open = state === "error" ? 1 : spring.shut * (state === "done" ? 1 : blink);
+        el.querySelectorAll(".ai-blink").forEach(layer => { layer.style.transform = `scaleY(${open.toFixed(3)})`; });
+        el.querySelectorAll(".ai-eye").forEach(eye => {
+          const side = eye.dataset.side === "r" ? "r" : "l";
+          const exprNow = eye.closest(".expr") ? FACE_EXPR.thinking : expr;
+          const [sx, sy, rot] = exprNow[side];
+          const fallback = FACE_EYE[side];
+          const cx = Number(eye.dataset.cx) || fallback[0];
+          const cy = Number(eye.dataset.cy) || fallback[1];
+          const holdWink = eye.closest(".expr") && side === "r";
+          const open = holdWink || state === "error" ? 1 : (eye.closest(".expr") ? blink : spring.shut * (state === "done" ? 1 : blink));
+          eye.setAttribute("transform", `translate(${cx} ${cy}) rotate(${rot}) scale(${sx} ${sy * open}) translate(${-cx} ${-cy})`);
+        });
+      });
+      faceRaf = requestAnimationFrame(tickAiFaces);
+    }
+    function moreaiHeadHtml(state) {
+      return `<span class="think-row">${aiFaceHtml(state || "idle")}<span class="think-name">MoreAI</span></span>`;
+    }
+    function moreaiThinkHeadHtml(opts) {
+      const open = !!opts.open;
+      const label = opts.label || "已思考";
+      const time = opts.time ? `<small>· 用时 ${esc(opts.time)}</small>` : "";
+      const chev = opts.toggle ? `<span class="think-chev" aria-hidden="true">${open ? "⌄" : "›"}</span>` : "";
+      const state = opts.state || (opts.done === false ? "thinking" : "idle");
+      const attrs = opts.attrs || "";
+      return `<button class="think-head" type="button" ${attrs} aria-expanded="${open ? "true" : "false"}">${moreaiHeadHtml(state)}<span class="think-status">${chev}<span>${esc(label)}</span>${time}</span></button>`;
+    }
+
     function errIconHtml() {
       return `<i class="msg-tone" aria-hidden="true"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="7.33" stroke="currentColor" stroke-width="1.34"/><path d="M5.2 5.2l5.6 5.6M10.8 5.2l-5.6 5.6" stroke="currentColor" stroke-width="1.34" stroke-linecap="round"/></svg></i>`;
     }
@@ -5029,10 +5287,12 @@ const roastPhotos = {green: "data:image/jpeg;base64,/9j/4QCARXhpZgAASUkqAAgAAAAF
     }
     function annoThreadHtml(id) {
       return (annoFollow[id] || []).map((item, index) => {
-        if (item.type === "pending") return `${moreaiHeadHtml()}<p class="lead anno-reply">${esc(item.text || "正在按标注整理…")}</p>`;
+        if (item.type === "pending") return `<div class="moreai-turn">${moreaiHeadHtml("thinking")}<p class="lead anno-reply">${esc(item.text || "正在按标注整理…")}</p></div>`;
         if (item.type === "assistant") {
           const version = pptConv(id) && item.versionId ? hp.versions.find(entry => entry.id === item.versionId) : null;
-          const thought = item.thoughts ? `<section class="anno-fail-thought">${moreaiHeadHtml()}<button class="hp-thought-toggle" type="button" data-anno-thought aria-expanded="${item.thoughtOpen ? "true" : "false"}"><span aria-hidden="true">${item.thoughtOpen ? "⌄" : "›"}</span>已思考${item.thoughtDuration ? `<small>· 用时 ${esc(item.thoughtDuration)}</small>` : ""}</button>${item.thoughtOpen ? `<div class="hp-thought-body">${item.thoughts.map(step => `<p>${esc(step)}</p>`).join("")}</div>` : ""}</section>` : moreaiHeadHtml();
+          const thought = item.thoughts
+            ? `<div class="moreai-turn hp-think-turn anno-fail-thought">${moreaiThinkHeadHtml({label:"已思考",time:item.thoughtDuration,open:item.thoughtOpen,state:"idle",done:true,attrs:"data-anno-thought",toggle:true})}${item.thoughtOpen ? `<div class="hp-thought-body">${item.thoughts.map(step => `<p>${esc(step)}</p>`).join("")}</div>` : ""}</div>`
+            : `<div class="moreai-turn">${moreaiHeadHtml("idle")}</div>`;
           const results = item.results || [];
           const failed = results.filter(row => !row.ok);
           const lead = results.length ? item.failText || item.text : item.text;
@@ -5053,7 +5313,7 @@ const roastPhotos = {green: "data:image/jpeg;base64,/9j/4QCARXhpZgAASUkqAAgAAAAF
         const quotes = (item.quotes || []).map(quote => `<div class="msg-quote" data-tip="${esc(quote.full)}"><span>${esc(quote.short)}</span></div>`).join("");
         const tags = item.tags || [];
         const quoteBlock = tags.length
-          ? `<div class="msg-tags" data-msg-tags>${tags.map(tag => `<span class="msg-tag" data-tip="${esc(tag.page)}">${tag.index ? `<b>${tag.index}</b>` : ""}<span>${esc(tag.page)}</span></span>`).join("")}</div>`
+          ? `<div class="msg-tags" data-msg-tags>${tags.map(tag => `<span class="msg-tag">${tag.index ? `<b>${tag.index}</b>` : ""}<span>${esc(tag.page)}</span></span>`).join("")}</div>`
           : quotes ? `<div class="msg-quotes">${quotes}</div>` : "";
         const listItems = tags.map(tag => `<li>${esc(tag.note || "未填写")}</li>`);
         if (item.extra) listItems.push(`<li>${esc(item.extra)}</li>`);
@@ -6227,10 +6487,36 @@ const roastPhotos = {green: "data:image/jpeg;base64,/9j/4QCARXhpZgAASUkqAAgAAAAF
       const show = uniq.length >= 2;
       host.hidden = !show;
       host.classList.toggle("show", show);
-      if (!show) { host.classList.remove("open"); track.innerHTML = ""; card.innerHTML = ""; return; }
+      if (!show) { closeQnav(true); track.innerHTML = ""; card.innerHTML = ""; host._qnavItems = []; return; }
       track.innerHTML = uniq.map((item, i) => `<i data-qnav-i="${i}" class="${i === 0 ? "is-current" : ""}"></i>`).join("");
       card.innerHTML = uniq.map((item, i) => `<button type="button" class="qnav-row${i === 0 ? " is-current" : ""}" data-qnav-i="${i}"><span class="qnav-text"><span class="qnav-q">${esc(item.title)}</span></span><span class="qnav-dash"></span></button>`).join("");
       host._qnavItems = uniq;
+    }
+    function placeQnavCard() {
+      const host = document.getElementById("qnav");
+      const rail = document.getElementById("qnavRail");
+      const card = document.getElementById("qnavCard");
+      if (!host || !rail || !card || !host.classList.contains("show")) return;
+      const box = host.clientHeight;
+      const r = rail.getBoundingClientRect();
+      const center = r.top + r.height / 2 - host.getBoundingClientRect().top;
+      card.style.maxHeight = "";
+      const height = Math.min(card.scrollHeight || 120, box - 24);
+      const top = Math.max(12, Math.min(box - height - 12, center - height / 2));
+      card.style.top = top + "px";
+      card.style.maxHeight = (box - top - 12) + "px";
+    }
+    function openQnav() {
+      const host = document.getElementById("qnav");
+      if (!host || !host.classList.contains("show") || host.classList.contains("open")) return;
+      placeQnavCard();
+      host.classList.add("open");
+    }
+    function closeQnav(now) {
+      const host = document.getElementById("qnav");
+      if (!host) return;
+      if (!host.classList.contains("open") && !now) return;
+      host.classList.remove("open");
     }
     function qnavJump(i) {
       const host = document.getElementById("qnav");
@@ -6241,21 +6527,28 @@ const roastPhotos = {green: "data:image/jpeg;base64,/9j/4QCARXhpZgAASUkqAAgAAAAF
       item.node.classList.remove("qnav-flash");
       void item.node.offsetWidth;
       item.node.classList.add("qnav-flash");
-      host.querySelectorAll(".qnav-rail i, .qnav-row").forEach((el, idx) => {
-        el.classList.toggle("is-current", Number(el.dataset.qnavI) === i || idx === i);
+      host.querySelectorAll(".qnav-rail i, .qnav-row").forEach(el => {
+        el.classList.toggle("is-current", Number(el.dataset.qnavI) === i);
       });
     }
     (() => {
       const host = document.getElementById("qnav");
-      if (!host) return;
+      const rail = document.getElementById("qnavRail");
+      const card = document.getElementById("qnavCard");
+      if (!host || !rail || !card) return;
       let leaveTimer = 0;
-      host.addEventListener("mouseenter", () => { clearTimeout(leaveTimer); host.classList.add("open"); });
-      host.addEventListener("mouseleave", () => { leaveTimer = setTimeout(() => host.classList.remove("open"), 160); });
+      const enter = () => { clearTimeout(leaveTimer); openQnav(); };
+      const leave = () => { clearTimeout(leaveTimer); leaveTimer = setTimeout(() => closeQnav(), 150); };
+      [rail, card].forEach(node => {
+        node.addEventListener("pointerenter", enter);
+        node.addEventListener("pointerleave", leave);
+      });
       host.addEventListener("click", event => {
         const row = event.target.closest("[data-qnav-i]");
         if (!row) return;
         qnavJump(Number(row.dataset.qnavI));
       });
+      window.addEventListener("resize", () => { if (host.classList.contains("open")) placeQnavCard(); });
     })();
     loadDemoVersion();
 
