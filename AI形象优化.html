@@ -246,12 +246,7 @@
       display: grid; place-items: center; flex: none; width: 14px; height: 14px;
       transform-origin: center; animation: spin .8s linear infinite; will-change: transform;
     }
-    .exec-spin::before {
-      content: ""; width: 12.83px; height: 12.83px; border-radius: 50%;
-      background: conic-gradient(from 0deg, #0F8204, rgba(15, 130, 4, 0));
-      -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 2px), #000 calc(100% - 2px));
-      mask: radial-gradient(farthest-side, transparent calc(100% - 2px), #000 calc(100% - 2px));
-    }
+    .exec-spin img { display: block; width: 12.834px; height: 12.834px; max-width: none; }
     .think-wait { display: flex; align-items: center; gap: 5px; height: 22px; padding-left: 4px; }
     .think-wait i { width: 6px; height: 6px; border-radius: 50%; background: #98a2b3; animation: think-dot 1.05s infinite ease-in-out; }
     .think-wait i:nth-child(2) { animation-delay: .16s; }
@@ -1423,6 +1418,7 @@
     .rev-number, .rev-pin { display: grid; place-items: center; flex: none; width: 22px; height: 22px; background: #ff791e; color: white; border: 2px solid white; border-radius: 50%; font-size: 11px; font-weight: 700; box-shadow: 0 1px 4px #bf580c55; }
     .rev-edit { font-size: 12px; line-height: 20px; color: #1c61d7; padding: 1px 6px; border-radius: 5px; white-space: nowrap; }
     .rev-body { font-size: 12.5px; line-height: 1.65; white-space: pre-wrap; color: #505c70; margin: 8px 0 0; overflow-wrap: anywhere; }
+    .rev-body a { color: #1c61d7; text-decoration: underline; text-underline-offset: 2px; }
     .rev-label { display: block; font-size: 12px; color: #768399; margin-top: 9px; }
     .rev-input, .rev-textarea { display: block; width: 100%; border: 1px solid #dce3ed; border-radius: 6px; padding: 8px; margin-top: 4px; color: #253047; font: 13px/1.55 var(--font); background: #fff; }
     .rev-textarea { min-height: 240px; resize: vertical; }
@@ -2339,7 +2335,7 @@
       return Math.max(1, Math.round(ms / 1000)) + " 秒";
     }
     function execIcon(state) {
-      if (state === "run") return `<span class="exec-spin" aria-hidden="true"></span>`;
+      if (state === "run") return `<span class="exec-spin" aria-hidden="true"><img src="load-icon.png" width="12.834" height="12.834" alt=""></span>`;
       if (state === "fail") return `<svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="6.2" fill="none" stroke="#f04438" stroke-width="1.5"/><path d="M5.6 5.6 10.4 10.4M10.4 5.6 5.6 10.4" fill="none" stroke="#f04438" stroke-width="1.5" stroke-linecap="round"/></svg>`;
       return `<svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="6.2" fill="none" stroke="#12b76a" stroke-width="1.5"/><path d="M5.2 8.1 7.1 10 10.8 6.1" fill="none" stroke="#12b76a" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
     }
@@ -5346,6 +5342,7 @@
       const defaults = [
         { id: "f3", num: "1", group: "feature", title: "对话里的形象", body: "【行为】形象出现在 MoreAI 旁边。思考时会眨眼、看向指针。步骤全部完成显示已完成，某一步失败时这一步标成失败。" },
         { id: "f2", num: "2", group: "feature", title: "右下角悬浮形象", body: "【行为】形象停在屏幕右下角。可以拖拽改变位置，眼睛跟随鼠标。" },
+        { id: "f4", num: "3", group: "feature", title: "失败返回", body: "【行为】生成失败后，这里返回失败说明，并给出「重新生成」。失败返回的内容见《生成异常与恢复》。\nhttps://shao12123.github.io/chatdemo/生成异常与恢复-PRD.html" },
         { id: "s1", group: "scene", title: "AI生成失败", body: "【前置】打开左侧「AI生成失败」。\n【期望】生成失败后，MoreAI 旁边的形象从默认睁眼换成失败状态：两只白色短线眼，不再眨眼。点「重新生成」后先进入思考，眼睛睁开并跟着动；思考结束再回到短线眼。\n【当前】点这条对话即可看到失败形象。点「重新生成」会先思考，再回到失败形象。" }
       ];
       const embedded = document.getElementById("revEmbedded");
@@ -5385,7 +5382,7 @@
           const number = item.num ? `<span class="rev-number">${item.num}</span>` : "";
           const body = editing
             ? `<label class="rev-label">标题<input class="rev-input" data-rev-title="${item.id}" value="${esc(entry.title)}"></label><label class="rev-label">说明<textarea class="rev-textarea" data-rev-body="${item.id}">${esc(entry.body)}</textarea></label>`
-            : `<p class="rev-body">${esc(entry.body)}</p>`;
+            : `<p class="rev-body">${esc(entry.body).replace(/https?:\/\/[^\s<]+/g, url => `<a href="${url}" target="_blank" rel="noopener">${url}</a>`)}</p>`;
           const badge = entry.status ? `<span class="rev-badge${entry.status === "已实现" ? "" : " is-pending"}">${esc(entry.status)}</span>` : "";
           return `<article class="rev-item" id="rev-${item.id}"><div class="rev-item-top">${number}<div class="rev-item-heading"><strong>${esc(entry.title)}</strong>${badge}</div><button type="button" class="rev-edit" data-rev-edit="${item.id}">${editing ? "完成" : "编辑"}</button></div>${body}</article>`;
         }).join("");
@@ -5395,9 +5392,10 @@
         if (!annotationMode) return;
         const specs = [
           ["f3", "1", ["#messages .ai-face", "#messages"]],
-          ["f2", "2", [".ai-float .ai-face"]]
+          ["f2", "2", [".ai-float .ai-face"]],
+          ["f4", "3", [".fail-note"], "on"]
         ];
-        specs.forEach(([id, num, selectors]) => {
+        specs.forEach(([id, num, selectors, place]) => {
           const target = selectors.map(selector => document.querySelector(selector)).find(node => {
             if (!node) return false;
             const rect = node.getBoundingClientRect();
@@ -5409,7 +5407,10 @@
           const pinSize = 24;
           let left = rect.left;
           let top = rect.top - pinSize - 6;
-          if (top < 58) {
+          if (place === "on") {
+            left = rect.left - pinSize - 4;
+            top = rect.top + (22 - pinSize) / 2;
+          } else if (top < 58) {
             left = rect.left - pinSize - 6;
             top = rect.top + (rect.height - pinSize) / 2;
           }
