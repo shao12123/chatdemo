@@ -214,7 +214,7 @@
     .next-chip:hover { border-color: #b9d0ff; background: #f3f7ff; color: var(--brand); }
     .think { align-self: flex-start; display: flex; flex-direction: column; gap: 8px; max-width: min(660px, 100%); }
     .think-head { display: flex; flex-direction: column; align-items: flex-start; gap: 6px; border: 0; background: transparent; padding: 0; text-align: left; cursor: pointer; }
-    .think-row { display: flex; align-items: center; gap: 8px; }
+    .think-row { display: flex; align-items: center; gap: 12px; margin-left: -8px; }
     .think-row .ai-face { width: 36px; height: 36px; }
     .think-row .ai-face-rig { transform-origin: 18px 18.7px; }
     .think-row .ai-face-art { left: 1.15px; top: 1.82px; transform: scale(0.6733, 0.6731); }
@@ -1222,7 +1222,8 @@
     #stage .msg-note { white-space: pre-wrap; }
     #stage .messages-inner > .msg.user + .msg.assistant,
     #stage .messages-inner > .msg.user + .think { margin-top: 20px; }
-    #stage .messages-inner > .think + .msg.assistant { margin-top: -4px; }
+    #stage .messages-inner > .think + .msg.assistant,
+    #stage .messages-inner > .think + .artifact { margin-top: -4px; }
     #stage .messages-inner > .msg.assistant + .msg.assistant { margin-top: -12px; }
     #stage .msg.assistant p,
     #stage .msg.assistant h4,
