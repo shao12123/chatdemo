@@ -2072,6 +2072,7 @@ function aiFaceHtml(state) {
       const key = "moreai-weather-annotation-v1";
       const defaults = [
         { id: "bg", num: "1", group: "feature", title: "卡片背景", body: "【行为】卡片背景需要和天气一致。" },
+        { id: "opt", num: "2", group: "feature", title: "选项文本", body: "【行为】卡片上选项的文本让 Agent 判断应该提供什么。这里只是做一个演示。" },
         { id: "s1", group: "scene", title: "询问可查询区间内天气（长卡片）", body: "【前置】打开左侧「询问可查询区间内天气（长卡片）」。\n【期望】今天是多云，卡片是灰蓝底。24 日最高 17.7°，25 日阵雨 12.6 mm。\n【当前】点这条对话即可看到多云卡片。" },
         { id: "s2", group: "scene", title: "询问可查询区间内天气（短卡片）", body: "【前置】打开左侧「询问可查询区间内天气（短卡片）」。\n【期望】卡片只排今天、明天、后天三行，没有滚动。后天最高 17.7°。\n【当前】点这条对话即可看到三日卡片。" },
         { id: "s3", group: "scene", title: "询问可查询区间外的天气", body: "【前置】打开左侧「询问可查询区间外的天气」。\n【期望】文案说明最多只能查到 15 天，到 11 月 5 日。卡片第一屏露出 8 天，第 8 天被蒙版挡住，提示下面还有内容。滚动后可以看到第 9 到第 15 天，滚到底蒙版消失。\n【当前】点这条对话即可看到十五日滚动卡片。" },
@@ -2124,7 +2125,8 @@ function aiFaceHtml(state) {
         pins.replaceChildren();
         if (!annotationMode) return;
         const specs = [
-          ["bg", "1", [".wx"]]
+          ["bg", "1", [".wx"]],
+          ["opt", "2", [".ask"]]
         ];
         specs.forEach(([id, num, selectors]) => {
           const target = selectors.map(selector => document.querySelector(selector)).find(node => {
