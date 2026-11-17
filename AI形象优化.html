@@ -1443,10 +1443,159 @@
       .rev-mode button { padding: 5px 9px; }
       .rev-export { padding: 6px 8px; font-size: 12px; }
     }
+    html.theme-dark {
+      color-scheme: dark;
+      --page: #090b0e;
+      --card: #111216;
+      --card-line: #292b2e;
+      --ink: #ffffff;
+      --nav: rgba(255, 255, 255, .6);
+      --secondary: rgba(255, 255, 255, .6);
+      --muted: rgba(255, 255, 255, .6);
+      --label: rgba(255, 255, 255, .4);
+      --placeholder: rgba(255, 255, 255, .4);
+      --line: #292b2e;
+      --chip: rgba(255, 255, 255, .06);
+      --chip-line: #292b2e;
+      --hover: #292b2e;
+      --brand: #317af7;
+      --brand-deep: #317af7;
+      --brand-hover: #2762c6;
+      --brand-active: #2762c6;
+      --brand-soft: #0a1831;
+      --send: #317af7;
+      --shadow: none;
+    }
+    html.theme-dark body,
+    html.theme-dark #stage.stage { background: var(--page); color: var(--ink); }
+    html.theme-dark #stage > .rail { background: #111216; }
+    html.theme-dark #stage > .rail .rail-ico:not(.on-blue) img { filter: brightness(0) invert(1); opacity: .6; }
+    html.theme-dark #stage > .rail .rail-ico.on-gray { background: rgba(255, 255, 255, .06); border-color: #292b2e; }
+    html.theme-dark #stage > .rail .rail-ico.on-blue,
+    html.theme-dark #stage > .rail .rail-ico.on-blue:hover { background: #0a1831; }
+    html.theme-dark #stage > .rail .rail-ico:hover,
+    html.theme-dark #stage > .rail .rail-ico.on-gray:hover { background: #292b2e; }
+    html.theme-dark #stage > .rail .rail-avatar { background: #0f254a; }
+    html.theme-dark #stage > .history,
+    html.theme-dark #stage > .main,
+    html.theme-dark #stage > .doc,
+    html.theme-dark .panel,
+    html.theme-dark .menu,
+    html.theme-dark .pop,
+    html.theme-dark .toc-pop,
+    html.theme-dark .ver-pop,
+    html.theme-dark .modal-card,
+    html.theme-dark .pick-card,
+    html.theme-dark .choice,
+    html.theme-dark .next-chip,
+    html.theme-dark .prompt-fill,
+    html.theme-dark .follow-bar { background: #111216; color: var(--ink); border-color: #292b2e; }
+    html.theme-dark .history-head h2,
+    html.theme-dark .session-title,
+    html.theme-dark .menu button,
+    html.theme-dark .plus-menu button,
+    html.theme-dark .toc-item,
+    html.theme-dark .choice { color: var(--ink); }
+    html.theme-dark .session:hover,
+    html.theme-dark .nav-item:hover,
+    html.theme-dark .row:hover,
+    html.theme-dark .new-chat:hover,
+    html.theme-dark .menu button:hover,
+    html.theme-dark .plus-menu button:hover,
+    html.theme-dark .toc-item:hover,
+    html.theme-dark .choice:hover { background: #292b2e; color: var(--ink); }
+    html.theme-dark .session.active,
+    html.theme-dark .nav-item.active { background: rgba(255, 255, 255, .06); color: var(--brand); }
+    html.theme-dark #stage .msg.user,
+    html.theme-dark #stage .msg.user:hover { background: #0a1831; color: #fff; }
+    html.theme-dark #stage .msg.assistant,
+    html.theme-dark .think-name,
+    html.theme-dark .fail-note p { color: #fff; }
+    html.theme-dark #stage .msg-quote { color: rgba(255, 255, 255, .6); border-left-color: #434448; }
+    html.theme-dark .think-status,
+    html.theme-dark .think-time,
+    html.theme-dark .think-chev,
+    html.theme-dark .think-shine { color: rgba(255, 255, 255, .6); }
+    html.theme-dark .exec { background: #111216; border-color: #292b2e; }
+    html.theme-dark .exec-bar,
+    html.theme-dark .exec-item { color: rgba(255, 255, 255, .6); }
+    html.theme-dark .exec-list { background: #191a1d; }
+    html.theme-dark .exec-item:not(:last-child)::before { background: #434448; }
+    html.theme-dark .exec-dot,
+    html.theme-dark .exec-item.done .exec-dot { background: rgba(255, 255, 255, .4); }
+    html.theme-dark .artifact { background: #111216; border-color: #292b2e; }
+    html.theme-dark .artifact:hover { background: #191a1d; }
+    html.theme-dark .artifact-copy b { color: #fff; }
+    html.theme-dark .artifact-copy small { color: rgba(255, 255, 255, .4); }
+    html.theme-dark .artifact-mark { background: #0a1831; }
+    html.theme-dark .artifact-actions { background: linear-gradient(to left, #191a1d 78%, rgba(25, 26, 29, 0)); }
+    html.theme-dark .artifact.on,
+    html.theme-dark .artifact.on:hover { background: #0a1831; border-color: #317af7; }
+    html.theme-dark .artifact.on:hover .artifact-actions { background: linear-gradient(to left, #0a1831 78%, rgba(10, 24, 49, 0)); }
+    html.theme-dark .artifact-actions button { color: rgba(255, 255, 255, .6); }
+    html.theme-dark .artifact-actions button:hover { background: rgba(255, 255, 255, .06); }
+    html.theme-dark .artifact-actions button img { filter: brightness(0) invert(1); opacity: .8; }
+    html.theme-dark .composer,
+    html.theme-dark #stage .composer-dock .composer { background: #191a1d; border-color: #434448; box-shadow: none; }
+    html.theme-dark .doc-chrome { background: #191a1d; }
+    html.theme-dark .doc-tab { color: rgba(255, 255, 255, .6); }
+    html.theme-dark .doc-tab:not(.active):hover { background: rgba(255, 255, 255, .06); }
+    html.theme-dark .doc-tab.active { background: #111216; color: #fff; }
+    html.theme-dark .doc-tab .favicon { background: #191a1d; }
+    html.theme-dark .doc-tab .x { color: rgba(255, 255, 255, .6); }
+    html.theme-dark .doc-tab .x:hover { background: #292b2e; color: #fff; }
+    html.theme-dark .doc-article { color: #fff; }
+    html.theme-dark .doc-article code,
+    html.theme-dark .doc-article pre { background: #191a1d; color: #fff; }
+    html.theme-dark .doc-article th,
+    html.theme-dark .doc-article td { border-color: #434448; }
+    html.theme-dark .doc-article th { background: #191a1d; }
+    html.theme-dark .doc-article blockquote { border-left-color: #434448; color: rgba(255, 255, 255, .6); }
+    html.theme-dark #stage .doc-outline .toc-item { color: rgba(255, 255, 255, .6); }
+    html.theme-dark #stage .doc-chrome .stage-actions .icon-btn,
+    html.theme-dark #stage .doc-chrome .stage-actions #btnMark { color: rgba(255, 255, 255, .6); }
+    html.theme-dark #stage .doc-chrome .stage-actions .icon-btn:hover { background: #292b2e; color: #fff; }
+    html.theme-dark #stage .doc-chrome .stage-actions .icon-btn.on,
+    html.theme-dark #stage .doc-chrome .stage-actions .icon-btn.on:hover,
+    html.theme-dark #stage .doc-chrome .stage-actions #btnMark.on,
+    html.theme-dark #stage .doc-chrome .stage-actions #btnMark.on:hover { background: #0a1831; color: #317af7; }
+    html.theme-dark #stage .tool-split { background: #292b2e; }
+    html.theme-dark .icon-tool:hover:not(:disabled),
+    html.theme-dark .ver-btn:hover:not(:disabled) { background: #292b2e; color: #fff; }
+    html.theme-dark .ver-item.selected { background: #0a1831; border-left-color: #317af7; }
+    html.theme-dark .ver-item:hover { background: #292b2e; }
+    html.theme-dark .regen { background: #191a1d; border-color: #292b2e; color: #fff; }
+    html.theme-dark #restoreCancel { background: #191a1d; border-color: #434448; color: #fff; }
+    html.theme-dark .rev-toolbar { background: #111216; border-bottom-color: #292b2e; color: #fff; }
+    html.theme-dark .rev-toolbar-title span,
+    html.theme-dark .rev-mode button { color: rgba(255, 255, 255, .6); }
+    html.theme-dark .rev-mode { background: #191a1d; }
+    html.theme-dark .rev-mode button[aria-pressed="true"] { background: #292b2e; color: #fff; box-shadow: none; }
+    html.theme-dark .rev-export { background: #191a1d; border-color: #434448; color: #fff; }
+    html.theme-dark .rev-panel { background: #111216; border-left-color: #292b2e; color: #fff; }
+    html.theme-dark .rev-panel-head,
+    html.theme-dark .rev-tabs,
+    html.theme-dark .rev-item { border-color: #292b2e; }
+    html.theme-dark .rev-panel-sub,
+    html.theme-dark .rev-body,
+    html.theme-dark .rev-label,
+    html.theme-dark .rev-tabs button,
+    html.theme-dark .rev-close { color: rgba(255, 255, 255, .6); }
+    html.theme-dark .rev-item-heading strong { color: #fff; }
+    html.theme-dark .rev-tabs button[aria-selected="true"],
+    html.theme-dark .rev-edit,
+    html.theme-dark .rev-backup-toggle,
+    html.theme-dark .rev-body a { color: #317af7; }
+    html.theme-dark .rev-input,
+    html.theme-dark .rev-textarea,
+    html.theme-dark .rev-backup-box textarea { background: #191a1d; border-color: #434448; color: #fff; }
+    html.theme-dark .rev-close:hover,
+    html.theme-dark .rev-edit:hover,
+    html.theme-dark .rev-export:hover { background: #292b2e; }
   </style>
 </head>
 <body>
-  <header class="rev-toolbar" id="revToolbar" aria-label="演示评审工具栏"><div class="rev-toolbar-title">AI形象优化 <span>AI 形象 · 标注供开发与测试参考</span></div><div class="rev-toolbar-actions"><div class="rev-mode" role="group" aria-label="切换预览和标注"><button type="button" data-rev-mode="preview" aria-pressed="true">预览</button><button type="button" data-rev-mode="annotation" aria-pressed="false">标注</button></div><button type="button" class="rev-export" id="revExport" hidden>导出 HTML</button></div></header>
+  <header class="rev-toolbar" id="revToolbar" aria-label="演示评审工具栏"><div class="rev-toolbar-title">AI形象优化 <span>AI 形象 · 标注供开发与测试参考</span></div><div class="rev-toolbar-actions"><div class="rev-mode theme-switch" id="themeSwitch" role="group" aria-label="浅色或深色"><button type="button" data-theme-mode="light" aria-pressed="true">浅色</button><button type="button" data-theme-mode="dark" aria-pressed="false">深色</button></div><div class="rev-mode" role="group" aria-label="切换预览和标注"><button type="button" data-rev-mode="preview" aria-pressed="true">预览</button><button type="button" data-rev-mode="annotation" aria-pressed="false">标注</button></div><button type="button" class="rev-export" id="revExport" hidden>导出 HTML</button></div></header>
   <div class="rev-shell">
   <div class="stage" id="stage">
     <aside class="rail" aria-label="主导航">
@@ -5525,6 +5674,19 @@
       persist();
       render();
       setMode(false);
+    })();
+    (function () {
+      function setTheme(mode) {
+        const dark = mode === "dark";
+        document.documentElement.classList.toggle("theme-dark", dark);
+        document.querySelectorAll("[data-theme-mode]").forEach(btn => btn.setAttribute("aria-pressed", String(btn.dataset.themeMode === (dark ? "dark" : "light"))));
+        try { localStorage.setItem("moreai-face-theme", dark ? "dark" : "light"); } catch (err) {}
+      }
+      document.getElementById("themeSwitch").addEventListener("click", event => {
+        const btn = event.target.closest("[data-theme-mode]");
+        if (btn) setTheme(btn.dataset.themeMode);
+      });
+      try { setTheme(localStorage.getItem("moreai-face-theme") || "light"); } catch (err) { setTheme("light"); }
     })();
   </script>
 </body>
