@@ -92,23 +92,22 @@
     .main.chatting .thread { display: flex; }
     .messages { flex: 1; overflow: auto; padding: 28px 24px 24px; }
     .messages-inner { width: min(640px, 100%); margin: 0 auto; display: flex; flex-direction: column; gap: 14px; }
-    .artifact { position: relative; align-self: flex-start; display: flex; align-items: center; width: 300px; max-width: 100%; height: 56px; border: 1px solid #eef0f3; border-radius: 12px; background: #fff; overflow: hidden; }
-    .artifact-open { display: flex; align-items: center; gap: 12px; min-width: 0; flex: 1; height: 100%; padding: 9px; border: 0; background: transparent; color: inherit; font: inherit; text-align: left; }
-    .artifact-thumb { position: relative; width: 68px; height: 38px; flex: none; overflow: hidden; border-radius: 6px; border: 1px solid #eef0f3; background: #fff; }
-    .artifact-sheet { position: absolute; left: 0; top: 0; width: 272px; padding: 10px 12px 0; transform: scale(0.25); transform-origin: top left; color: #1f2329; pointer-events: none; }
-    .artifact-sheet em { display: block; color: #8f959e; font-size: 12px; line-height: 16px; font-style: normal; }
-    .artifact-sheet strong { display: block; margin: 2px 0 6px; font-size: 18px; line-height: 24px; font-weight: 650; }
-    .artifact-sheet span { display: block; margin: 0 0 4px; color: #3a3d42; font-size: 12px; line-height: 18px; }
+    .artifact { position: relative; align-self: flex-start; display: flex; align-items: center; width: 280px; max-width: 100%; min-height: 54px; padding: 7px 13px; border: 1px solid #eef0f3; border-radius: 12px; background: #fff; overflow: hidden; }
+    .artifact-open { display: flex; align-items: center; gap: 12px; min-width: 0; flex: 1; padding: 0; border: 0; background: transparent; color: inherit; font: inherit; text-align: left; }
+    .artifact-mark { display: grid; place-items: center; flex: none; width: 32px; height: 32px; border-radius: 8px; background: #e6eefe; }
+    .artifact-mark img { display: block; width: 16px; height: 16px; }
     .artifact-copy { min-width: 0; flex: 1; overflow: hidden; }
     .artifact-copy b { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: #1e293b; font-size: 14px; line-height: 20px; font-weight: 500; }
-    .artifact-copy small { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: rgba(0, 0, 0, 0.4); font-size: 12px; line-height: 18px; font-weight: 400; }
-    .artifact-actions { display: none; align-items: center; gap: 2px; padding-right: 8px; flex: none; }
-    .artifact:hover { background: rgba(9, 11, 14, 0.04); }
+    .artifact-copy small { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: rgba(0, 0, 0, 0.4); font-size: 12px; line-height: 20px; font-weight: 400; }
+    .artifact-actions { display: none; position: absolute; right: 0; top: 0; bottom: 0; align-items: center; padding: 0 8px 0 24px; background: linear-gradient(to left, #f9f9f9 78%, rgba(249, 249, 249, 0)); }
+    .artifact:hover { background: #f9f9f9; }
     .artifact:hover .artifact-actions { display: flex; }
     .artifact.on,
-    .artifact.on:hover { background: #f3f7ff; border-color: #3370ff; }
-    .artifact-actions button { width: 28px; height: 28px; border: 0; border-radius: 8px; background: transparent; color: #5e6063; display: grid; place-items: center; padding: 0; }
-    .artifact-actions button:hover { background: rgba(9, 11, 14, 0.04); color: #5e6063; }
+    .artifact.on:hover { background: #f3f7ff; border-color: #eef0f3; }
+    .artifact.on .artifact-actions,
+    .artifact.on:hover .artifact-actions { background: linear-gradient(to left, #f3f7ff 78%, rgba(243, 247, 255, 0)); }
+    .artifact-actions button { width: 28px; height: 28px; border: 0; border-radius: 8px; background: rgba(9, 11, 14, 0.04); color: #5e6063; display: grid; place-items: center; padding: 0; }
+    .artifact-actions button img { display: block; width: 14px; height: 14px; }
     .doc-unfold { position: absolute; right: 15px; top: 16px; z-index: 3; width: 28px; height: 28px; border: 0; border-radius: 6px; background: transparent; color: #3c4043; display: inline-flex; align-items: center; justify-content: center; padding: 0; }
     .doc-unfold[hidden] { display: none; }
     .doc-unfold:hover { color: var(--ink); background: rgba(0,0,0,.06); }
@@ -1221,6 +1220,7 @@
     #stage .msg-note { white-space: pre-wrap; }
     #stage .messages-inner > .msg.user + .msg.assistant,
     #stage .messages-inner > .msg.user + .think { margin-top: 20px; }
+    #stage .messages-inner > .think + .msg.assistant { margin-top: -4px; }
     #stage .messages-inner > .msg.assistant + .msg.assistant { margin-top: -12px; }
     #stage .msg.assistant p,
     #stage .msg.assistant h4,
@@ -1315,7 +1315,7 @@
     #stage .doc-tab .x:hover { background: rgba(9, 11, 14, 0.06); color: #1e293b; }
     #stage .doc-chrome .stage-actions { margin: 0 0 0 auto; gap: 8px; }
     #stage .doc-chrome .doc-tool-pair { display: flex; align-items: center; gap: 4px; }
-    #stage .doc-chrome .stage-actions .icon-btn { width: 32px; height: 32px; border-radius: 8px; color: #5e6063; }
+    #stage .doc-chrome .stage-actions .icon-btn { width: 28px; height: 28px; border-radius: 8px; color: #5e6063; }
     #stage .doc-chrome .stage-actions .icon-btn:hover { background: rgba(9, 11, 14, 0.04); color: #5e6063; }
     #stage .doc-chrome .stage-actions .icon-btn.on,
     #stage .doc-chrome .stage-actions .icon-btn.on:hover { background: #f3f7ff; color: #0a59f7; }
@@ -1547,10 +1547,10 @@
           <div class="stage-actions">
             <div class="doc-tool-pair">
               <button class="icon-btn" id="btnMark" type="button" data-tip="标注修改" aria-label="标注修改">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 20h4l10-10-4-4L4 16v4z"/><path d="M14 6l4 4"/></svg>
+                <img src="mark-icon.svg" width="14" height="14" alt="">
               </button>
               <button class="icon-btn" id="btnMax" type="button" data-tip="展开" aria-label="展开">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 3H3v6M15 3h6v6M9 21H3v-6M21 15v6h-6"/></svg>
+                <img src="zoom-icon.svg" width="14" height="14" alt="">
               </button>
             </div>
             <span class="tool-split" aria-hidden="true"></span>
@@ -2019,16 +2019,6 @@
       const view = Number.isInteger(win.view) ? win.view : versions.length - 1;
       return versions[view]?.blocks || versions[versions.length - 1]?.blocks || [];
     }
-    function artifactThumb(win, name) {
-      const blocks = artifactBlocks(win);
-      const heading = blocks.find(block => block.kind === "h2" || block.kind === "h1");
-      const title = plainText(heading?.text || name || "文档");
-      const lines = blocks.filter(block => block.kind === "p").slice(0, 2).map(block => {
-        const text = plainText(block.text).replace(/^(摘要|关键词)[：:]/, "");
-        return `<span>${esc(text)}</span>`;
-      }).join("");
-      return `<span class="artifact-thumb" aria-hidden="true"><span class="artifact-sheet"><em>课程论文</em><strong>${esc(title)}</strong>${lines}</span></span>`;
-    }
     function downloadArtifact(session, winId) {
       const win = (session.windows || []).find(item => item.id === winId);
       if (!win || win.mode === "compare") return;
@@ -2384,10 +2374,9 @@
           return `<button class="artifact cmp${on ? " on" : ""}" type="button" data-artifact="${esc(m.winId)}">${thumb}<span class="artifact-copy"><b>${esc(m.name)}</b><small class="${writing ? "live" : ""}">${esc(status)}</small></span></button>`;
         }
         const status = writing ? "编写中" : "可编辑";
-        const thumb = artifactThumb(win, m.name);
-        const eye = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>`;
-        const down = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 4v11"/><path d="M7 11l5 5 5-5"/><path d="M5 20h14"/></svg>`;
-        return `<div class="artifact${on ? " on" : ""}"><button class="artifact-open" type="button" data-artifact="${esc(m.winId)}">${thumb}<span class="artifact-copy"><b>${esc(m.name)}</b><small class="${writing ? "live" : ""}">${esc(status)}</small></span></button><span class="artifact-actions"><button type="button" data-artifact="${esc(m.winId)}" data-tip="预览" aria-label="预览">${eye}</button><button type="button" data-artifact-download="${esc(m.winId)}" data-tip="下载" aria-label="下载">${down}</button></span></div>`;
+        const mark = `<span class="artifact-mark" aria-hidden="true"><img src="doc-icon.svg" width="16" height="16" alt=""></span>`;
+        const down = `<img src="artifact-download.svg" width="14" height="14" alt="">`;
+        return `<div class="artifact${on ? " on" : ""}"><button class="artifact-open" type="button" data-artifact="${esc(m.winId)}">${mark}<span class="artifact-copy"><b>${esc(m.name)}</b><small class="${writing ? "live" : ""}">${esc(status)}</small></span></button><span class="artifact-actions"><button type="button" data-artifact-download="${esc(m.winId)}" data-tip="下载" aria-label="下载">${down}</button></span></div>`;
       }
       if (m.html) {
         const shown = m.typing ? m.html.replace(/<\/p>\s*$/, `<i class="stream-caret"></i></p>`) : m.html;
