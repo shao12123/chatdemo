@@ -767,14 +767,15 @@
 
     .think { align-self: flex-start; display: flex; flex-direction: column; gap: 8px; max-width: 100%; }
     .think-head { display: flex; flex-direction: column; align-items: flex-start; gap: 6px; border: 0; background: transparent; padding: 0; font: inherit; color: inherit; cursor: pointer; }
-    .think-row { display: flex; align-items: center; gap: 8px; }
-    .think-row .ai-face { width: 36px; height: 36px; }
-    .think-row .ai-face-rig { transform-origin: 18px 18.7px; }
-    .think-row .ai-face-art { left: 1.15px; top: 1.82px; transform: scale(0.6733, 0.6731); }
-    .think-name { color: #1c2330; font-size: 15px; line-height: 22px; font-weight: 600; }
-    .think-status { display: flex; align-items: center; gap: 4px; min-height: 20px; color: #98a2b3; font-size: 13px; line-height: 20px; }
+    .think-row { display: flex; align-items: center; gap: 8px; height: 50px; }
+    .think-face { position: relative; width: 36px; height: 36px; flex: none; overflow: hidden; background: #fff; }
+    .think-face img { position: absolute; left: 50%; top: calc(50% + 0.67px); transform: translate(-50%, -50%); }
+    .think-name { color: #1c2330; font-size: 15px; line-height: 22px; font-weight: 700; }
+    .think-status { display: flex; align-items: center; gap: 8px; min-height: 20px; color: #98a2b3; font-size: 13px; line-height: 20px; }
     .think-status b { font-weight: 400; }
+    .think-meta { display: inline-flex; align-items: flex-start; }
     .think-time { color: #98a2b3; font-size: 13px; line-height: 20px; }
+    .think-chev-box { display: flex; align-items: center; justify-content: center; width: 20px; height: 20px; flex: none; }
     .think-chev { flex: none; color: #98a2b3; transition: transform .2s ease; }
     .think.open .think-chev { transform: rotate(180deg); }
     .think-body { display: flex; flex-direction: column; align-items: flex-start; gap: 12px; width: 100%; }
@@ -1597,13 +1598,14 @@ function aiFaceHtml(state) {
     }
 
     const execDoneIcon = `<svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="6.2" fill="none" stroke="#12b76a" stroke-width="1.5"/><path d="M5.2 8.1 7.1 10 10.8 6.1" fill="none" stroke="#12b76a" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
-    const thinkChev = `<svg class="think-chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>`;
+    const thinkFace = `<span class="think-face" aria-hidden="true"><img src="ai-face-idle.svg" width="33.696" height="27.54" alt=""></span>`;
+    const thinkChev = `<span class="think-chev-box"><svg class="think-chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></span>`;
     function thinkHtml(scene) {
       const steps = scene.steps || [];
       const open = !!scene.thinkOpen;
       const rows = steps.map(text => `<li class="exec-item done"><i class="exec-dot"></i><span>${esc(text)}</span></li>`).join("");
       const body = open ? `<div class="think-body"><div class="exec"><div class="exec-bar">${execDoneIcon}<span class="exec-title">已执行 ${steps.length} 个步骤</span></div><ul class="exec-list">${rows}</ul></div></div>` : "";
-      return `<div class="think done${open ? " open" : ""}"><button class="think-head" type="button" data-think aria-expanded="${open ? "true" : "false"}"><span class="think-row">${aiFaceHtml("idle")}<span class="think-name">MoreAI</span></span><span class="think-status"><b>已完成</b><span class="think-time">${scene.seconds || 2} 秒</span>${thinkChev}</span></button>${body}</div>`;
+      return `<div class="think done${open ? " open" : ""}"><button class="think-head" type="button" data-think aria-expanded="${open ? "true" : "false"}"><span class="think-row">${thinkFace}<span class="think-name">MoreAI</span></span><span class="think-status"><b>已完成</b><span class="think-meta"><span class="think-time">${scene.seconds || 2} 秒</span>${thinkChev}</span></span></button>${body}</div>`;
     }
     function bindThink() {
       document.querySelectorAll("[data-think]").forEach(button => {
