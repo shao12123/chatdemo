@@ -214,7 +214,10 @@
     .next-chip:hover { border-color: #b9d0ff; background: #f3f7ff; color: var(--brand); }
     .think { align-self: flex-start; display: flex; flex-direction: column; gap: 8px; max-width: min(660px, 100%); }
     .think-head { display: flex; flex-direction: column; align-items: flex-start; gap: 6px; border: 0; background: transparent; padding: 0; text-align: left; cursor: pointer; }
-    .think-row { display: flex; align-items: center; gap: 12px; margin-left: -8px; }
+    .think-row { display: flex; align-items: center; gap: 8px; }
+    .think-row .ai-face { width: 36px; height: 36px; }
+    .think-row .ai-face-rig { transform-origin: 18px 18.7px; }
+    .think-row .ai-face-art { left: 1.15px; top: 1.82px; transform: scale(0.6733, 0.6731); }
     .think-name { color: #1c2330; font-size: 15px; line-height: 22px; font-weight: 600; }
     .think-status { display: flex; align-items: center; gap: 4px; min-height: 20px; color: #98a2b3; font-size: 13px; line-height: 20px; }
     .think-status b { font-weight: 400; }
@@ -225,7 +228,7 @@
     }
     @keyframes think-shine { from { background-position: 100% 0; } to { background-position: -80% 0; } }
     .think-chev { flex: none; color: #98a2b3; transition: transform .2s ease; }
-    .think.open .think-chev { transform: rotate(90deg); }
+    .think.open .think-chev { transform: rotate(180deg); }
     .think-body { display: flex; flex-direction: column; align-items: flex-start; gap: 12px; width: 100%; }
     .exec { width: min(520px, 100%); border: 1px solid #e7e9ee; border-radius: 12px; background: #fff; overflow: hidden; }
     .exec-bar { display: flex; align-items: center; gap: 8px; min-height: 36px; padding: 8px 12px; color: #667085; font-size: 12px; line-height: 20px; }
@@ -239,7 +242,16 @@
     .exec-item.fail { color: #667085; }
     .exec-item.fail .exec-dot { background: #98a2b3; }
     .exec-item span { min-width: 0; }
-    .exec-spin { display: block; flex: none; transform-origin: center; transform-box: fill-box; animation: spin .8s linear infinite; will-change: transform; }
+    .exec-spin {
+      display: grid; place-items: center; flex: none; width: 14px; height: 14px;
+      transform-origin: center; animation: spin .8s linear infinite; will-change: transform;
+    }
+    .exec-spin::before {
+      content: ""; width: 12.83px; height: 12.83px; border-radius: 50%;
+      background: conic-gradient(from 0deg, #0F8204, rgba(15, 130, 4, 0));
+      -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 2px), #000 calc(100% - 2px));
+      mask: radial-gradient(farthest-side, transparent calc(100% - 2px), #000 calc(100% - 2px));
+    }
     .think-wait { display: flex; align-items: center; gap: 5px; height: 22px; padding-left: 4px; }
     .think-wait i { width: 6px; height: 6px; border-radius: 50%; background: #98a2b3; animation: think-dot 1.05s infinite ease-in-out; }
     .think-wait i:nth-child(2) { animation-delay: .16s; }
@@ -2327,7 +2339,7 @@
       return Math.max(1, Math.round(ms / 1000)) + " 秒";
     }
     function execIcon(state) {
-      if (state === "run") return `<svg class="exec-spin" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="6.2" fill="none" stroke="#d8f3e4" stroke-width="1.5"/><path d="M8 1.8a6.2 6.2 0 0 1 6.2 6.2" fill="none" stroke="#12b76a" stroke-width="1.5" stroke-linecap="round"/></svg>`;
+      if (state === "run") return `<span class="exec-spin" aria-hidden="true"></span>`;
       if (state === "fail") return `<svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="6.2" fill="none" stroke="#f04438" stroke-width="1.5"/><path d="M5.6 5.6 10.4 10.4M10.4 5.6 5.6 10.4" fill="none" stroke="#f04438" stroke-width="1.5" stroke-linecap="round"/></svg>`;
       return `<svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="6.2" fill="none" stroke="#12b76a" stroke-width="1.5"/><path d="M5.2 8.1 7.1 10 10.8 6.1" fill="none" stroke="#12b76a" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
     }
@@ -2346,7 +2358,7 @@
       const finished = list.filter(step => step && typeof step === "object" && step.state && step.state !== "run").length;
       const title = finished ? `已执行 ${finished} 个步骤` : "正在执行";
       const mark = working ? execIcon("run") : execIcon("done");
-      return `<div class="exec"><div class="exec-bar">${mark}<span class="exec-title">${title}</span><svg class="exec-chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></div><ul class="exec-list">${rows.join("")}</ul></div>`;
+      return `<div class="exec"><div class="exec-bar">${mark}<span class="exec-title">${title}</span></div><ul class="exec-list">${rows.join("")}</ul></div>`;
     }
     function messageHtml(session, m, index) {
       if (m.type === "assistant" && !m.text && !m.html) return "";
@@ -2357,8 +2369,8 @@
         const working = !m.done;
         const time = traceClock(m);
         const label = working ? `<b class="think-shine">思考中</b>` : `<b>已完成</b>`;
-        const chev = !working && list.length ? `<svg class="think-chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>` : "";
-        const head = `<button class="think-head" type="button" data-think="${index}" aria-expanded="${working || m.open ? "true" : "false"}"><span class="think-row">${aiFaceHtml(faceState(session, m))}<span class="think-name">MoreAI</span></span><span class="think-status">${label}${time ? `<span class="think-time">${esc(time)}</span>` : ""}${chev}</span></button>`;
+        const chev = !working && list.length ? `<svg class="think-chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>` : "";
+        const head = `<button class="think-head" type="button" ${working ? "" : `data-think="${index}"`} aria-expanded="${working || m.open ? "true" : "false"}"><span class="think-row">${aiFaceHtml(faceState(session, m))}<span class="think-name">MoreAI</span></span><span class="think-status">${label}${time ? `<span class="think-time">${esc(time)}</span>` : ""}${chev}</span></button>`;
         const card = list.length ? execHtml(list, working) : "";
         const wait = working && m.wait !== false ? `<div class="think-wait" aria-hidden="true"><i></i><i></i><i></i></div>` : "";
         const body = (working || m.open) && (card || wait) ? `<div class="think-body">${card}${wait}</div>` : "";
@@ -5224,7 +5236,7 @@
         title: "课程论文",
         messages: [
           { type: "user", text: "帮我写一篇课程论文：生成式 AI 会怎样改变初级程序员的代码评审" },
-          { type: "think", steps, open: true, done, keep: true, wait: !done, started: Date.now() - (done ? 16000 : 4000), elapsed: done ? 16000 : 0, stage: done ? "已完成" : "思考中" }
+          { type: "think", steps, open: !done, done, keep: true, wait: !done, started: Date.now() - (done ? 16000 : 4000), elapsed: done ? 16000 : 0, stage: done ? "已完成" : "思考中" }
         ],
         docOpen: done,
         windows: [],
