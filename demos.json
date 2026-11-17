@@ -30,6 +30,13 @@
       "summary": "PPT 标注修改：多标注发送、失败与部分失败、暂停后预览不保留标注"
     },
     {
+      "id": "anno-prd",
+      "title": "标注修改说明",
+      "file": "标注修改-PRD.html",
+      "owner": "张宏尧",
+      "summary": "PRD：PPT 标注入队、一次发送、成功另存新版、失败与暂停不留预览标注；顶部可打开交互 Demo，可复制 Markdown 给 AGENT"
+    },
+    {
       "id": "route-plan-prd",
       "title": "行程对比方案",
       "file": "三个路线方案-PRD.html",
