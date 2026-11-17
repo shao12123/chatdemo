@@ -6,29 +6,61 @@
   <title>映射对照场景</title>
   <style>
     :root {
-      --page: #f6f7fb;
+      --page: #eef0f3;
       --card: #ffffff;
-      --card-line: #f1f5f9;
+      --card-line: #e3e4e7;
       --brand: #0a59f7;
       --brand-deep: #165dff;
       --brand-hover: #1e61ea;
       --brand-active: #0e4ed9;
-      --ink: #1e293b;
-      --nav: #5e6063;
-      --secondary: #5e6063;
-      --muted: #858e9c;
-      --label: #858e9c;
-      --placeholder: #828a99;
-      --line: #f1f5f9;
+      --ink: #000000;
+      --nav: rgba(0, 0, 0, .6);
+      --secondary: rgba(0, 0, 0, .6);
+      --muted: rgba(0, 0, 0, .4);
+      --label: rgba(0, 0, 0, .4);
+      --placeholder: rgba(0, 0, 0, .4);
+      --line: #e3e4e7;
       --chip: rgba(9, 11, 14, 0.04);
-      --chip-line: #e9ebee;
+      --chip-line: #e3e4e7;
       --hover: #f3f7ff;
       --brand-soft: #f3f7ff;
+      --bubble: #f3f7ff;
+      --map-zh: #eef0f3;
+      --map-en: #f3f7ff;
+      --map-line: #e3e4e7;
+      --map-pair: #d6e4ff;
       --send: #165dff;
       --sidebar: linear-gradient(180deg, rgba(248,250,255,.8) 0%, rgba(234,242,255,.8) 54%, rgba(234,242,255,.8) 61%, rgba(243,243,255,.8) 100%);
       --stage: var(--page);
       --shadow: 0 1px 2px rgba(0,0,0,.05);
       --font: "HarmonyOS Sans SC", "HarmonyOS Sans", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "微软雅黑", "Noto Sans SC", "Source Han Sans SC", "Noto Sans CJK SC", sans-serif;
+    }
+    html.theme-dark {
+      color-scheme: dark;
+      --page: #090b0e;
+      --card: #111216;
+      --card-line: #292b2e;
+      --brand: #317af7;
+      --brand-deep: #317af7;
+      --brand-hover: #2762c6;
+      --brand-active: #317af7;
+      --ink: #ffffff;
+      --nav: rgba(255, 255, 255, .6);
+      --secondary: rgba(255, 255, 255, .6);
+      --muted: rgba(255, 255, 255, .4);
+      --label: rgba(255, 255, 255, .4);
+      --placeholder: rgba(255, 255, 255, .4);
+      --line: #292b2e;
+      --chip: rgba(255, 255, 255, .06);
+      --chip-line: #292b2e;
+      --hover: #292b2e;
+      --brand-soft: #0a1831;
+      --bubble: #0a1831;
+      --map-zh: #191a1d;
+      --map-en: #0a1831;
+      --map-line: #292b2e;
+      --map-pair: rgba(49, 122, 247, .32);
+      --send: #317af7;
     }
     * { box-sizing: border-box; }
     html, body { height: 100%; margin: 0; }
@@ -406,7 +438,7 @@
       display: flex;
       flex-direction: column;
       overflow: hidden;
-      background: #fff;
+      background: var(--card);
       border: 1px solid var(--card-line);
       border-radius: 24px;
       box-shadow: var(--shadow);
@@ -416,7 +448,7 @@
       grid-row: 2;
       min-width: 0;
       min-height: 0;
-      background: #fff;
+      background: var(--card);
       border: 1px solid var(--card-line);
       border-radius: 24px;
       box-shadow: var(--shadow);
@@ -638,8 +670,8 @@
       gap: 12px;
     }
     #stage .msg { max-width: 86%; font-size: 14px; line-height: 22px; }
-    #stage .msg.user { display: block; margin: 0; align-self: flex-end; background: #eef2ff; border-radius: 8px; padding: 10px 14px; white-space: pre-wrap; }
-    #stage .msg.user:hover { background: #eef2ff; }
+    #stage .msg.user { display: block; margin: 0; align-self: flex-end; background: var(--bubble); border-radius: 8px; padding: 10px 14px; white-space: pre-wrap; }
+    #stage .msg.user:hover { background: var(--bubble); }
     #stage .msg.assistant {
       align-self: flex-start;
       max-width: 100%;
@@ -764,28 +796,82 @@
     }
 
     .lead { margin: 0 0 12px; font-size: 15px; line-height: 24px; }
-    .map { position: relative; align-self: flex-start; width: 100%; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); border: 1px solid #eceef2; border-radius: 16px; overflow: hidden; }
-    .map-block { min-width: 0; background: #f7f8fa; padding: 12px 16px 16px; }
-    .map-target { background: #f4f7ff; border-left: 1px solid #eceef2; padding-left: 26px; }
+    .map { position: relative; align-self: flex-start; width: 100%; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); border: 1px solid var(--map-line); border-radius: 16px; overflow: hidden; }
+    .map-block { min-width: 0; background: var(--map-zh); padding: 12px 16px 16px; }
+    .map-target { background: var(--map-en); border-left: 1px solid var(--map-line); padding-left: 26px; }
     .map-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 28px; margin-bottom: 8px; }
-    .map-head span { color: #646a73; font-size: 13px; line-height: 20px; font-weight: 500; }
+    .map-head span { color: var(--secondary); font-size: 13px; line-height: 20px; font-weight: 500; }
     .map-copy { width: 28px; height: 28px; flex: none; border: 0; border-radius: 8px; background: transparent; padding: 0; display: grid; place-items: center; }
     .map-copy img { width: 14px; height: 14px; }
     .map-copy:hover { background: rgba(9, 11, 14, 0.04); }
-    .map-swap { position: absolute; z-index: 2; left: 50%; top: 12px; width: 28px; height: 28px; margin: 0 0 0 -14px; border: 1px solid #eceef2; border-radius: 50%; background: #fff; color: #8f959e; display: grid; place-items: center; padding: 0; pointer-events: none; }
+    .map-swap { position: absolute; z-index: 2; left: 50%; top: 12px; width: 28px; height: 28px; margin: 0 0 0 -14px; border: 1px solid var(--map-line); border-radius: 50%; background: var(--card); color: var(--secondary); display: grid; place-items: center; padding: 0; pointer-events: none; }
     .map-block p { margin: 0; color: var(--ink); font-size: 16px; line-height: 28px; }
     .map-pair { border-radius: 4px; padding: 1px 2px; margin: 0 -1px; cursor: pointer; -webkit-box-decoration-break: clone; box-decoration-break: clone; }
-    .map-pair.on { background: #d6e4ff; }
+    .map-pair.on { background: var(--map-pair); }
     @media (max-width: 760px) {
       .map { grid-template-columns: minmax(0, 1fr); }
-      .map-target { border-left: 0; border-top: 1px solid #eceef2; padding-left: 16px; }
+      .map-target { border-left: 0; border-top: 1px solid var(--map-line); padding-left: 16px; }
       .map-swap { display: none; }
     }
+
+    .theme-switch { display: inline-flex; align-items: center; background: #f2f4f7; border-radius: 8px; padding: 3px; }
+    .theme-switch button { padding: 4px 10px; border-radius: 6px; font-size: 12px; color: var(--secondary); line-height: 18px; }
+    .theme-switch button[aria-pressed="true"] { background: #fff; color: var(--brand); box-shadow: 0 1px 3px rgba(24, 36, 62, .12); font-weight: 600; }
+    html.theme-dark #stage > .rail { background: #111216; }
+    html.theme-dark #stage > .rail .rail-avatar { background: #0f254a; }
+    html.theme-dark #stage > .rail .rail-ico.on-gray,
+    html.theme-dark #stage > .rail .rail-ico:hover,
+    html.theme-dark #stage > .rail .rail-ico.on-gray:hover { background: #292b2e; border-color: #434448; }
+    html.theme-dark #stage > .rail .rail-ico.on-blue,
+    html.theme-dark #stage > .rail .rail-ico.on-blue:hover { background: #0a1831; border-color: transparent; }
+    html.theme-dark .composer,
+    html.theme-dark #stage .composer-dock .composer { background: #191a1d; border-color: #434448; box-shadow: none; }
+    html.theme-dark .composer textarea { color: var(--ink); }
+    html.theme-dark .pop,
+    html.theme-dark .hist-pop,
+    html.theme-dark .toast { background: #111216; color: #ffffff; border-color: #434448; }
+    html.theme-dark .plus-menu button:hover,
+    html.theme-dark #sessionList .session:hover,
+    html.theme-dark #histPopList button:hover,
+    html.theme-dark #stage #newChat.new-chat:hover,
+    html.theme-dark #stage .chats-toggle:hover,
+    html.theme-dark #stage .main .doc-unfold:hover,
+    html.theme-dark .strip-btn:hover,
+    html.theme-dark .map-copy:hover { background: #292b2e; color: var(--ink); }
+    html.theme-dark .rev-toolbar { background: #111216; color: var(--ink); border-bottom-color: #292b2e; }
+    html.theme-dark .rev-toolbar-title span,
+    html.theme-dark .rev-mode button,
+    html.theme-dark .theme-switch button { color: var(--secondary); }
+    html.theme-dark .rev-mode,
+    html.theme-dark .theme-switch { background: #292b2e; }
+    html.theme-dark .rev-mode button[aria-pressed="true"],
+    html.theme-dark .theme-switch button[aria-pressed="true"] { background: #191a1d; color: var(--brand); box-shadow: none; }
+    html.theme-dark .rev-export { background: #191a1d; border-color: #434448; color: var(--ink); }
+    html.theme-dark .rev-panel { background: var(--card); color: var(--ink); border-left-color: #292b2e; }
+    html.theme-dark .rev-item { border-bottom-color: #292b2e; }
+    html.theme-dark .rev-item-heading strong { color: var(--ink); }
+    html.theme-dark .rev-body,
+    html.theme-dark .rev-label,
+    html.theme-dark .rev-panel-sub,
+    html.theme-dark .rev-tabs button { color: var(--secondary); }
+    html.theme-dark .rev-tabs button[aria-selected="true"] { color: var(--brand); border-bottom-color: var(--brand); }
+    html.theme-dark .rev-input,
+    html.theme-dark .rev-textarea { background: #191a1d; color: var(--ink); border-color: #434448; }
+    html.theme-dark .rev-close:hover,
+    html.theme-dark .rev-export:hover { background: #292b2e; }
+    html.theme-dark #stage > .rail .rail-ico img,
+    html.theme-dark #stage .hist-fold img,
+    html.theme-dark #stage .new-chat img,
+    html.theme-dark #stage .doc-unfold img,
+    html.theme-dark #stage .chats-toggle img,
+    html.theme-dark #stage .strip-btn img,
+    html.theme-dark .map-copy img,
+    html.theme-dark .map-swap svg { filter: invert(.86) hue-rotate(180deg); }
 
   </style>
 </head>
 <body>
-  <header class="rev-toolbar" id="revToolbar" aria-label="演示评审工具栏"><div class="rev-toolbar-title">映射对照场景 <span>中英对照 · 标注供开发与测试参考</span></div><div class="rev-toolbar-actions"><div class="rev-mode" role="group" aria-label="切换预览和标注"><button type="button" data-rev-mode="preview" aria-pressed="true">预览</button><button type="button" data-rev-mode="annotation" aria-pressed="false">标注</button></div><button type="button" class="rev-export" id="revExport" hidden>导出 HTML</button></div></header>
+  <header class="rev-toolbar" id="revToolbar" aria-label="演示评审工具栏"><div class="rev-toolbar-title">映射对照场景 <span>中英对照 · 标注供开发与测试参考</span></div><div class="rev-toolbar-actions"><div class="theme-switch" id="themeSwitch" role="group" aria-label="浅色或深色"><button type="button" data-theme-mode="light" aria-pressed="true">浅色</button><button type="button" data-theme-mode="dark" aria-pressed="false">深色</button></div><div class="rev-mode" role="group" aria-label="切换预览和标注"><button type="button" data-rev-mode="preview" aria-pressed="true">预览</button><button type="button" data-rev-mode="annotation" aria-pressed="false">标注</button></div><button type="button" class="rev-export" id="revExport" hidden>导出 HTML</button></div></header>
   <div class="rev-shell">
   <div class="stage" id="stage">
     <aside class="rail" aria-label="主导航">
@@ -1214,6 +1300,17 @@ const toastIcons = {
       if (!host || host.contains(event.relatedTarget)) return;
       hoverTip.classList.remove("show");
     });
+    function setTheme(mode) {
+      const dark = mode === "dark";
+      document.documentElement.classList.toggle("theme-dark", dark);
+      document.querySelectorAll("[data-theme-mode]").forEach(btn => btn.setAttribute("aria-pressed", String(btn.dataset.themeMode === (dark ? "dark" : "light"))));
+      try { localStorage.setItem("moreai-map-theme", dark ? "dark" : "light"); } catch (err) {}
+    }
+    document.getElementById("themeSwitch")?.addEventListener("click", event => {
+      const btn = event.target.closest("[data-theme-mode]");
+      if (btn) setTheme(btn.dataset.themeMode);
+    });
+    try { setTheme(localStorage.getItem("moreai-map-theme") === "dark" ? "dark" : "light"); } catch (err) { setTheme("light"); }
     openSession("demo");
 
   </script>
