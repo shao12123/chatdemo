@@ -51,8 +51,24 @@
     .hint {
       flex: none; margin: 12px 20px 0; padding: 10px 12px; border-radius: 12px; background: #eef0f3;
       font-size: 12px; line-height: 18px; color: var(--sub);
+      display: flex; align-items: flex-start; justify-content: space-between; gap: 12px;
     }
     .hint b { color: var(--ink); font-weight: 600; }
+    .hint .acts { flex: none; display: flex; gap: 6px; }
+    .hint .acts button {
+      height: 28px; padding: 0 10px; border-radius: 8px; border: 1px solid var(--line);
+      background: #fff; font-size: 12px; color: var(--ink);
+    }
+    .hint .acts button:hover { border-color: #b9cdfb; color: var(--brand); }
+    .hint .acts button.on { border-color: var(--brand); color: var(--brand); background: #f3f7ff; }
+    .stage-row { flex: 1; min-height: 0; display: flex; }
+    .stage-row .scroll { flex: 1; }
+    .fake-doc {
+      display: none; width: 280px; flex: none; border-left: 1px solid var(--line);
+      background: #fafbfc; padding: 16px; overflow: auto; font-size: 12px; color: var(--sub); line-height: 20px;
+    }
+    .main.with-doc .fake-doc { display: block; }
+    .fake-doc h4 { margin: 0 0 8px; font-size: 13px; color: var(--ink); }
     .scroll {
       flex: 1; min-height: 0; overflow: auto; padding: 16px 48px 48px 24px; position: relative;
     }
@@ -80,13 +96,16 @@
     .qnav { position: absolute; top: 0; right: 14px; bottom: 0; width: 28px; z-index: 6; pointer-events: none; opacity: 0; visibility: hidden; transition: opacity .2s ease, visibility 0s linear .2s; }
     .qnav.show { opacity: 1; visibility: visible; transition: opacity .2s ease; }
     .qnav-rail { position: absolute; top: 50%; right: 0; padding: 6px 0 6px 12px; transform: translateY(-50%); pointer-events: auto; cursor: pointer; transition: opacity .16s ease; }
-    .qnav-view { width: 16px; overflow: hidden; }
-    .qnav-track { transition: transform .25s ease; }
-    .qnav-rail i { display: block; width: 8px; height: 2px; margin: 4px 0 4px auto; border-radius: 1px; background: #c9cdd4; transition: width .2s ease, background-color .2s ease; }
+    .qnav-view { width: 20px; overflow: hidden; }
+    /* flex + gap：避免相邻 margin 塌陷把 10px 间距压成 ~6px，滚到底只剩几根 */
+    .qnav-track { display: flex; flex-direction: column; align-items: flex-end; gap: 8px; transition: transform .25s ease; }
+    .qnav-rail i { display: block; width: 8px; height: 2px; margin: 0; flex: 0 0 2px; border-radius: 1px; background: #c9cdd4; transition: width .12s ease, background-color .2s ease; transform-origin: right center; }
     .qnav-rail i.is-current { width: 16px; background: #1f2329; }
     .qnav-rail i.is-new { animation: qnav-dash-in .32s cubic-bezier(.2, .8, .2, 1); }
+    .qnav.dense-rail .qnav-rail { width: 22px; }
     @keyframes qnav-dash-in { from { width: 0; opacity: 0; } }
     .qnav.open .qnav-rail { opacity: 0; }
+    .qnav.dense-rail.open .qnav-rail { opacity: 0; pointer-events: none; }
     .qnav-card { position: absolute; right: -13px; width: 280px; max-height: calc(100% - 24px); overflow-y: auto; overscroll-behavior: contain; scrollbar-width: none; padding: 6px; background: #fff; border: 1px solid #eceef2; border-radius: 12px; box-shadow: 0 8px 28px rgba(31, 35, 41, .08), 0 1px 3px rgba(31, 35, 41, .06); pointer-events: none; opacity: 0; clip-path: inset(0 0 0 calc(100% - 24px) round 12px); transition: opacity .2s ease, clip-path .2s cubic-bezier(.2, .8, .2, 1); }
     .qnav-card::-webkit-scrollbar { display: none; }
     .qnav.open .qnav-card { pointer-events: auto; opacity: 1; clip-path: inset(0 round 12px); }
@@ -130,21 +149,33 @@
       </aside>
       <section class="main">
         <div class="hint" id="hint"></div>
-        <div class="scroll" id="scroller"></div>
+        <div class="stage-row">
+          <div class="scroll" id="scroller"></div>
+          <aside class="fake-doc" id="fakeDoc" aria-label="模拟右侧文档台">
+            <h4>模拟右侧文档台</h4>
+            <p>打开后，对话列上的提问 / 消息目录应隐藏；文档目录改在文档区右缘出现（正式产品）。本 case 只演示「隐藏提问目录」。</p>
+          </aside>
+        </div>
       </section>
       <aside class="notes" id="notes" aria-label="说明"></div>
     </div>
   </div>
 
   <script>
-    const OUTLINE_MIN = 2, OUTLINE_MAX = 30, OUTLINE_PITCH = 10;
+    const OUTLINE_MIN = 2, OUTLINE_MAX = 18, OUTLINE_PITCH = 10;
+    const OUTLINE_CARD_MAX = 12, OUTLINE_ROW_H = 30; // 展开卡最多约 12 行，兼顾 1440 小屏
     const outlineReduced = () => window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     const esc = s => String(s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 
     function createOutline(cfg) {
-      const ui = { items: [], open: false, peek: null, current: -1, pinned: null, sig: "", counts: {}, peekTimer: 0, closeTimer: 0, raf: 0 };
+      const dense = !!cfg.denseRail;
+      const ui = {
+        items: [], open: false, peek: null, current: -1, pinned: null, sig: "", counts: {},
+        peekTimer: 0, closeTimer: 0, openTimer: 0, raf: 0, panRaf: 0,
+        panExtra: 0, edgeDir: 0, fisheyeY: null, baseOffset: 0, maxOffset: 0
+      };
       const el = document.createElement("nav");
-      el.className = "qnav" + (cfg.peek ? "" : " no-peek");
+      el.className = "qnav" + (cfg.peek ? "" : " no-peek") + (dense ? " dense-rail" : "");
       el.id = cfg.id;
       el.setAttribute("aria-label", cfg.label);
       el.innerHTML = `<div class="qnav-rail" aria-hidden="true"><div class="qnav-view"><div class="qnav-track"></div></div></div><div class="qnav-card"></div>`;
@@ -156,15 +187,71 @@
       const scroller = cfg.scroller;
       const keyOf = node => Number(node.dataset.qi);
       const markCurrent = () => el.querySelectorAll("[data-qi]").forEach(node => node.classList.toggle("is-current", keyOf(node) === ui.current));
-      function placeTrack() {
+      function metrics() {
         const n = ui.items.length;
         const room = Math.max(OUTLINE_PITCH, el.clientHeight - 48);
         const visible = Math.max(1, Math.min(n, OUTLINE_MAX, Math.floor(room / OUTLINE_PITCH)));
-        view.style.height = visible * OUTLINE_PITCH + "px";
+        const max = Math.max(0, (n - visible) * OUTLINE_PITCH);
         const at = Math.max(0, ui.items.findIndex(item => item.key === ui.current));
-        const max = (n - visible) * OUTLINE_PITCH;
-        const offset = Math.max(0, Math.min(max, at * OUTLINE_PITCH - (visible * OUTLINE_PITCH) / 2 + OUTLINE_PITCH / 2));
+        const base = Math.max(0, Math.min(max, at * OUTLINE_PITCH - (visible * OUTLINE_PITCH) / 2 + OUTLINE_PITCH / 2));
+        return { n, visible, max, base };
+      }
+      function applyFisheye() {
+        const dashes = [...track.querySelectorAll("i")];
+        // 鱼眼只加长横线，不改上下间距，避免 overflow 窗口里只剩两三根
+        if (!dense || ui.fisheyeY == null || outlineReduced() || ui.open) {
+          dashes.forEach(d => {
+            d.style.width = "";
+            d.style.marginTop = "";
+            d.style.marginBottom = "";
+          });
+          return;
+        }
+        dashes.forEach(d => {
+          const r = d.getBoundingClientRect();
+          const cy = r.top + r.height / 2;
+          const t = Math.max(0, 1 - Math.abs(cy - ui.fisheyeY) / 52);
+          const current = d.classList.contains("is-current");
+          d.style.width = ((current ? 16 : 8) + t * 12) + "px";
+        });
+      }
+      function placeTrack() {
+        const { visible, max, base } = metrics();
+        // 整段轨始终垂直居中固定；窗口高度锁定满窗条数，头/尾只平移 track，不挪 rail
+        const viewH = visible * OUTLINE_PITCH;
+        view.style.height = viewH + "px";
+        view.style.minHeight = viewH + "px";
+        ui.baseOffset = base;
+        ui.maxOffset = max;
+        const offset = Math.max(0, Math.min(max, base + ui.panExtra));
         track.style.transform = `translateY(${-offset}px)`;
+        applyFisheye();
+      }
+      function stopEdgePan() {
+        ui.edgeDir = 0;
+        if (ui.panRaf) { cancelAnimationFrame(ui.panRaf); ui.panRaf = 0; }
+      }
+      function tickEdgePan() {
+        ui.panRaf = 0;
+        if (!ui.edgeDir || ui.open) return;
+        const { max, base } = metrics();
+        const next = ui.panExtra + ui.edgeDir * 2.2;
+        ui.panExtra = Math.max(-base, Math.min(max - base, next));
+        placeTrack();
+        ui.panRaf = requestAnimationFrame(tickEdgePan);
+      }
+      function updateEdgePan(clientY) {
+        if (!dense || ui.open) { stopEdgePan(); return; }
+        const box = view.getBoundingClientRect();
+        const y = clientY - box.top;
+        const zone = 24;
+        let dir = 0;
+        if (y < zone) dir = -1;
+        else if (y > box.height - zone) dir = 1;
+        if (dir === ui.edgeDir) return;
+        ui.edgeDir = dir;
+        if (!dir) { stopEdgePan(); return; }
+        if (!ui.panRaf) ui.panRaf = requestAnimationFrame(tickEdgePan);
       }
       function centerRow(smooth) {
         const row = card.querySelector(".qnav-row.is-current");
@@ -172,15 +259,19 @@
         const top = row.offsetTop - (card.clientHeight - row.offsetHeight) / 2;
         card.scrollTo({ top: Math.max(0, top), behavior: smooth && !outlineReduced() ? "smooth" : "auto" });
       }
-      function setCurrent(key) {
-        if (key === ui.current) return;
+      function setCurrent(key, opts = {}) {
+        if (key === ui.current) {
+          if (opts.resetPan) { ui.panExtra = 0; placeTrack(); }
+          return;
+        }
         ui.current = key;
+        if (opts.resetPan !== false && !opts.keepPan) ui.panExtra = 0;
         markCurrent();
         placeTrack();
       }
       function sync() {
         if (!el.classList.contains("show")) return;
-        if (ui.pinned != null && ui.items.some(item => item.key === ui.pinned)) { setCurrent(ui.pinned); return; }
+        if (ui.pinned != null && ui.items.some(item => item.key === ui.pinned)) { setCurrent(ui.pinned, { resetPan: true }); return; }
         const box = scroller.getBoundingClientRect();
         const atEnd = scroller.scrollTop + scroller.clientHeight >= scroller.scrollHeight - 4;
         const line = atEnd ? box.bottom - 1 : box.top + cfg.line;
@@ -189,7 +280,7 @@
           const node = cfg.nodeFor(item.key);
           if (node && node.getBoundingClientRect().top <= line) pick = item.key;
         });
-        setCurrent(pick);
+        setCurrent(pick, { resetPan: true });
       }
       function setPeek(key) {
         ui.peek = key;
@@ -197,20 +288,27 @@
       }
       function open() {
         if (ui.open || !el.classList.contains("show")) return;
+        stopEdgePan();
+        ui.fisheyeY = null;
+        applyFisheye();
         ui.open = true;
         const host = el.clientHeight;
         const r = rail.getBoundingClientRect();
         const center = r.top + r.height / 2 - el.getBoundingClientRect().top;
-        card.style.maxHeight = "";
-        const height = Math.min(card.scrollHeight, host - 24);
+        const cap = OUTLINE_CARD_MAX * OUTLINE_ROW_H + 12;
+        const height = Math.min(card.scrollHeight, host - 24, cap);
         const top = Math.max(12, Math.min(host - height - (cfg.peek ? 60 : 12), center - height / 2));
         card.style.top = top + "px";
-        card.style.maxHeight = (host - top - 12) + "px";
+        card.style.maxHeight = Math.min(host - top - 12, cap) + "px";
         el.classList.add("open");
         centerRow(false);
       }
       function close(now) {
         clearTimeout(ui.peekTimer);
+        clearTimeout(ui.openTimer);
+        stopEdgePan();
+        ui.fisheyeY = null;
+        applyFisheye();
         if (!ui.open && !now) return;
         ui.open = false;
         setPeek(null);
@@ -220,7 +318,7 @@
         const node = cfg.nodeFor(key);
         if (!node) return;
         ui.pinned = key;
-        setCurrent(key);
+        setCurrent(key, { resetPan: true });
         centerRow(true);
         const top = node.getBoundingClientRect().top - scroller.getBoundingClientRect().top + scroller.scrollTop - cfg.offset;
         scroller.scrollTo({ top: Math.max(0, top), behavior: outlineReduced() ? "auto" : "smooth" });
@@ -239,6 +337,7 @@
         if (sig !== ui.sig) {
           ui.sig = sig;
           if (cfg.unpinOnChange) ui.pinned = null;
+          ui.panExtra = 0;
           track.innerHTML = items.map((item, i) => `<i data-qi="${item.key}"${i >= prev ? ` class="is-new"` : ""}></i>`).join("");
           const keepScroll = card.scrollTop;
           card.innerHTML = items.map(item => `<button class="qnav-row${item.key === ui.peek ? " is-peek" : ""}" type="button" data-qi="${item.key}" aria-label="${esc(item.title)}"><span class="qnav-text"><span class="qnav-q">${esc(item.title)}</span>${cfg.peek && item.answer ? `<span class="qnav-a-wrap"><span class="qnav-a"><span>${esc(item.answer)}</span></span></span>` : ""}</span><i class="qnav-dash"></i></button>`).join("");
@@ -248,14 +347,42 @@
         placeTrack();
         sync();
       }
-      const enter = () => { clearTimeout(ui.closeTimer); open(); };
-      const leave = () => { clearTimeout(ui.closeTimer); ui.closeTimer = setTimeout(close, 150); };
-      [rail, card].forEach(node => {
-        node.addEventListener("pointerenter", enter);
-        node.addEventListener("pointerleave", leave);
-      });
-      card.addEventListener("focusin", enter);
+      const enterRail = () => {
+        clearTimeout(ui.closeTimer);
+        clearTimeout(ui.openTimer);
+        if (dense) ui.openTimer = setTimeout(open, 240);
+        else open();
+      };
+      const enterCard = () => {
+        clearTimeout(ui.closeTimer);
+        clearTimeout(ui.openTimer);
+        open();
+      };
+      const leave = () => {
+        clearTimeout(ui.openTimer);
+        stopEdgePan();
+        ui.fisheyeY = null;
+        applyFisheye();
+        clearTimeout(ui.closeTimer);
+        ui.closeTimer = setTimeout(close, 150);
+      };
+      rail.addEventListener("pointerenter", enterRail);
+      rail.addEventListener("pointerleave", leave);
+      card.addEventListener("pointerenter", enterCard);
+      card.addEventListener("pointerleave", leave);
+      card.addEventListener("focusin", enterCard);
       card.addEventListener("focusout", event => { if (!card.contains(event.relatedTarget)) leave(); });
+      if (dense) {
+        rail.addEventListener("pointermove", event => {
+          ui.fisheyeY = event.clientY;
+          updateEdgePan(event.clientY);
+          applyFisheye();
+        });
+        rail.addEventListener("click", event => {
+          const dash = event.target.closest("i[data-qi]");
+          if (dash) jump(keyOf(dash));
+        });
+      }
       if (cfg.peek) {
         card.addEventListener("pointerover", event => {
           const row = event.target.closest(".qnav-row");
@@ -341,14 +468,96 @@
           { key: 6, kind: "h", title: "七、结论", body: "按研究问题给出有边界的答案。" },
           { key: 7, kind: "h", title: "八、参考文献", body: "正文引用的六篇文献列表。" }
         ]
+      },
+      {
+        id: "mutex",
+        title: "右侧打开时隐藏",
+        hint: "默认显示提问目录；点「打开右侧」后轨应消失，关闭后淡入回来。",
+        peek: true,
+        label: "提问目录",
+        filter: "user",
+        mutex: true,
+        notes: [
+          { t: "互斥规则", b: "提问 / 消息目录在右侧展示区打开时隐藏；文档目录改在文档区显示（本 Demo 只演示隐藏）。" },
+          { t: "验收", b: "打开右侧 → 无短横线；关闭右侧 → 短横线回来且仍可跳转。" }
+        ],
+        blocks: [
+          { key: 0, kind: "user", title: "帮我写一篇课程论文", answer: "已按推荐定下方向并开始写入。" },
+          { key: 1, kind: "ai", title: "写入中", body: "右侧文档台已打开时，对话列不再显示提问目录。" },
+          { key: 2, kind: "user", title: "把讨论写得保守一点", answer: "已出修订页签，旧版保留。" },
+          { key: 3, kind: "ai", title: "修订完成", body: "可关闭右侧后再用目录跳回提问。" }
+        ]
+      },
+      {
+        id: "few",
+        title: "不足两条不显示",
+        hint: "只有 1 条用户消息时右侧不应出现短横线；点「再加一条提问」后出现。",
+        peek: true,
+        label: "提问目录",
+        filter: "user",
+        grow: true,
+        notes: [
+          { t: "出现条件", b: "OUTLINE_MIN = 2；少于 2 条锚点时 paint(show=false)。" },
+          { t: "验收", b: "初始无轨；加到 2 条用户消息后出现轨并可展开。" }
+        ],
+        blocks: [
+          { key: 0, kind: "user", title: "帮我写一篇课程论文：生成式 AI 与代码评审", answer: "生成中…" },
+          { key: 1, kind: "ai", title: "思考中", body: "此时还只有 1 条用户消息，目录不出现。" }
+        ]
+      },
+      {
+        id: "many",
+        title: "很多条",
+        hint: "40 条：短横线满窗约 18，整段轨垂直居中固定（不随滚动贴顶/贴底）；展开卡约 12 行。悬停鱼眼；边缘拨轨；停约 0.24s 开卡。",
+        peek: true,
+        label: "提问目录",
+        filter: "user",
+        many: true,
+        denseRail: true,
+        notes: [
+          { t: "轨窗口", b: "可见条数 = min(总数, 18, 可用高度/10px)。整段轨固定在对话列垂直居中；头/尾只平移 track，rail 位置不变。" },
+          { t: "展开卡高度", b: "最多约 12 行（行高按 30px 估），超出在卡内滚动，避免小屏顶满。" },
+          { t: "边缘平移", b: "指针在轨上/下沿约 24px 热区时持续拨轨，把更早/更晚的横线送进窗口（对齐 Cursor）。" },
+          { t: "悬停鱼眼", b: "指针附近横线只加长、不加大上下间距，避免滚到末项时只剩两三根；离开恢复。" },
+          { t: "展开卡（方案 A）", b: "在轨上停留约 240ms 后仍展开标题卡 + peek；与鱼眼/拨轨不互斥。" },
+          { t: "验收", b: "展开卡视觉上不超过约 12 行高；贴顶/底拨轨；卡内能滚到第 40 条。" }
+        ],
+        blocks: []
       }
     ];
+
+    (function buildManyCase() {
+      const many = CASES.find(c => c.id === "many");
+      const blocks = [];
+      for (let i = 0; i < 40; i++) {
+        const n = i + 1;
+        blocks.push({
+          key: i * 2,
+          kind: "user",
+          title: n === 1
+            ? "帮我写一篇课程论文：生成式 AI 会怎样改变初级程序员的代码评审"
+            : `第 ${n} 轮追问：请再收紧一点讨论里的措辞（示例 ${n}/40）`,
+          answer: n === 40 ? "这是最后一轮回复的首句，展开目录滚到底应能看到。" : `已处理第 ${n} 轮，文档仍保留在右侧。`
+        });
+        blocks.push({
+          key: i * 2 + 1,
+          kind: "ai",
+          title: `回复 ${n}`,
+          body: n % 10 === 0
+            ? `里程碑：已累计 ${n} 轮对话。目录轨不应画出全部 ${n} 条横线铺满屏幕。`
+            : `这是第 ${n} 轮的正文占位，用来把对话区撑长，便于滚动测试目录轨窗口。`
+        });
+      }
+      many.blocks = blocks;
+    })();
 
     const scroller = document.getElementById("scroller");
     const main = document.querySelector(".main");
     let outline = null;
     let activeId = CASES[0].id;
     let mode = "preview";
+    let docOpen = false;
+    let extraAsk = 0;
 
     function current() { return CASES.find(c => c.id === activeId) || CASES[0]; }
 
@@ -365,10 +574,42 @@
         c.notes.map(n => `<div class="note"><b>${esc(n.t)}</b>${esc(n.b)}</div>`).join("");
     }
 
+    function outlineItems(c) {
+      let blocks = c.blocks.slice();
+      if (c.grow && extraAsk > 0) {
+        blocks = blocks.concat([
+          { key: 10, kind: "user", title: "再生成一版，结论写保守一点", answer: "已记下，准备改讨论与结论。" },
+          { key: 11, kind: "ai", title: "已接收", body: "第二条提问已出现，目录应显示。" }
+        ]);
+      }
+      const filtered = c.filter === "user" || c.id === "ask"
+        ? blocks.filter(b => b.kind === "user")
+        : blocks;
+      return {
+        blocks,
+        items: filtered.map(b => ({ key: b.key, title: b.title, answer: b.answer || "" }))
+      };
+    }
+
     function paintContent() {
       const c = current();
-      document.getElementById("hint").innerHTML = `<b>${esc(c.title)}</b> · ${esc(c.hint)}`;
-      scroller.innerHTML = c.blocks.map(b => {
+      if (c.id !== "mutex") docOpen = false;
+      if (c.id !== "few") extraAsk = 0;
+      main.classList.toggle("with-doc", !!(c.mutex && docOpen));
+
+      const acts = [];
+      if (c.mutex) {
+        acts.push(`<button type="button" data-act="toggle-doc" class="${docOpen ? "on" : ""}">${docOpen ? "关闭右侧" : "打开右侧"}</button>`);
+      }
+      if (c.grow) {
+        acts.push(`<button type="button" data-act="add-ask"${extraAsk ? " disabled" : ""}>${extraAsk ? "已有两条提问" : "再加一条提问"}</button>`);
+      }
+      document.getElementById("hint").innerHTML =
+        `<span><b>${esc(c.title)}</b> · ${esc(c.hint)}</span>` +
+        (acts.length ? `<span class="acts">${acts.join("")}</span>` : "");
+
+      const { blocks, items } = outlineItems(c);
+      scroller.innerHTML = blocks.map(b => {
         if (b.kind === "user") {
           return `<article class="block user" data-oid="${b.key}"><span class="kicker">用户</span><p>${esc(b.title)}</p></article>`;
         }
@@ -379,22 +620,20 @@
       }).join("");
       scroller.scrollTop = 0;
       if (outline) { outline.el.remove(); outline = null; }
-      const c2 = current();
       outline = createOutline({
         id: "demoQnav",
-        label: c2.label,
+        label: c.label,
         host: main,
         scroller,
-        peek: c2.peek,
+        peek: c.peek,
+        denseRail: !!c.denseRail,
         line: 48,
         offset: 24,
-        unpinOnChange: c2.id === "doc",
+        unpinOnChange: c.id === "doc",
         nodeFor: key => scroller.querySelector(`[data-oid="${key}"]`)
       });
-      const items = c2.blocks
-        .filter(b => c2.id !== "ask" || b.kind === "user")
-        .map(b => ({ key: b.key, title: b.title, answer: b.answer || "" }));
-      outline.paint(items, items.length >= OUTLINE_MIN, c2.id);
+      const show = items.length >= OUTLINE_MIN && !(c.mutex && docOpen);
+      outline.paint(items, show, c.id + ":" + extraAsk + ":" + (docOpen ? 1 : 0));
     }
 
     function setMode(next) {
@@ -410,6 +649,18 @@
       paintList();
       paintNotes();
       paintContent();
+    });
+    document.getElementById("hint").addEventListener("click", event => {
+      const btn = event.target.closest("[data-act]");
+      if (!btn || btn.disabled) return;
+      if (btn.dataset.act === "toggle-doc") {
+        docOpen = !docOpen;
+        paintContent();
+      }
+      if (btn.dataset.act === "add-ask") {
+        extraAsk = 1;
+        paintContent();
+      }
     });
     document.querySelector(".mode").addEventListener("click", event => {
       const btn = event.target.closest("[data-mode]");

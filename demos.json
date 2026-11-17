@@ -10,9 +10,9 @@
     {
       "id": "chat-outline",
       "title": "对话目录",
-      "file": "对话目录.html",
+      "file": "对话目录-PRD.html",
       "owner": "共同维护",
-      "summary": "提问目录 / 消息目录 / 文档目录同一控件：短横线轨、悬停展开、peek、跳转高亮"
+      "summary": "PRD：提问/消息/文档目录同一控件；很多条边缘平移+鱼眼、展开 peek、右侧互斥；顶部可打开 Demo"
     },
     {
       "id": "hot-topics",
