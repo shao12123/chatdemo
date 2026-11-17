@@ -213,14 +213,16 @@
     .next-chip:hover { border-color: #b9d0ff; background: #f3f7ff; color: var(--brand); }
     .think { align-self: flex-start; display: flex; flex-direction: column; gap: 8px; max-width: min(660px, 100%); }
     .think-head { display: flex; flex-direction: column; align-items: flex-start; gap: 6px; border: 0; background: transparent; padding: 0; text-align: left; cursor: pointer; }
-    .think-row { display: flex; align-items: center; gap: 12px; margin-left: -8px; }
+    .think-row { display: flex; align-items: center; gap: 8px; height: 50px; margin-left: 0; }
     .think-row .ai-face { width: 36px; height: 36px; }
     .think-row .ai-face-rig { transform-origin: 18px 18.7px; }
     .think-row .ai-face-art { left: 1.15px; top: 1.82px; transform: scale(0.6733, 0.6731); }
     .think-name { color: #1c2330; font-size: 15px; line-height: 22px; font-weight: 600; }
-    .think-status { display: flex; align-items: center; gap: 4px; min-height: 20px; color: #98a2b3; font-size: 13px; line-height: 20px; }
+    .think-status { display: flex; align-items: center; gap: 8px; min-height: 20px; color: #98a2b3; font-size: 13px; line-height: 20px; }
     .think-status b { font-weight: 400; }
+    .think-clock { display: inline-flex; align-items: center; }
     .think-time { color: #98a2b3; font-size: 13px; line-height: 20px; }
+    .think-clock .think-time + .think-chev { margin-left: 3px; }
     .think-shine { color: #98a2b3; }
     @supports ((-webkit-background-clip: text) or (background-clip: text)) {
       .think-shine { background-image: linear-gradient(100deg, #98a2b3 0%, #98a2b3 36%, #ffffff 50%, #98a2b3 64%, #98a2b3 100%); background-size: 220% 100%; -webkit-background-clip: text; background-clip: text; color: transparent; animation: think-shine 1.6s linear infinite; }
@@ -229,7 +231,7 @@
     .think-chev { flex: none; color: #98a2b3; transition: transform .2s ease; }
     .think.open .think-chev { transform: rotate(180deg); }
     .think-body { display: flex; flex-direction: column; align-items: flex-start; gap: 12px; width: 100%; }
-    .exec { width: min(520px, 100%); border: 1px solid #e7e9ee; border-radius: 12px; background: #fff; overflow: hidden; }
+    .exec { width: 100%; border: 1px solid #e7e9ee; border-radius: 12px; background: #fff; overflow: hidden; }
     .exec-bar { display: flex; align-items: center; gap: 8px; min-height: 36px; padding: 8px 12px; color: #667085; font-size: 12px; line-height: 20px; }
     .exec-title { font-weight: 500; }
     .exec-chev { flex: none; color: #98a2b3; }
@@ -1183,7 +1185,7 @@
     #stage .messages-inner {
       width: min(736px, calc(100% - 40px));
       margin: 0 auto;
-      gap: 12px;
+      gap: 0;
     }
     #stage .msg { max-width: 86%; font-size: 14px; line-height: 22px; }
     #stage .msg.user { display: block; margin: 0; align-self: flex-end; background: #eef2ff; border-radius: 8px; padding: 10px 14px; white-space: pre-wrap; }
@@ -1197,11 +1199,6 @@
       line-height: 24px;
       white-space: normal;
     }
-    #stage .messages-inner > .msg.assistant,
-    #stage .messages-inner > .think,
-    #stage .messages-inner > .artifact,
-    #stage .messages-inner > .pick-card,
-    #stage .messages-inner > .revise-card { margin-top: 0; }
     #stage .msg.user.has-quote { white-space: normal; }
     #stage .msg-quotes { display: flex; flex-direction: column; gap: 6px; margin: 0 0 8px; }
     #stage .msg-quote {
@@ -1219,11 +1216,15 @@
       white-space: normal;
     }
     #stage .msg-note { white-space: pre-wrap; }
+    #stage .messages-inner > * + * { margin-top: 8px; }
     #stage .messages-inner > .msg.user + .msg.assistant,
-    #stage .messages-inner > .msg.user + .think { margin-top: 20px; }
-    #stage .messages-inner > .think + .msg.assistant,
-    #stage .messages-inner > .think + .artifact { margin-top: -4px; }
-    #stage .messages-inner > .msg.assistant + .msg.assistant { margin-top: -12px; }
+    #stage .messages-inner > .msg.user + .think,
+    #stage .messages-inner > .artifact + .msg.user,
+    #stage .messages-inner > .msg.assistant + .msg.user,
+    #stage .messages-inner > .think + .msg.user { margin-top: 30px; }
+    #stage .messages-inner > .think + .msg.assistant { margin-top: 8px; }
+    #stage .messages-inner > .msg.assistant + .artifact,
+    #stage .messages-inner > .think + .artifact { margin-top: 12px; }
     #stage .msg.assistant p,
     #stage .msg.assistant h4,
     #stage .msg.assistant ul,
@@ -2361,7 +2362,8 @@
         const time = traceClock(m);
         const label = working ? `<b class="think-shine">思考中</b>` : `<b>已完成</b>`;
         const chev = !working && list.length ? `<svg class="think-chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>` : "";
-        const head = `<button class="think-head" type="button" ${working ? "" : `data-think="${index}"`} aria-expanded="${working || m.open ? "true" : "false"}"><span class="think-row">${aiFaceHtml(faceState(session, m))}<span class="think-name">MoreAI</span></span><span class="think-status">${label}${time ? `<span class="think-time">${esc(time)}</span>` : ""}${chev}</span></button>`;
+        const clock = (time || chev) ? `<span class="think-clock">${time ? `<span class="think-time">${esc(time)}</span>` : ""}${chev}</span>` : "";
+        const head = `<button class="think-head" type="button" ${working ? "" : `data-think="${index}"`} aria-expanded="${working || m.open ? "true" : "false"}"><span class="think-row">${aiFaceHtml(faceState(session, m))}<span class="think-name">MoreAI</span></span><span class="think-status">${label}${clock}</span></button>`;
         const card = list.length ? execHtml(list, working) : "";
         const body = (working || m.open) && card ? `<div class="think-body">${card}</div>` : "";
         return `<div class="think${working ? "" : " done"}${m.open ? " open" : ""}">${head}${body}</div>`;
