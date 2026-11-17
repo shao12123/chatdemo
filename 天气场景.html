@@ -1683,7 +1683,8 @@ function aiFaceHtml(state) {
         const homeX = tracked ? 0 : 4 * unit;
         el.querySelectorAll(".ai-sclera").forEach(node => { node.style.transform = `translate(${spring.x.toFixed(3)}px, ${spring.y.toFixed(3)}px)`; });
         el.querySelectorAll(".ai-pupil").forEach(node => { node.style.transform = `translate(${(spring.x + leadX + homeX).toFixed(3)}px, ${(spring.y + leadY).toFixed(3)}px)`; });
-        el.querySelectorAll(".ai-blink").forEach(node => { node.style.transform = `scaleY(${blink.toFixed(3)})`; });
+        const open = el.closest(".think-row") ? 1 : blink;
+        el.querySelectorAll(".ai-blink").forEach(node => { node.style.transform = `scaleY(${open.toFixed(3)})`; });
       });
       faceRaf = requestAnimationFrame(tickAiFaces);
     }
