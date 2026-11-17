@@ -92,22 +92,21 @@
     .main.chatting .thread { display: flex; }
     .messages { flex: 1; overflow: auto; padding: 28px 24px 24px; }
     .messages-inner { width: min(640px, 100%); margin: 0 auto; display: flex; flex-direction: column; gap: 14px; }
-    .artifact { position: relative; align-self: flex-start; display: flex; align-items: center; width: 280px; max-width: 100%; min-height: 54px; padding: 7px 13px; border: 1px solid #eef0f3; border-radius: 12px; background: #fff; overflow: hidden; }
+    .artifact { position: relative; align-self: flex-start; display: flex; align-items: center; width: 300px; max-width: 100%; min-height: 54px; padding: 7px 13px; border: 1px solid #eef0f3; border-radius: 12px; background: #fff; overflow: hidden; }
     .artifact-open { display: flex; align-items: center; gap: 12px; min-width: 0; flex: 1; padding: 0; border: 0; background: transparent; color: inherit; font: inherit; text-align: left; }
     .artifact-mark { display: grid; place-items: center; flex: none; width: 32px; height: 32px; border-radius: 8px; background: #e6eefe; }
     .artifact-mark img { display: block; width: 16px; height: 16px; }
     .artifact-copy { min-width: 0; flex: 1; overflow: hidden; }
     .artifact-copy b { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: #1e293b; font-size: 14px; line-height: 20px; font-weight: 500; }
     .artifact-copy small { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: rgba(0, 0, 0, 0.4); font-size: 12px; line-height: 20px; font-weight: 400; }
-    .artifact-actions { display: none; position: absolute; right: 0; top: 0; bottom: 0; align-items: center; padding: 0 8px 0 24px; background: linear-gradient(to left, #f9f9f9 78%, rgba(249, 249, 249, 0)); }
+    .artifact-actions { display: none; position: absolute; right: 0; top: 0; bottom: 0; align-items: center; padding: 0 13px 0 23px; background: linear-gradient(to left, #f9f9f9 78%, rgba(249, 249, 249, 0)); }
     .artifact:hover { background: #f9f9f9; }
     .artifact:hover .artifact-actions { display: flex; }
     .artifact.on,
-    .artifact.on:hover { background: #f3f7ff; border-color: #eef0f3; }
-    .artifact.on .artifact-copy b { color: #3b6dff; }
-    .artifact.on .artifact-actions,
-    .artifact.on:hover .artifact-actions { display: flex; background: linear-gradient(to left, #f3f7ff 78%, rgba(243, 247, 255, 0)); }
+    .artifact.on:hover { background: #f3f7ff; border-color: #3370ff; }
+    .artifact.on:hover .artifact-actions { background: linear-gradient(to left, #f3f7ff 78%, rgba(243, 247, 255, 0)); }
     .artifact-actions button { width: 28px; height: 28px; border: 0; border-radius: 8px; background: rgba(9, 11, 14, 0.04); color: #5e6063; display: grid; place-items: center; padding: 0; }
+    .artifact-actions button:hover { background: rgba(9, 11, 14, 0.04); }
     .artifact-actions button img { display: block; width: 14px; height: 14px; }
     .doc-unfold { position: absolute; right: 15px; top: 16px; z-index: 3; width: 28px; height: 28px; border: 0; border-radius: 6px; background: transparent; color: #3c4043; display: inline-flex; align-items: center; justify-content: center; padding: 0; }
     .doc-unfold[hidden] { display: none; }
