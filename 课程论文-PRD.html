@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>课程论文对话 PRD</title>
+  <style>
+    :root { --ink: #1c2330; --sub: #344054; --muted: #667085; --line: #e4e7ec; --brand: #0a59f7; --page: #f5f6f8; }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: var(--page); color: var(--ink); font: 14px/1.7 -apple-system, BlinkMacSystemFont, "PingFang SC", "Helvetica Neue", sans-serif; }
+    .bar { position: sticky; top: 0; z-index: 5; display: flex; align-items: center; gap: 12px; padding: 12px 24px; background: rgba(255,255,255,.92); backdrop-filter: blur(8px); border-bottom: 1px solid var(--line); }
+    .bar h1 { flex: 1; min-width: 0; margin: 0; font-size: 15px; line-height: 22px; font-weight: 700; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .bar a, .bar button { display: inline-flex; align-items: center; gap: 6px; height: 32px; padding: 0 12px; border-radius: 8px; font: 500 13px/20px inherit; cursor: pointer; text-decoration: none; white-space: nowrap; }
+    .btn-primary { border: 0; background: var(--brand); color: #fff; }
+    .btn-primary:hover { filter: brightness(.94); }
+    .btn-ghost { border: 1px solid var(--line); background: #fff; color: var(--ink); }
+    .btn-ghost:hover { border-color: #b9cdfb; color: var(--brand); }
+    .wrap { display: grid; grid-template-columns: 240px minmax(0, 1fr); gap: 24px; max-width: 1180px; margin: 0 auto; padding: 24px; }
+    nav.toc { position: sticky; top: 76px; align-self: start; max-height: calc(100vh - 100px); overflow: auto; padding: 12px 8px; border-radius: 12px; background: #fff; }
+    nav.toc a { display: block; padding: 4px 8px; border-radius: 6px; color: var(--sub); font-size: 13px; line-height: 20px; text-decoration: none; }
+    nav.toc a.l3 { padding-left: 20px; color: var(--muted); font-size: 12px; }
+    nav.toc a:hover, nav.toc a.on { background: #f3f7ff; color: var(--brand); }
+    article { min-width: 0; padding: 32px 40px 64px; border-radius: 16px; background: #fff; }
+    article h1 { margin: 0 0 16px; font-size: 26px; line-height: 36px; }
+    article h2 { margin: 36px 0 12px; padding-top: 8px; font-size: 20px; line-height: 30px; border-top: 1px solid var(--line); }
+    article h2:first-of-type { border-top: 0; }
+    article h3 { margin: 24px 0 8px; font-size: 16px; line-height: 24px; }
+    article p, article li { color: var(--sub); }
+    article p { margin: 8px 0; }
+    article ul, article ol { margin: 8px 0; padding-left: 22px; }
+    article li { margin: 3px 0; }
+    article li.task { list-style: none; margin-left: -22px; }
+    article li.task::before { content: "☐"; margin-right: 8px; color: var(--muted); }
+    article strong { color: var(--ink); }
+    article code { padding: 1px 6px; border-radius: 4px; background: #f2f4f7; color: #b42318; font: 12.5px/1.6 ui-monospace, SFMono-Regular, Menlo, monospace; }
+    article pre { margin: 12px 0; padding: 14px 16px; border-radius: 12px; background: #1c2330; color: #e4e7ec; overflow: auto; font: 12.5px/1.6 ui-monospace, SFMono-Regular, Menlo, monospace; }
+    article pre code { padding: 0; background: none; color: inherit; }
+    article blockquote { margin: 12px 0; padding: 10px 14px; border-left: 3px solid #5b86f5; border-radius: 0 10px 10px 0; background: #f5f6f8; }
+    article blockquote p { margin: 0; color: var(--ink); }
+    article a { color: var(--brand); }
+    article hr { border: 0; border-top: 1px solid var(--line); margin: 24px 0; }
+    .tbl { overflow-x: auto; margin: 12px 0; border: 1px solid #eceef2; border-radius: 12px; }
+    table { width: 100%; border-collapse: collapse; font-size: 13px; line-height: 20px; }
+    th { padding: 8px 12px; background: #f7f8fa; color: var(--muted); font-weight: 500; text-align: left; border-bottom: 1px solid #eceef2; white-space: nowrap; }
+    td { padding: 8px 12px; color: var(--ink); vertical-align: top; border-bottom: 1px solid #f0f1f4; }
+    tr:last-child td { border-bottom: 0; }
+    td .st-wait { display: inline-block; padding: 0 6px; border-radius: 99px; background: #fff4e5; color: #b54708; font-size: 12px; font-weight: 600; white-space: nowrap; }
+    td .st-ok { display: inline-block; padding: 0 6px; border-radius: 99px; background: #e7f8ef; color: #067647; font-size: 12px; font-weight: 600; white-space: nowrap; }
+    .toast { position: fixed; left: 50%; bottom: 32px; transform: translateX(-50%); padding: 8px 16px; border-radius: 8px; background: #1c2330; color: #fff; font-size: 13px; opacity: 0; pointer-events: none; transition: opacity .2s; }
+    .toast.show { opacity: 1; }
+    @media (max-width: 900px) { .wrap { grid-template-columns: 1fr; padding: 12px; } nav.toc { display: none; } article { padding: 20px; } }
+  </style>
+</head>
+<body>
+  <header class="bar">
+    <h1>课程论文对话 PRD</h1>
+    <a class="btn-primary" href="conversations.html" target="_blank" rel="noopener">打开交互 Demo ↗</a>
+    <button class="btn-ghost" type="button" id="downloadDemo">下载 Demo.html</button>
+    <button class="btn-ghost" type="button" id="copyMd">复制 Markdown（给 AGENT）</button>
+    <button class="btn-ghost" type="button" id="downloadMd">下载 .md</button>
+  </header>
+  <div class="wrap">
+    <nav class="toc" id="toc" aria-label="目录"></nav>
+    <article id="doc"></article>
+  </div>
+  <div class="toast" id="toast" role="status"></div>
+  <script type="text/markdown" id="prdSource">
+# 课程论文对话 PRD
+
+| 项目 | 内容 |
+|---|---|
+| 文档状态 | 待开发 · 2.1/2.2 已区分 Demo 与工程；第 12 节其余项待确认 |
+| 版本 | v0.2 · 2026-11-17 |
+| 交互 Demo | [conversations.html](conversations.html)（入口标题「MoreAI 对话」）：左侧历史含正常生成、中途停止、失败重试、生成中断、网络慢；右上角「说明」可看逐项标注 |
+| Agent TOOL | **本期不单独立 TOOL**。首轮是否走「文档台长文写作」由意图识别决定；触发细则见 7.1。若后续要严触发再拆 `present_course_paper` |
+| 适用读者 | 前端、后端、测试，以及接手开发的 AGENT |
+
+> 给 AGENT：请按「第 3 节场景 → 第 4 节交互 → 第 5 节组件 → 第 6 节数据契约 → 第 7–8 节前后端 → 第 11 节验收」的顺序实现。异常分级与错误卡片**不在本文重定义**，一律对齐 [生成异常与恢复-PRD.md](生成异常与恢复-PRD.md)。提问 / 文档目录控件对齐全站规范与 Demo 中的 `createOutline`；公共目录专章 PRD 未出前，以本文 5.6 与 Demo 为准。第 12 节写「默认方案」的先按默认开发并留配置开关。
+
+---
+
+## 1. 背景与目标
+
+### 1.1 现状
+用户在 MoreAI 里说「帮我写一篇课程论文…」时，需要：
+- 长文写入右侧文档台（可编辑、可多版本），对话里只留文档卡片入口；
+- 生成过程可停止、可断网恢复、可继续；
+- 写完后能「再生成一版 / 改成开题报告 / 按标注修改 / 对比版本」。
+
+线上若只回一大段 Markdown，无法承接版本、对比、标注与文档台工具栏。`conversations.html` 已给出完整交互 Demo，本文把它收成可开发口径。
+
+### 1.2 目标
+- 一套「课程论文 / 同类长文写作」对话能力：首稿 → 异常恢复 → 修订 / 改体裁 → 对比 → 标注修订。
+- 右侧文档台为正文真源；对话区负责思考过程、结论、文档卡片、分析卡、选择卡与操作栏。
+- **文案与推荐逻辑沿用 Demo / 线上模型口径**；本期工程重点是结构、状态机与组件复用，不是重写论文内容。
+
+### 1.3 成功标准
+- 用户能在不丢已写章节的前提下停止 / 断网重试 / 继续生成，最终章节齐全。
+- 修订、开题报告、标注修订均**新开页签**，原文件保留。
+- 对比只列差异；主题无关时给出「没有可比性」而不出空表。
+- 思考过程、错误卡、悬停气泡、目录对齐全站规范。
+
+---
+
+## 2. 范围
+
+### 2.1 本期做（产品工程）
+1. 首轮课程论文生成（按推荐自动定方向，不弹研究问题选择卡）；**接入真实模型**产出思考轨迹、正文与结论。
+2. 停止（写前撤回 query / 写中保留章节 +「继续生成」）。
+3. 检索超时自动重试；断网重连 5×5s + 错误卡片「重试」；网络慢提示。
+4. 再生成一版（结构化分析卡闸门）→ 新页签修订稿。
+5. 改成开题报告（结构变更，研究问题与文献不变）。
+6. 多文件对比（2～3 份）：选择卡、指名对比、无可比性。
+7. **上传读取**：有文字层则直接抽取；抽不到（扫描件 / 纯图 PDF 等）再走 **OCR**；失败逐条提醒。不是「凡 PDF 都 OCR」。
+8. 文档区标注修改 → 按标注另出一版。
+9. 文档卡片、页签、提问目录 / 文档目录、操作栏、时间戳、悬停气泡。
+10. 深浅色 token（对齐全站；具体色值见规范与 Demo）。
+11. **会话持久化**：按产品既有账号 / 会话存储方案落库；刷新后可恢复本会话消息与文档窗口（具体存储介质沿用线上，不限 localStorage）。
+12. **文献检索**（若产品对本场景开放检索工具）：走真实检索 / 工具调用；失败与缺口写进思考步骤与正文（对齐 Demo「获取评审评论失败仍继续」的交互，但数据为真）。
+
+### 2.2 Demo 与工程分工（不是「产品不做」）
+`conversations.html` 是交互与视觉真源，内容多为**预设与模拟**，便于演示与验收口径对齐：
+
+| 能力 | Demo | 工程 |
+|---|---|---|
+| 模型回复 / 论文正文 | 写死文案与节奏 | 真实模型 |
+| PDF / 附件读取 | 模拟「读文字层 → OCR」文案与字数 | 真抽取 + 真 OCR 回退 |
+| 文献检索 | 预设 6 篇与失败步 | 真实工具（若本期接检索） |
+| 课程论文外的闲聊 | 仅示意一句 | 走通用对话能力，不在本文展开 |
+| 刷新后会话 | 不保留（说明模式编辑除外） | 按 2.1.11 持久化 |
+
+开发以实现 **2.1** 为准；Demo 用来对交互、组件与状态机，不把上表「Demo 列」当成砍需求。
+
+### 2.3 本期不做
+- 移动端窄屏专项适配。
+- 服务繁忙 / 额度不足 / 内容过长等：走《生成异常与恢复》，本文不另开文案。
+- 输入框「继续」任务排队状态：不纳入本期。
+- 对比相关性的**专用算法选型细则**（工程可用模型 / 规则做「可否对比」二分类；Demo 关键词粗判仅演示）。
+- 独立 Agent TOOL 文档（见头表；触发先按 7.1 意图识别）。
+
+---
+
+## 3. 场景
+
+**场景名：课程论文 / 长文写作进文档台。**  
+用户要一份可写入右侧文档台的结构化长文（课程论文、开题报告、修订稿等），而不是只要几句口头建议。
+
+Demo 左侧历史 case **用于验收与演示**，不是触发白名单：
+
+| Demo case | 关键路径 |
+|---|---|
+| 课程论文 | 正常首稿 8 节写入 |
+| 课程论文 · 中途停止 | 写入中停止 → 继续生成 |
+| 课程论文 · 失败重试 | 检索超时自动重试 |
+| 课程论文 · 生成中断 | 断网 5 次失败 → 手动重试 |
+| 课程论文 · 网络慢 | 慢响应提示，不报错 |
+
+另在同一会话可触发（说明模式有条目）：再生成一版、改成开题报告、对比、标注修改、上传读取。
+
+---
+
+## 4. 交互流程
+
+### 4.1 第一轮（正常生成）
+1. 用户发送写论文类 query（示例：`帮我写一篇课程论文：生成式 AI 会怎样改变初级程序员的代码评审`）。
+2. **思考过程**：MoreAI 头像 + 名称；阶段流光 + 秒数；展开为「已执行 N 个步骤」。默认展开，结论开始出现时收起成「已完成 · N 秒」，头像跳一下。
+3. **按推荐定方向**（不弹选择卡），思考里写明研究问题 / 材料 / 成稿；需要换方向时写完后再说。
+4. 步骤顺序（Demo）：读取题目 → 确定方向 → 检索文献 → 获取评审评论（可失败并写明缺口）→ 搭建结构 → 写入文档（右侧逐节）→ 核对引用与篇幅 → 结论。
+5. 对话区出现**文档卡片**；点击打开右侧对应页签。
+6. **操作栏**：复制、重新生成、赞、踩、分享 + 悬停时间戳。可出现推荐操作（如「再生成一版」「改成开题报告」「对比两个版本」）。
+
+### 4.2 停止
+| 时机 | 行为 |
+|---|---|
+| 尚未写入文档 | 撤回本轮用户消息与思考，原文回填输入框，发送可点 |
+| 已写入部分章节 | 保留已写；提示「继续生成」；点击从中断节接着写，不重写已写 |
+
+生成中输入框为停止态（实心方块）；断网重连期间不可停止。
+
+### 4.3 断网 / 重试 / 网络慢
+- 对齐《生成异常与恢复》：错误卡片浅灰无描边 +「重试」；重连 5×5s；关闭卡片后不留入口。
+- 检索超时：自动重试，不弹卡；成功后继续。
+- 网络慢：不报错；超过阈值在思考步骤补「响应较慢，仍在处理…」。
+
+### 4.4 再生成一版（修订）
+1. 满足分析卡闸门（见 5.3）时先出**结构化分析卡**，再改写。
+2. 新页签「课程论文 · 修订」；旧版保留。
+3. 改动范围与卡上「这一版会改」一致。
+
+### 4.5 改成开题报告
+- 识别改动 → 调整结构（Demo：6 节含进度表）→ 新页签；研究问题与文献不变；原论文保留。
+
+### 4.6 对比
+1. 「对比两个版本」或等价输入 → 选择卡（每份最新版，最多 3 份；可上传）。
+2. 指名「对比「A」和「B」」：都在则直接比；缺则预选已找到的并说明。
+3. 相关：右侧「方案对比」只列差异。
+4. 不相关：不出对比页签，结论说明主题不同与下一步建议。
+
+### 4.7 标注修改
+- 右侧标注入队 → 发送 → 读取标注 → 定位 → 改写 → **另出一版**，原文件不覆盖。
+
+### 4.8 其他交互
+| 交互 | 规则 |
+|---|---|
+| 重新生成 | 重跑思考与文档；新页签；结论旁「‹ n / m ›」切换时对话结论与右侧页签一起切 |
+| 赞 / 踩 | 互斥，再点取消；点踩不弹原因 |
+| 用户消息编辑 | 原位编辑；发送后追加新 query 再生成；生成中不可编辑；带文件/引用仅复制 |
+| 提问目录 | ≥2 条用户消息且右侧关闭时显示（见 5.6） |
+| 文档目录 | 右侧为文档且 ≥2 个标题时显示；对比 / 任务视图不显示 |
+
+---
+
+## 5. 组件与样式规范
+
+### 5.1 组件清单
+| 组件 | 出现条件 | 形态 | 依赖 |
+|---|---|---|---|
+| MoreAI + 思考过程 | 每轮 AI 输出（含首轮） | 对齐全站：头像 + `.exec.paper-exec` + `.exec-dot` 时间线 | `thinking_steps[]` |
+| 结论句 | 每轮完成时 | 正文流式 / 一次出现均可（工程可先整段） | `conclusion` |
+| 文档卡片 | 有文档窗口 | 缩略入口；编写中 / 可编辑 | `artifact` |
+| 结构化分析卡 | 闸门成立 | 诊断/方案型卡片 | `analysis` |
+| 对比选择卡 | 用户要对比且需选文件 | 下拉 + 来源时间 | `pick` |
+| 错误卡片 | 断网失败等 | 抄《生成异常与恢复》`.net-card` | `error` |
+| 继续生成 / 重试 | 停止后 / 重连失败后 | 主按钮文案见异常 PRD | — |
+| 提问目录 / 文档目录 | 见 5.6 | 同一 `qnav` 控件 | `outline items` |
+| 操作栏 / 时间戳 / 悬停气泡 | 对齐全站规范 | — | — |
+
+### 5.2 思考过程
+- **强制**复用路线 / 异常 Demo 结构：禁止 `.think-tag` 灰胶囊 + 扁 `think-list`。
+- 字段 `{ t, n }`（标题 + 说明）；进行中当前步 `.run`，完成自动收起。
+- 断网晕眩、完成跳跃：与论文 Demo / AI 形象一致。
+
+### 5.3 结构化分析卡闸门
+删掉结构化块只留段落会糊，且下列 ≥2 条成立才出卡：
+1. 替用户做非平凡取舍；
+2. 需要核对依据 / 边界才敢继续；
+3. 结论驱动下一跳（改稿等）。
+
+单路径交付、低风险事实、用户已指定路径、过程已在思考轨迹里 → **不出卡**。
+
+本场景「再生成一版」实例：结论 → 问题/原因 → 最终方案（被选用）+ 过程方案可折 → 选用理由 →「这一版会改」标签。
+
+### 5.4 文档台
+- 页签：原稿 / 修订 / 开题 / 对比等；关闭页签不删文档，卡片可再开，仍可参与对比。
+- 工具：标注、展开/收起等；页签关闭键**无**悬停气泡。
+- 写入中右侧逐节出现；目录随章节增加。
+
+### 5.5 视觉约束（摘录）
+- 最多两层卡；颜色只表层级；主按钮一张卡一个。
+- 错误卡：浅灰 `#EEF0F3`（深色 `#191A1D`）、无描边、圆角 14、圆形叉号、文案「重试」。
+- 悬停气泡：白底、`#E3E4E7` 边、圆角 8、垫 2×12、字 12/20、距按钮 4px；时间戳/关闭键不出。
+- 输入框：对齐全站三态（发送 / 停止 / 继续排队本期不做）。
+
+### 5.6 目录控件（本期口径）
+与文档目录同一控件；交互 Demo 见 [对话目录.html](对话目录.html)；实现真源仍对齐 `conversations.html` 的 `createOutline`（后续可迁入《对话目录》公共 PRD）。
+
+| 模式 | 展示条件 | 列表内容 | peek |
+|---|---|---|---|
+| 提问目录 | ≥2 条用户消息；右侧展示区关闭 | 每条用户消息 + 可选 AI 首句 | 开 |
+| 文档目录 | 右侧为文档（非对比/任务/空）；≥2 个 h3/h4 | 章节标题 | 关 |
+
+- 收起：右缘短横线，间距 10px，最多露出约 30 条；当前项更长更深；滚动时轨跟随居中。
+- 展开：悬停轨/卡约 200ms 展开 280 宽卡片；点击跳转并短暂高亮；离开约 150ms 收起。
+- 右侧打开时提问目录隐藏；减弱动效时关闭展开动画。
+
+---
+
+## 6. 数据契约
+
+### 6.1 会话与窗口
+```ts
+type PaperSession = {
+  id: string;
+  title: string;
+  scenario?: "normal" | "stop" | "retry" | "error" | "slow";
+  messages: PaperMessage[];
+  windows: PaperWindow[];
+  activeWin?: number;
+  variants?: Record<string, { shown: number; runs: number }>;
+  job?: string;
+  running?: boolean;
+  thinking?: boolean;
+};
+
+type PaperWindow = {
+  id: string;
+  title: string;
+  closed: boolean;
+  versions: PaperVersion[];
+  view: number;          // 当前版本下标
+  mode: "write" | "compare" | string;
+  stage?: string;
+  // compare 时另有 slots / canvas 数据
+};
+
+type PaperVersion = {
+  id: string;
+  blocks: DocBlock[];
+  createdAt?: string;
+};
+
+type DocBlock = {
+  key: string;           // 唯一；目录 / 流式写入用
+  kind: "h2" | "h3" | "h4" | "p" | "div" | string;
+  text: string;
+  className?: string;
+};
+```
+
+### 6.2 消息
+```ts
+type PaperMessage =
+  | { type: "user"; text: string; files?: UploadFile[]; quotes?: Quote[]; group?: string; run?: number }
+  | { type: "assistant"; html?: string; text?: string; group?: string; run?: number }
+  | { type: "think"; steps: { t: string; n: string }[]; open?: boolean; status?: string; seconds?: number }
+  | { type: "artifact"; winId: string; title: string; state: "writing" | "ready" }
+  | { type: "analysis"; /* 分析卡字段，见 5.3 */ }
+  | { type: "pick"; /* 对比选择卡 */ }
+  | { type: "compare"; /* 对比结论 */ }
+  | { type: "notice"; kind: "error" | "info"; text: string; actions?: ("continue" | "retry")[] };
+```
+
+### 6.3 首轮生成载荷（后端 → 前端，示意）
+```ts
+type PaperWritePayload = {
+  think: { t: string; n: string }[];
+  direction: { question: string; material: string; depth: string }; // 按推荐写死进思考文案
+  doc: { title: string; blocks: DocBlock[] };
+  conclusion: string;
+  recommends?: ("revise" | "proposal" | "compare")[];
+  fallback_markdown?: string;
+};
+```
+
+### 6.4 校验
+- `blocks[].key` 唯一；至少 1 个标题块 + 1 个正文块，否则回退 Markdown。
+- 修订 / 标注：必须带 `baseWinId` / `baseVersionId`，禁止静默覆盖基版。
+- 对比：`slots.length` ∈ [2, 3]；主题无关时不返回 compare 表，只返回结论文案。
+
+---
+
+## 7. 后端职责
+
+### 7.1 触发（首轮）
+同时偏向「长文进文档台」时走本能力，例如：
+- 用户明确要写课程论文 / 开题报告 / 长文方案，且主交付是可编辑文档；
+- 不是只要一句建议、不是行程规划（行程走 `present_route_compare`）、不是纯附件总结卡（总结走文档分析 PRD）。
+
+缺研究方向等信息：**按推荐默认**，不强制打断选卡（与 Demo「少选择」一致）。
+
+### 7.2 生成步骤
+1. 解析意图与附件（失败文案见异常 PRD）。**附件读取顺序**：先抽文字层 → 无可用文本再 OCR → 仍失败则逐条提醒且该文件不进对比下拉。有文字层的 PDF **不强制 OCR**。
+2. 产出思考步骤轨迹（可与工具调用、真实检索对齐）。
+3. 流式或整包写入 `blocks`（工程可先整包；Demo 为逐节演示）。
+4. 返回结论与推荐操作。
+5. 按产品会话存储写入，保证刷新可恢复（见 2.1.11）。
+
+### 7.3 多轮
+| 用户意图 | 行为 |
+|---|---|
+| 再生成一版 / 等价 | 分析（若闸门过）→ 新 window 修订版 |
+| 改成开题报告 | 新 window；改结构 |
+| 对比 | 选文件 → diff 页或「无可比性」 |
+| 标注修改 | 读标注 → 新 window |
+| 继续生成 / 重试 | 从 checkpoint 续写 |
+
+### 7.4 失败与续传
+- 任务 checkpoint：已完成 block keys + 下一节。
+- 断线续传、工具重试、停止回填：对齐异常 PRD。
+
+### 7.5 埋点（建议）
+`paper_write_start` / `paper_write_stop` / `paper_resume` / `paper_revise` / `paper_compare` / `paper_anno_apply` / `paper_error_show`。
+
+---
+
+## 8. 前端职责
+
+### 8.1 渲染
+- 每条 AI 输出带 MoreAI 头（含首轮思考）：禁止只给跟帖加。
+- 思考用 `routeThinkHtml` 族；错误用 `.net-card`。
+- 文档写入驱动右侧 `paintDoc`；对话只更新 artifact 状态。
+
+### 8.2 状态与按钮
+- 生成中：停止；停止后：继续生成；重连失败：重试。
+- 右侧 `with-doc` 时隐藏提问目录；文档态显示文档目录。
+
+### 8.3 版本切换
+- 重新生成产生的多 run：结论「‹ n / m ›」与 `activeWin` / version 联动。
+
+### 8.4 职责边界
+- Tip / 错误卡 / 悬停气泡 / 目录：全站公共。
+- 论文正文内容：模型侧；前端不因排版补空章节。
+
+---
+
+## 9. 边界与异常
+
+| 情况 | 处理 |
+|---|---|
+| 写前停止 | 回填 query，无文档卡 |
+| 写中停止 | 保留章节 + 继续生成 |
+| 断网 | 错误卡 + 5 次重连；失败后重试续写 |
+| 对比主题无关 | 无可比性文案，无对比页 |
+| 指名文件缺失 | 选择卡预选已有 + 说明 |
+| 上传失败 | 逐条提醒；失败文件不进对比下拉 |
+| 结构化失败 | `fallback_markdown` |
+| 普通闲聊 | 不进本文档台流程 |
+
+---
+
+## 10. 埋点
+见 7.5；错误类事件带 `request_id`（卡片上不展示编号，对齐异常 PRD Q11）。
+
+---
+
+## 11. 验收标准
+
+### 11.1 功能
+- [ ] 正常生成：8 节齐全，目录同步，文档卡可打开。
+- [ ] 写中停止 → 继续：不丢节、不重复。
+- [ ] 写前停止：query 回填，无文档卡。
+- [ ] 检索超时自动重试后仍能完成。
+- [ ] 断网 5 次失败后「重试」可续写；思考态为生成中断。
+- [ ] 再生成一版：分析卡字段齐全；新页签；旧版保留。
+- [ ] 开题报告：新页签，原论文保留。
+- [ ] 对比 2/3 份：只列差异；不相关不出表。
+- [ ] 标注修改：另出一版，不覆盖原件。
+- [ ] 提问目录 / 文档目录出现条件与跳转正确。
+
+### 11.2 视觉
+- [ ] MoreAI 每条 AI 输出都有；思考为 exec 时间线而非灰胶囊。
+- [ ] 错误卡为 `.net-card` +「重试」。
+- [ ] 悬停气泡与输入框对齐全站。
+
+### 11.3 测试用例（摘）
+| # | 步骤 | 期望 |
+|---|---|---|
+| 1 | 发论文 starter | 思考 → 右侧逐节 → 结论与卡片 |
+| 2 | 写到半程点停止再继续 | 从中断节续写 |
+| 3 | 打开 paper-error case | 重连失败卡 → 重试成功 |
+| 4 | 再生成一版 | 分析卡 → 修订页签 |
+| 5 | 对比原稿与修订 | 差异页；提问目录在右侧关闭后可跳转 |
+| 6 | 标注发送 | 新文档；结论含「不覆盖」 |
+
+---
+
+## 12. 模拟开发走查：问题与待确认
+
+| # | 问题 | 影响 | 默认方案 | 状态 |
+|---|---|---|---|---|
+| Q1 | 是否单独拆 `present_course_paper` TOOL？ | Agent 触发 | 本期靠意图识别；要严触发再补 TOOL | 待确认 |
+| Q2 | 首轮是否允许弹研究问题选择卡？ | 与「少选择」冲突 | **不弹**，按推荐；写完后再改方向 | 默认方案 |
+| Q3 | 正文流式 vs 整包？ | 前端复杂度 | 工程可先整包；交互对齐 Demo 逐节更佳 | 待确认 |
+| Q4 | 对比相关性算法？ | 误判 | 先规则/模型二分类；Demo 关键词仅演示 | 待确认 |
+| Q5 | 分析卡是否多业务变体？ | 组件库 | 本期只做论文修订诊断型；闸门通用 | 默认方案 |
+| Q6 | 目录是否等公共 PRD？ | 文档重复 | 本期按 5.6 + Demo；公共 PRD 后改引用 | 默认方案 |
+| Q7 | 会话刷新是否持久化？ | 存储 | **要做**：沿用线上账号 / 会话存储；Demo 不模拟落库 | 已确认 |
+
+---
+
+## 13. 给 AGENT 的开发指引
+
+### 13.1 任务拆分（建议顺序）
+1. 文档台窗口 / 版本 / 页签 + 对话 artifact。
+2. 思考过程与 MoreAI 头（抄路线 / 异常）。
+3. 首稿写入与停止 / 继续 checkpoint。
+4. 接入异常 PRD（断网卡、重试）。
+5. 修订分析卡 + 开题报告。
+6. 对比选择卡与差异页。
+7. 标注修订。
+8. 目录控件复用 `createOutline`。
+9. 按第 11 节验收。
+
+### 13.2 实现约束
+- 单文件 Demo 可参考 `conversations.html`；工程实现拆模块，但**交互与 class 语义对齐 Demo**。
+- 禁止自造错误条「重新生成」替代错误卡。
+- 禁止首轮 AI 漏 MoreAI 头。
+
+### 13.3 参考
+- Demo：`conversations.html`
+- 异常：`生成异常与恢复-PRD.md` / `生成异常与恢复.html`
+- 思考结构：`三个路线方案.html` `routeThinkHtml`
+- 全站：`docs/CHATDEMO-STANDARDS.md`
+
+</script>
+  <script>
+    const source = document.getElementById("prdSource").textContent.replace(/^\n/, "");
+    const esc = s => s.replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+    function inline(text) {
+      let s = esc(text);
+      s = s.replace(/`([^`]+)`/g, (_, c) => `<code>${c}</code>`);
+      s = s.replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>");
+      s = s.replace(/\[([^\]]+)\]\(([^)]+)\)/g, (_, t, u) => `<a href="${u}"${/\.html$/.test(u) ? ' target="_blank" rel="noopener"' : ""}>${t}</a>`);
+      return s;
+    }
+    function slug(text, used) {
+      let base = text.replace(/[^\w\u4e00-\u9fa5]+/g, "-").replace(/^-|-$/g, "") || "sec";
+      let id = base, n = 2;
+      while (used.has(id)) id = base + "-" + n++;
+      used.add(id);
+      return id;
+    }
+    function render(md) {
+      const lines = md.split("\n");
+      const out = [];
+      const toc = [];
+      const used = new Set();
+      let i = 0;
+      const isTableSep = l => /^\s*\|?\s*:?-{2,}/.test(l) && l.includes("|");
+      while (i < lines.length) {
+        const line = lines[i];
+        if (/^```/.test(line)) {
+          const buf = [];
+          i++;
+          while (i < lines.length && !/^```/.test(lines[i])) buf.push(lines[i++]);
+          i++;
+          out.push(`<pre><code>${esc(buf.join("\n"))}</code></pre>`);
+          continue;
+        }
+        const h = line.match(/^(#{1,3})\s+(.*)$/);
+        if (h) {
+          const level = h[1].length;
+          const id = slug(h[2], used);
+          if (level > 1) toc.push({ level, id, text: h[2] });
+          out.push(`<h${level} id="${id}">${inline(h[2])}</h${level}>`);
+          i++;
+          continue;
+        }
+        if (/^---\s*$/.test(line)) { out.push("<hr>"); i++; continue; }
+        if (/^>\s?/.test(line)) {
+          const buf = [];
+          while (i < lines.length && /^>\s?/.test(lines[i])) buf.push(lines[i++].replace(/^>\s?/, ""));
+          out.push(`<blockquote><p>${inline(buf.join(" "))}</p></blockquote>`);
+          continue;
+        }
+        if (line.includes("|") && i + 1 < lines.length && isTableSep(lines[i + 1])) {
+          const cells = l => l.trim().replace(/^\||\|$/g, "").split("|").map(c => c.trim());
+          const head = cells(line);
+          i += 2;
+          const rows = [];
+          while (i < lines.length && lines[i].includes("|") && lines[i].trim()) rows.push(cells(lines[i++]));
+          out.push(`<div class="tbl"><table><thead><tr>${head.map(c => `<th>${inline(c)}</th>`).join("")}</tr></thead><tbody>${rows.map(r => `<tr>${r.map(c => `<td>${c === "待确认" ? '<span class="st-wait">待确认</span>' : c === "已确认" ? '<span class="st-ok">已确认</span>' : inline(c)}</td>`).join("")}</tr>`).join("")}</tbody></table></div>`);
+          continue;
+        }
+        if (/^\s*([-*]|\d+\.)\s+/.test(line)) {
+          const items = [];
+          while (i < lines.length && /^\s*([-*]|\d+\.)\s+/.test(lines[i])) {
+            const raw = lines[i];
+            const depth = raw.match(/^\s*/)[0].length;
+            const text = raw.replace(/^\s*([-*]|\d+\.)\s+/, "");
+            items.push({ depth, text, ordered: /^\s*\d+\./.test(raw) });
+            i++;
+          }
+          let html = "";
+          const stack = [];
+          items.forEach(item => {
+            const lvl = item.depth >= 3 ? 1 : 0;
+            while (stack.length > lvl + 1) html += `</li></${stack.pop()}>`;
+            if (stack.length < lvl + 1) { const tag = item.ordered ? "ol" : "ul"; stack.push(tag); html += `<${tag}>`; }
+            else html += "</li>";
+            const task = item.text.match(/^\[ \]\s+(.*)$/);
+            html += task ? `<li class="task">${inline(task[1])}` : `<li>${inline(item.text)}`;
+          });
+          while (stack.length) html += `</li></${stack.pop()}>`;
+          out.push(html);
+          continue;
+        }
+        if (!line.trim()) { i++; continue; }
+        const buf = [];
+        while (i < lines.length && lines[i].trim() && !/^(#{1,3}\s|```|>|---\s*$|\s*([-*]|\d+\.)\s)/.test(lines[i]) && !(lines[i].includes("|") && i + 1 < lines.length && isTableSep(lines[i + 1]))) buf.push(lines[i++]);
+        out.push(`<p>${inline(buf.join(" "))}</p>`);
+      }
+      return { html: out.join("\n"), toc };
+    }
+    const { html, toc } = render(source);
+    document.getElementById("doc").innerHTML = html;
+    document.getElementById("toc").innerHTML = toc.map(t => `<a class="l${t.level}" href="#${t.id}">${esc(t.text)}</a>`).join("");
+    const toast = document.getElementById("toast");
+    let timer = 0;
+    function notify(text) { toast.textContent = text; toast.classList.add("show"); clearTimeout(timer); timer = setTimeout(() => toast.classList.remove("show"), 1600); }
+    function downloadText(text, filename) {
+      const link = document.createElement("a");
+      link.href = URL.createObjectURL(new Blob([text], { type: "text/markdown;charset=utf-8" }));
+      link.download = filename;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      setTimeout(() => URL.revokeObjectURL(link.href), 2000);
+    }
+    document.getElementById("copyMd").addEventListener("click", () => {
+      const done = () => notify("已复制 Markdown，可直接发给 AGENT");
+      const fallback = () => {
+        const area = document.createElement("textarea");
+        area.value = source;
+        area.style.position = "fixed";
+        area.style.left = "-999px";
+        document.body.appendChild(area);
+        area.select();
+        try { document.execCommand("copy"); done(); } catch (e) { notify("复制失败，请用「下载 .md」"); }
+        area.remove();
+      };
+      if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(source).then(done).catch(fallback);
+      else fallback();
+    });
+    document.getElementById("downloadMd").addEventListener("click", () => {
+      downloadText(source, "课程论文-PRD.md");
+      notify("已开始下载 PRD.md");
+    });
+    document.getElementById("downloadDemo").addEventListener("click", async () => {
+      const name = "conversations.html";
+      try {
+        const res = await fetch(name);
+        if (!res.ok) throw new Error(String(res.status));
+        const blob = await res.blob();
+        const link = document.createElement("a");
+        link.href = URL.createObjectURL(blob);
+        link.download = name;
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+        setTimeout(() => URL.revokeObjectURL(link.href), 2000);
+        notify("已开始下载 Demo.html");
+      } catch (e) {
+        const link = document.createElement("a");
+        link.href = name;
+        link.download = name;
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+        notify("已尝试下载 Demo.html");
+      }
+    });
+    const links = [...document.querySelectorAll("nav.toc a")];
+    const heads = links.map(a => document.getElementById(a.getAttribute("href").slice(1)));
+    window.addEventListener("scroll", () => {
+      let on = 0;
+      heads.forEach((h, k) => { if (h && h.getBoundingClientRect().top < 120) on = k; });
+      links.forEach((a, k) => a.classList.toggle("on", k === on));
+    }, { passive: true });
+  </script>
+</body>
+</html>

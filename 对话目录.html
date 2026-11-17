@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>对话目录</title>
+  <style>
+    :root {
+      --page: #f5f6f8; --ink: #1c2330; --sub: #5e6063; --muted: #858e9c;
+      --line: #e3e4e7; --brand: #0a59f7; --card: #fff;
+      --font: "PingFang SC", "HarmonyOS Sans SC", -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; height: 100%; }
+    body { height: 100%; background: var(--page); color: var(--ink); font: 14px/1.6 var(--font); overflow: hidden; }
+    button { font: inherit; border: 0; background: transparent; color: inherit; cursor: pointer; padding: 0; }
+    a { color: var(--brand); text-decoration: none; }
+
+    .app { display: grid; grid-template-rows: 48px minmax(0, 1fr); height: 100%; }
+    .top {
+      display: flex; align-items: center; gap: 10px; padding: 0 16px;
+      background: rgba(255,255,255,.92); border-bottom: 1px solid var(--line); backdrop-filter: blur(8px);
+    }
+    .top h1 { margin: 0; font-size: 14px; font-weight: 700; flex: 1; min-width: 0; }
+    .top .ver { font-size: 12px; color: var(--muted); }
+    .top a.entry, .top .mode button {
+      height: 28px; padding: 0 10px; border-radius: 8px; border: 1px solid var(--line);
+      background: #fff; font-size: 12px; line-height: 26px;
+    }
+    .top a.entry:hover, .top .mode button:hover { border-color: #b9cdfb; color: var(--brand); }
+    .mode { display: inline-flex; gap: 4px; padding: 2px; border-radius: 10px; background: #f2f3f5; border: 0; }
+    .mode button { border: 0; background: transparent; height: 24px; padding: 0 10px; border-radius: 8px; color: var(--sub); }
+    .mode button[aria-pressed="true"] { background: #fff; color: var(--ink); font-weight: 600; box-shadow: 0 1px 2px rgba(0,0,0,.06); }
+
+    .body { display: grid; grid-template-columns: 220px minmax(0, 1fr) 280px; min-height: 0; }
+    .body.hide-notes { grid-template-columns: 220px minmax(0, 1fr); }
+    .body.hide-notes .notes { display: none; }
+
+    .hist {
+      border-right: 1px solid var(--line); background: #fff; padding: 12px 10px; overflow: auto;
+    }
+    .hist .label { padding: 4px 8px 8px; font-size: 12px; color: var(--muted); }
+    .hist button {
+      display: block; width: 100%; text-align: left; padding: 10px 12px; border-radius: 10px;
+      color: var(--sub); font-size: 13px; line-height: 20px; margin-bottom: 4px;
+    }
+    .hist button:hover { background: #f5f6f7; }
+    .hist button.on { background: #f3f7ff; color: var(--brand); font-weight: 600; }
+
+    .main { position: relative; min-width: 0; min-height: 0; display: flex; flex-direction: column; background: #fff; }
+    .hint {
+      flex: none; margin: 12px 20px 0; padding: 10px 12px; border-radius: 12px; background: #eef0f3;
+      font-size: 12px; line-height: 18px; color: var(--sub);
+    }
+    .hint b { color: var(--ink); font-weight: 600; }
+    .scroll {
+      flex: 1; min-height: 0; overflow: auto; padding: 16px 48px 48px 24px; position: relative;
+    }
+    .block {
+      max-width: 680px; margin: 0 0 20px; padding: 14px 16px; border-radius: 14px; background: #f7f8fa;
+      scroll-margin-top: 24px;
+    }
+    .block.user { background: #e8f0fe; margin-left: auto; width: fit-content; max-width: min(440px, 100%); }
+    .block .kicker { display: block; margin-bottom: 4px; font-size: 12px; color: var(--muted); }
+    .block h3 { margin: 0 0 6px; font-size: 15px; line-height: 22px; }
+    .block p { margin: 0; color: var(--sub); font-size: 13px; line-height: 22px; }
+    .block.qnav-flash { animation: qnav-flash 1s ease; }
+
+    .notes {
+      border-left: 1px solid var(--line); background: #fff; overflow: auto; padding: 14px 14px 32px;
+    }
+    .notes h2 { margin: 0 0 8px; font-size: 14px; }
+    .notes .note {
+      margin: 0 0 10px; padding: 10px 12px; border-radius: 12px; background: #f7f8fa;
+      font-size: 12px; line-height: 18px; color: var(--sub);
+    }
+    .notes .note b { display: block; margin-bottom: 4px; color: var(--ink); font-size: 13px; }
+
+    /* qnav — 对齐 conversations / 三个路线方案 */
+    .qnav { position: absolute; top: 0; right: 14px; bottom: 0; width: 28px; z-index: 6; pointer-events: none; opacity: 0; visibility: hidden; transition: opacity .2s ease, visibility 0s linear .2s; }
+    .qnav.show { opacity: 1; visibility: visible; transition: opacity .2s ease; }
+    .qnav-rail { position: absolute; top: 50%; right: 0; padding: 6px 0 6px 12px; transform: translateY(-50%); pointer-events: auto; cursor: pointer; transition: opacity .16s ease; }
+    .qnav-view { width: 16px; overflow: hidden; }
+    .qnav-track { transition: transform .25s ease; }
+    .qnav-rail i { display: block; width: 8px; height: 2px; margin: 4px 0 4px auto; border-radius: 1px; background: #c9cdd4; transition: width .2s ease, background-color .2s ease; }
+    .qnav-rail i.is-current { width: 16px; background: #1f2329; }
+    .qnav-rail i.is-new { animation: qnav-dash-in .32s cubic-bezier(.2, .8, .2, 1); }
+    @keyframes qnav-dash-in { from { width: 0; opacity: 0; } }
+    .qnav.open .qnav-rail { opacity: 0; }
+    .qnav-card { position: absolute; right: -13px; width: 280px; max-height: calc(100% - 24px); overflow-y: auto; overscroll-behavior: contain; scrollbar-width: none; padding: 6px; background: #fff; border: 1px solid #eceef2; border-radius: 12px; box-shadow: 0 8px 28px rgba(31, 35, 41, .08), 0 1px 3px rgba(31, 35, 41, .06); pointer-events: none; opacity: 0; clip-path: inset(0 0 0 calc(100% - 24px) round 12px); transition: opacity .2s ease, clip-path .2s cubic-bezier(.2, .8, .2, 1); }
+    .qnav-card::-webkit-scrollbar { display: none; }
+    .qnav.open .qnav-card { pointer-events: auto; opacity: 1; clip-path: inset(0 round 12px); }
+    .qnav-row { display: grid; grid-template-columns: minmax(0, 1fr) 16px; align-items: start; column-gap: 10px; width: 100%; padding: 5px 6px 5px 10px; border: 0; border-radius: 8px; background: transparent; color: #646a73; font: inherit; font-size: 12px; line-height: 20px; text-align: right; cursor: pointer; transition: background-color .16s ease, color .16s ease; }
+    .qnav-row:hover, .qnav-row:focus-visible { color: #1f2329; outline: 0; }
+    .qnav-row.is-peek { background: #f5f6f7; text-align: left; }
+    .qnav-row.is-current { color: #1f2329; font-weight: 600; }
+    .qnav-text { min-width: 0; }
+    .qnav-q { display: block; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+    .qnav-a-wrap { display: grid; grid-template-rows: 0fr; transition: grid-template-rows .18s ease; }
+    .qnav-row.is-peek .qnav-a-wrap { grid-template-rows: 1fr; }
+    .qnav-a { min-height: 0; overflow: hidden; }
+    .qnav-a span { display: -webkit-box; margin-top: 2px; overflow: hidden; -webkit-box-orient: vertical; -webkit-line-clamp: 2; color: #8f959e; font-weight: 400; opacity: 0; transform: translateY(4px); transition: opacity .18s ease, transform .18s ease; }
+    .qnav-row.is-peek .qnav-a span { opacity: 1; transform: none; }
+    .qnav-dash { justify-self: end; width: 8px; height: 2px; margin-top: 9px; border-radius: 1px; background: #c9cdd4; transition: width .2s ease, background-color .2s ease; }
+    .qnav-row.is-current .qnav-dash { width: 16px; background: #1f2329; }
+    .qnav-row:hover .qnav-dash, .qnav-row.is-peek .qnav-dash { background: #1f2329; }
+    .qnav.no-peek .qnav-q { white-space: normal; overflow: visible; text-overflow: clip; }
+    @keyframes qnav-flash { 0%, 100% { box-shadow: 0 0 0 0 rgba(10, 89, 247, 0); } 25% { box-shadow: 0 0 0 4px rgba(10, 89, 247, .16); } }
+    @media (prefers-reduced-motion: reduce) {
+      .qnav, .qnav-card, .qnav-track, .qnav-rail i, .qnav-a-wrap, .qnav-a span { transition: none; }
+      .qnav-rail i.is-new, .block.qnav-flash { animation: none; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header class="top">
+      <a class="entry" href="index.html">入口</a>
+      <h1>对话目录</h1>
+      <span class="ver" id="verLabel">—</span>
+      <div class="mode" role="group" aria-label="预览或说明">
+        <button type="button" data-mode="preview" aria-pressed="true">预览</button>
+        <button type="button" data-mode="notes" aria-pressed="false">说明</button>
+      </div>
+    </header>
+    <div class="body" id="layout">
+      <aside class="hist" aria-label="历史">
+        <div class="label">历史对话</div>
+        <div id="caseList"></div>
+      </aside>
+      <section class="main">
+        <div class="hint" id="hint"></div>
+        <div class="scroll" id="scroller"></div>
+      </section>
+      <aside class="notes" id="notes" aria-label="说明"></div>
+    </div>
+  </div>
+
+  <script>
+    const OUTLINE_MIN = 2, OUTLINE_MAX = 30, OUTLINE_PITCH = 10;
+    const outlineReduced = () => window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const esc = s => String(s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+
+    function createOutline(cfg) {
+      const ui = { items: [], open: false, peek: null, current: -1, pinned: null, sig: "", counts: {}, peekTimer: 0, closeTimer: 0, raf: 0 };
+      const el = document.createElement("nav");
+      el.className = "qnav" + (cfg.peek ? "" : " no-peek");
+      el.id = cfg.id;
+      el.setAttribute("aria-label", cfg.label);
+      el.innerHTML = `<div class="qnav-rail" aria-hidden="true"><div class="qnav-view"><div class="qnav-track"></div></div></div><div class="qnav-card"></div>`;
+      cfg.host.appendChild(el);
+      const rail = el.querySelector(".qnav-rail");
+      const view = el.querySelector(".qnav-view");
+      const track = el.querySelector(".qnav-track");
+      const card = el.querySelector(".qnav-card");
+      const scroller = cfg.scroller;
+      const keyOf = node => Number(node.dataset.qi);
+      const markCurrent = () => el.querySelectorAll("[data-qi]").forEach(node => node.classList.toggle("is-current", keyOf(node) === ui.current));
+      function placeTrack() {
+        const n = ui.items.length;
+        const room = Math.max(OUTLINE_PITCH, el.clientHeight - 48);
+        const visible = Math.max(1, Math.min(n, OUTLINE_MAX, Math.floor(room / OUTLINE_PITCH)));
+        view.style.height = visible * OUTLINE_PITCH + "px";
+        const at = Math.max(0, ui.items.findIndex(item => item.key === ui.current));
+        const max = (n - visible) * OUTLINE_PITCH;
+        const offset = Math.max(0, Math.min(max, at * OUTLINE_PITCH - (visible * OUTLINE_PITCH) / 2 + OUTLINE_PITCH / 2));
+        track.style.transform = `translateY(${-offset}px)`;
+      }
+      function centerRow(smooth) {
+        const row = card.querySelector(".qnav-row.is-current");
+        if (!row) return;
+        const top = row.offsetTop - (card.clientHeight - row.offsetHeight) / 2;
+        card.scrollTo({ top: Math.max(0, top), behavior: smooth && !outlineReduced() ? "smooth" : "auto" });
+      }
+      function setCurrent(key) {
+        if (key === ui.current) return;
+        ui.current = key;
+        markCurrent();
+        placeTrack();
+      }
+      function sync() {
+        if (!el.classList.contains("show")) return;
+        if (ui.pinned != null && ui.items.some(item => item.key === ui.pinned)) { setCurrent(ui.pinned); return; }
+        const box = scroller.getBoundingClientRect();
+        const atEnd = scroller.scrollTop + scroller.clientHeight >= scroller.scrollHeight - 4;
+        const line = atEnd ? box.bottom - 1 : box.top + cfg.line;
+        let pick = ui.items[0]?.key ?? -1;
+        ui.items.forEach(item => {
+          const node = cfg.nodeFor(item.key);
+          if (node && node.getBoundingClientRect().top <= line) pick = item.key;
+        });
+        setCurrent(pick);
+      }
+      function setPeek(key) {
+        ui.peek = key;
+        card.querySelectorAll(".qnav-row").forEach(row => row.classList.toggle("is-peek", keyOf(row) === key));
+      }
+      function open() {
+        if (ui.open || !el.classList.contains("show")) return;
+        ui.open = true;
+        const host = el.clientHeight;
+        const r = rail.getBoundingClientRect();
+        const center = r.top + r.height / 2 - el.getBoundingClientRect().top;
+        card.style.maxHeight = "";
+        const height = Math.min(card.scrollHeight, host - 24);
+        const top = Math.max(12, Math.min(host - height - (cfg.peek ? 60 : 12), center - height / 2));
+        card.style.top = top + "px";
+        card.style.maxHeight = (host - top - 12) + "px";
+        el.classList.add("open");
+        centerRow(false);
+      }
+      function close(now) {
+        clearTimeout(ui.peekTimer);
+        if (!ui.open && !now) return;
+        ui.open = false;
+        setPeek(null);
+        el.classList.remove("open");
+      }
+      function jump(key) {
+        const node = cfg.nodeFor(key);
+        if (!node) return;
+        ui.pinned = key;
+        setCurrent(key);
+        centerRow(true);
+        const top = node.getBoundingClientRect().top - scroller.getBoundingClientRect().top + scroller.scrollTop - cfg.offset;
+        scroller.scrollTo({ top: Math.max(0, top), behavior: outlineReduced() ? "auto" : "smooth" });
+        node.classList.remove("qnav-flash");
+        void node.offsetWidth;
+        node.classList.add("qnav-flash");
+        setTimeout(() => node.classList.remove("qnav-flash"), 1000);
+      }
+      function paint(items, show, countKey) {
+        ui.items = items;
+        const prev = countKey ? (ui.counts[countKey] ?? items.length) : items.length;
+        if (countKey) ui.counts[countKey] = items.length;
+        el.classList.toggle("show", show);
+        if (!show) { close(true); return; }
+        const sig = countKey + "\u0003" + items.map(item => `${item.key}\u0001${item.title}\u0001${item.answer || ""}`).join("\u0002");
+        if (sig !== ui.sig) {
+          ui.sig = sig;
+          if (cfg.unpinOnChange) ui.pinned = null;
+          track.innerHTML = items.map((item, i) => `<i data-qi="${item.key}"${i >= prev ? ` class="is-new"` : ""}></i>`).join("");
+          const keepScroll = card.scrollTop;
+          card.innerHTML = items.map(item => `<button class="qnav-row${item.key === ui.peek ? " is-peek" : ""}" type="button" data-qi="${item.key}" aria-label="${esc(item.title)}"><span class="qnav-text"><span class="qnav-q">${esc(item.title)}</span>${cfg.peek && item.answer ? `<span class="qnav-a-wrap"><span class="qnav-a"><span>${esc(item.answer)}</span></span></span>` : ""}</span><i class="qnav-dash"></i></button>`).join("");
+          card.scrollTop = keepScroll;
+          ui.current = -1;
+        }
+        placeTrack();
+        sync();
+      }
+      const enter = () => { clearTimeout(ui.closeTimer); open(); };
+      const leave = () => { clearTimeout(ui.closeTimer); ui.closeTimer = setTimeout(close, 150); };
+      [rail, card].forEach(node => {
+        node.addEventListener("pointerenter", enter);
+        node.addEventListener("pointerleave", leave);
+      });
+      card.addEventListener("focusin", enter);
+      card.addEventListener("focusout", event => { if (!card.contains(event.relatedTarget)) leave(); });
+      if (cfg.peek) {
+        card.addEventListener("pointerover", event => {
+          const row = event.target.closest(".qnav-row");
+          if (!row || keyOf(row) === ui.peek) return;
+          clearTimeout(ui.peekTimer);
+          ui.peekTimer = setTimeout(() => setPeek(keyOf(row)), 80);
+        });
+        card.addEventListener("pointerleave", () => { clearTimeout(ui.peekTimer); setPeek(null); });
+      }
+      card.addEventListener("click", event => {
+        const row = event.target.closest(".qnav-row");
+        if (row) jump(keyOf(row));
+      });
+      const unpin = () => { ui.pinned = null; };
+      ["wheel", "touchstart", "pointerdown"].forEach(type => scroller.addEventListener(type, unpin, { passive: true }));
+      scroller.addEventListener("scroll", () => {
+        if (ui.raf) return;
+        ui.raf = requestAnimationFrame(() => { ui.raf = 0; sync(); });
+      }, { passive: true });
+      window.addEventListener("resize", () => { if (el.classList.contains("open")) open(); placeTrack(); });
+      return { el, ui, paint, sync, close };
+    }
+
+    const CASES = [
+      {
+        id: "ask",
+        title: "提问目录",
+        hint: "悬停右侧短横线展开列表；悬停某一行可 peek AI 首句；点击跳转到对应提问。",
+        peek: true,
+        label: "提问目录",
+        notes: [
+          { t: "出现条件", b: "≥2 条用户消息；本 Demo 无右侧文档台，故始终显示。" },
+          { t: "收起", b: "右缘短横线，一条提问一条；当前项更长更深；滚动时轨跟随居中。" },
+          { t: "展开 / peek", b: "悬停展开 280 宽卡片；行悬停约 80ms 展开 AI 首句（灰字最多 2 行）。" },
+          { t: "交互", b: "点击跳转并短暂高亮；离开约 150ms 收起；减弱动效时关闭动画。" }
+        ],
+        blocks: [
+          { key: 0, kind: "user", title: "帮我写一篇课程论文：生成式 AI 会怎样改变初级程序员的代码评审", answer: "按推荐定下研究问题与材料范围，开始检索文献。" },
+          { key: 1, kind: "ai", title: "首稿已写入文档台", body: "八节结构已齐：摘要、问题、相关工作、方法、分析、讨论、结论、参考文献。" },
+          { key: 2, kind: "user", title: "再生成一版，结论写得太满了", answer: "结论与证据对不上，建议改成「可能改变注意力，但尚未被测量」。" },
+          { key: 3, kind: "ai", title: "修订说明", body: "新开「课程论文 · 修订」页签；旧版保留，可直接对比。" },
+          { key: 4, kind: "user", title: "对比「生成式 AI 与代码评审」和「课程论文 · 修订」", answer: "两版差异已整理好，只列出写得不一样的部分。" },
+          { key: 5, kind: "ai", title: "对比结论", body: "讨论与结论两节改动最大；方法与参考文献沿用。" }
+        ]
+      },
+      {
+        id: "msg",
+        title: "消息目录",
+        hint: "长回复内多块锚点（导语 / 总判断 / 各报告）。悬停展开后点击跳转；本 case 开 peek 以展示块摘要。",
+        peek: true,
+        label: "消息目录",
+        notes: [
+          { t: "出现条件", b: "≥2 个可跳转块；业务侧用 data-sum-sec 等挂锚（见文档分析 PRD）。" },
+          { t: "与提问目录关系", b: "同一控件；列表内容由业务填充 items，不改交互壳。" },
+          { t: "右侧打开时", b: "正式产品中消息目录应隐藏或让位；本 Demo 单独演示故仍显示。" }
+        ],
+        blocks: [
+          { key: 0, kind: "sec", title: "导语", body: "三份材料一起看：总判断先给，再按文件拆开。", answer: "导语：先总判断再分文件。" },
+          { key: 1, kind: "sec", title: "总判断", body: "缺陷发现率提升约 18%，评审阅读时长下降约 11 分钟；适合初筛。", answer: "总判断：适合初筛，不能当合并依据。" },
+          { key: 2, kind: "sec", title: "论文 A · 方法", body: "样本：86 个后端服务，2140 次合并请求。", answer: "方法：样本与对照设置。" },
+          { key: 3, kind: "sec", title: "论文 B · 结果", body: "模型初审后人工复核，漏报集中在跨文件改动。", answer: "结果：跨文件改动易漏报。" },
+          { key: 4, kind: "sec", title: "提示", body: "报告卡只展示有依据的模块；空模块不渲染。", answer: "提示：模块闸门，有数据才渲染。" }
+        ]
+      },
+      {
+        id: "doc",
+        title: "文档目录",
+        hint: "章节目录：无 peek（悬停行不展开副文）。标题过长可换行。滚动正文时当前章跟随。",
+        peek: false,
+        label: "文档目录",
+        notes: [
+          { t: "出现条件", b: "右侧为文档且 ≥2 个章节标题；对比 / 任务视图不显示。" },
+          { t: "与提问目录差异", b: "同一 createOutline；peek:false；unpinOnChange 建议为 true。" },
+          { t: "写入中", b: "目录随章节增加；新横线可播 is-new 动画。" }
+        ],
+        blocks: [
+          { key: 0, kind: "h", title: "一、题目与摘要", body: "研究问题、材料范围与本文判断。" },
+          { key: 1, kind: "h", title: "二、研究问题", body: "生成式 AI 是否已经改变初级程序员的代码评审。" },
+          { key: 2, kind: "h", title: "三、相关工作", body: "评审制度研究与代码生成工具可用性调查对照阅读。" },
+          { key: 3, kind: "h", title: "四、研究方法", body: "六篇公开论文对照表与三项归类。" },
+          { key: 4, kind: "h", title: "五、分析", body: "评审对象、改动说明、初级程序员困难点。" },
+          { key: 5, kind: "h", title: "六、讨论", body: "证据测量的是写代码，不是评审评论。" },
+          { key: 6, kind: "h", title: "七、结论", body: "按研究问题给出有边界的答案。" },
+          { key: 7, kind: "h", title: "八、参考文献", body: "正文引用的六篇文献列表。" }
+        ]
+      }
+    ];
+
+    const scroller = document.getElementById("scroller");
+    const main = document.querySelector(".main");
+    let outline = null;
+    let activeId = CASES[0].id;
+    let mode = "preview";
+
+    function current() { return CASES.find(c => c.id === activeId) || CASES[0]; }
+
+    function paintList() {
+      document.getElementById("caseList").innerHTML = CASES.map(c =>
+        `<button type="button" data-case="${c.id}" class="${c.id === activeId ? "on" : ""}">${esc(c.title)}</button>`
+      ).join("");
+    }
+
+    function paintNotes() {
+      const c = current();
+      document.getElementById("notes").innerHTML =
+        `<h2>${esc(c.title)}</h2>` +
+        c.notes.map(n => `<div class="note"><b>${esc(n.t)}</b>${esc(n.b)}</div>`).join("");
+    }
+
+    function paintContent() {
+      const c = current();
+      document.getElementById("hint").innerHTML = `<b>${esc(c.title)}</b> · ${esc(c.hint)}`;
+      scroller.innerHTML = c.blocks.map(b => {
+        if (b.kind === "user") {
+          return `<article class="block user" data-oid="${b.key}"><span class="kicker">用户</span><p>${esc(b.title)}</p></article>`;
+        }
+        if (b.kind === "ai") {
+          return `<article class="block" data-oid="${b.key}"><span class="kicker">MoreAI</span><h3>${esc(b.title)}</h3><p>${esc(b.body)}</p></article>`;
+        }
+        return `<article class="block" data-oid="${b.key}"><span class="kicker">锚点</span><h3>${esc(b.title)}</h3><p>${esc(b.body || "")}</p></article>`;
+      }).join("");
+      scroller.scrollTop = 0;
+      if (outline) { outline.el.remove(); outline = null; }
+      const c2 = current();
+      outline = createOutline({
+        id: "demoQnav",
+        label: c2.label,
+        host: main,
+        scroller,
+        peek: c2.peek,
+        line: 48,
+        offset: 24,
+        unpinOnChange: c2.id === "doc",
+        nodeFor: key => scroller.querySelector(`[data-oid="${key}"]`)
+      });
+      const items = c2.blocks
+        .filter(b => c2.id !== "ask" || b.kind === "user")
+        .map(b => ({ key: b.key, title: b.title, answer: b.answer || "" }));
+      outline.paint(items, items.length >= OUTLINE_MIN, c2.id);
+    }
+
+    function setMode(next) {
+      mode = next;
+      document.querySelectorAll(".mode button").forEach(btn => btn.setAttribute("aria-pressed", String(btn.dataset.mode === mode)));
+      document.getElementById("layout").classList.toggle("hide-notes", mode !== "notes");
+    }
+
+    document.getElementById("caseList").addEventListener("click", event => {
+      const btn = event.target.closest("[data-case]");
+      if (!btn) return;
+      activeId = btn.dataset.case;
+      paintList();
+      paintNotes();
+      paintContent();
+    });
+    document.querySelector(".mode").addEventListener("click", event => {
+      const btn = event.target.closest("[data-mode]");
+      if (btn) setMode(btn.dataset.mode);
+    });
+
+    fetch("version.json").then(r => r.json()).then(v => {
+      document.getElementById("verLabel").textContent = v.version || "";
+    }).catch(() => {});
+
+    paintList();
+    paintNotes();
+    setMode("preview");
+    paintContent();
+  </script>
+</body>
+</html>
