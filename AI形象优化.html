@@ -104,8 +104,9 @@
     .artifact:hover .artifact-actions { display: flex; }
     .artifact.on,
     .artifact.on:hover { background: #f3f7ff; border-color: #eef0f3; }
+    .artifact.on .artifact-copy b { color: #3b6dff; }
     .artifact.on .artifact-actions,
-    .artifact.on:hover .artifact-actions { background: linear-gradient(to left, #f3f7ff 78%, rgba(243, 247, 255, 0)); }
+    .artifact.on:hover .artifact-actions { display: flex; background: linear-gradient(to left, #f3f7ff 78%, rgba(243, 247, 255, 0)); }
     .artifact-actions button { width: 28px; height: 28px; border: 0; border-radius: 8px; background: rgba(9, 11, 14, 0.04); color: #5e6063; display: grid; place-items: center; padding: 0; }
     .artifact-actions button img { display: block; width: 14px; height: 14px; }
     .doc-unfold { position: absolute; right: 15px; top: 16px; z-index: 3; width: 28px; height: 28px; border: 0; border-radius: 6px; background: transparent; color: #3c4043; display: inline-flex; align-items: center; justify-content: center; padding: 0; }
@@ -1124,7 +1125,8 @@
     #stage .chats-toggle:hover { background: rgba(9, 11, 14, 0.04); color: #5e6063; }
     #stage .chats-toggle img,
     #stage .strip-btn img,
-    #stage .doc-chrome .stage-actions .icon-btn img { width: 14px; height: 14px; display: block; }
+    #stage .doc-chrome .stage-actions .icon-btn img,
+    #stage .doc-chrome .stage-actions .icon-btn svg { width: 14px; height: 14px; display: block; }
     #stage #newChat.new-chat {
       display: flex;
       height: 34px;
@@ -1319,6 +1321,9 @@
     #stage .doc-chrome .stage-actions .icon-btn:hover { background: rgba(9, 11, 14, 0.04); color: #5e6063; }
     #stage .doc-chrome .stage-actions .icon-btn.on,
     #stage .doc-chrome .stage-actions .icon-btn.on:hover { background: #f3f7ff; color: #0a59f7; }
+    #stage .doc-chrome .stage-actions #btnMark { color: rgba(0, 0, 0, 0.6); }
+    #stage .doc-chrome .stage-actions #btnMark.on,
+    #stage .doc-chrome .stage-actions #btnMark.on:hover { background: #f3f7ff; color: #0a59f7; }
     #stage .tool-split { width: 1px; height: 14px; background: #eef0f3; flex: none; }
     #stage .doc-head { display: none; }
     #stage .doc-outline {
@@ -1547,7 +1552,7 @@
           <div class="stage-actions">
             <div class="doc-tool-pair">
               <button class="icon-btn" id="btnMark" type="button" data-tip="标注修改" aria-label="标注修改">
-                <img src="mark-icon.svg" width="14" height="14" alt="">
+                <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M6.79004 7.70117C6.57278 6.84735 7.34223 6.06923 8.19824 6.27734L12.5098 7.32715C13.531 7.57583 13.7307 8.94133 12.8232 9.47168L10.9434 10.5693C10.9121 10.5876 10.8882 10.6161 10.874 10.6494L10.1436 12.3701C9.7064 13.3996 8.2118 13.2859 7.93555 12.2021L6.79004 7.70117ZM1.75 8.16699C2.07217 8.16699 2.33301 8.42783 2.33301 8.75V10.5C2.33301 11.1443 2.85567 11.667 3.5 11.667H5.25C5.57217 11.667 5.83301 11.9278 5.83301 12.25C5.83301 12.5722 5.57217 12.833 5.25 12.833H3.5C2.21134 12.833 1.16699 11.7887 1.16699 10.5V8.75C1.16699 8.42783 1.42783 8.16699 1.75 8.16699ZM7.96191 7.24902C7.83855 7.21917 7.72762 7.33105 7.75879 7.4541L8.9043 11.9551C8.94412 12.1115 9.16059 12.1281 9.22363 11.9795L9.95312 10.2588C10.0514 10.0273 10.2223 9.83398 10.4395 9.70703L12.3184 8.6084C12.4493 8.5319 12.4207 8.33475 12.2734 8.29883L7.96191 7.24902ZM5.25 1.16699C5.57217 1.16699 5.83301 1.42783 5.83301 1.75C5.83301 2.07217 5.57217 2.33301 5.25 2.33301H3.5C2.85567 2.33301 2.33301 2.85567 2.33301 3.5V5.25C2.33301 5.57217 2.07217 5.83301 1.75 5.83301C1.42783 5.83301 1.16699 5.57217 1.16699 5.25V3.5C1.16699 2.21134 2.21134 1.16699 3.5 1.16699H5.25ZM10.5 1.16699C11.7887 1.16699 12.833 2.21134 12.833 3.5V5.25C12.833 5.57217 12.5722 5.83301 12.25 5.83301C11.9278 5.83301 11.667 5.57217 11.667 5.25V3.5C11.667 2.85567 11.1443 2.33301 10.5 2.33301H8.75C8.42783 2.33301 8.16699 2.07217 8.16699 1.75C8.16699 1.42783 8.42783 1.16699 8.75 1.16699H10.5Z" fill="currentColor"/></svg>
               </button>
               <button class="icon-btn" id="btnMax" type="button" data-tip="展开" aria-label="展开">
                 <img src="zoom-icon.svg" width="14" height="14" alt="">
@@ -2358,8 +2363,7 @@
         const chev = !working && list.length ? `<svg class="think-chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>` : "";
         const head = `<button class="think-head" type="button" ${working ? "" : `data-think="${index}"`} aria-expanded="${working || m.open ? "true" : "false"}"><span class="think-row">${aiFaceHtml(faceState(session, m))}<span class="think-name">MoreAI</span></span><span class="think-status">${label}${time ? `<span class="think-time">${esc(time)}</span>` : ""}${chev}</span></button>`;
         const card = list.length ? execHtml(list, working) : "";
-        const wait = working && m.wait !== false ? `<div class="think-wait" aria-hidden="true"><i></i><i></i><i></i></div>` : "";
-        const body = (working || m.open) && (card || wait) ? `<div class="think-body">${card}${wait}</div>` : "";
+        const body = (working || m.open) && card ? `<div class="think-body">${card}</div>` : "";
         return `<div class="think${working ? "" : " done"}${m.open ? " open" : ""}">${head}${body}</div>`;
       }
       if (m.type === "artifact") {
