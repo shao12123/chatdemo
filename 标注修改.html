@@ -562,15 +562,20 @@
       flex: none;
     }
     .add {
-      width: 32px;
-      height: 32px;
-      border-radius: 50%;
+      width: 28px;
+      height: 28px;
+      border-radius: 6px;
       background: transparent;
       display: flex;
       align-items: center;
       justify-content: center;
     }
-    .add:hover:not(:disabled) { background: rgba(9, 11, 14, 0.04); }
+    .add:hover:not(:disabled), .add.open { background: rgba(0, 0, 0, .06); }
+    .plus-menu { position: absolute; left: 12px; bottom: 56px; z-index: 8; min-width: 166px; padding: 10px; display: none; background: #fff; border: .5px solid #dcdcdc; border-radius: 16px; box-shadow: 0 3px 7px rgba(0,0,0,.05), 0 8px 5px rgba(0,0,0,.06), 0 5px 2.5px rgba(0,0,0,.1); }
+    .plus-menu.show { display: block; }
+    .plus-menu button { display: flex; align-items: center; gap: 8px; width: 100%; height: 28px; border: 0; background: transparent; border-radius: 6px; padding: 3px 8px; font-size: 14px; line-height: 22px; color: var(--ink); text-align: left; }
+    .plus-menu button:hover { background: rgba(0, 0, 0, .06); }
+    html.theme-dark .plus-menu { background: var(--card); border-color: var(--card-line); }
     .add:disabled, .add:disabled:hover { opacity: 0.3; cursor: default; background: transparent; }
     .upload-host { position: relative; display: inline-flex; }
     .upload-host.is-capped .add, .upload-host.is-capped .anno-upload { pointer-events: none; }
@@ -975,7 +980,7 @@
     .anno-revision-card li { margin: 4px 0; font-size: 13px; line-height: 20px; }
     .anno-revision-card li span { display: block; color: var(--label); font-size: 12px; line-height: 18px; }
     .msg-user-block { align-self: stretch; display: flex; flex-direction: column; align-items: flex-end; gap: 4px; max-width: 100%; }
-    .msg-user-block .msg.user { width: max-content; max-width: 100%; background: rgba(218, 230, 254, 0.5); color: #1e293b; border-radius: 8px; padding: 8px 16px; }
+    .msg-user-block .msg.user { width: max-content; max-width: 100%; background: #eef2ff; color: var(--ink); border-radius: 8px; padding: 10px 14px; }
     .msg-user-block .msg-tags { width: 100%; max-width: 100%; min-width: 0; margin: 0; flex-wrap: nowrap; justify-content: flex-end; gap: 4px; overflow: hidden; }
     .msg-anno-list { margin: 0; padding-left: 21px; }
     .msg-anno-list li { margin: 0; }
@@ -1496,12 +1501,44 @@
       .think-dots i { opacity: .7; }
     }
 
-    .think-head { display: flex; flex-direction: column; align-items: flex-start; gap: 6px; border: 0; background: transparent; padding: 0; text-align: left; cursor: pointer; width: 100%; }
-    .think-row { display: flex; align-items: center; gap: 12px; margin-left: -8px; }
-    .think-name { color: var(--ink); font-size: 15px; line-height: 22px; font-weight: 600; }
-    .think-status { display: flex; align-items: center; gap: 4px; min-height: 20px; color: var(--ink-3); font-size: 13px; line-height: 20px; }
-    .think-status small { color: var(--ink-3); font-size: 13px; line-height: 20px; }
-    .think-chev { flex: none; color: var(--ink-3); display: inline-flex; }
+    .think-head { display: flex; flex-direction: column; align-items: flex-start; gap: 6px; border: 0; background: transparent; padding: 0; text-align: left; cursor: pointer; width: 100%; font: inherit; color: inherit; }
+    .think-row { display: flex; align-items: center; gap: 8px; height: 50px; margin-left: 0; }
+    .think-row .ai-face { width: 36px; height: 36px; }
+    .think-row .ai-face-rig { transform-origin: 18px 18.7px; }
+    .think-row .ai-face-art { left: 1.15px; top: 1.82px; transform: scale(0.6733, 0.6731); }
+    .think-name { color: #1c2330; font-size: 15px; line-height: 22px; font-weight: 700; }
+    .think-status { display: flex; align-items: center; gap: 8px; min-height: 20px; color: #98a2b3; font-size: 13px; line-height: 20px; }
+    .think-status b { font-weight: 400; }
+    .think-status small { color: #98a2b3; font-size: 13px; line-height: 20px; }
+    .think-meta { display: inline-flex; align-items: flex-start; }
+    .think-time { color: #98a2b3; font-size: 13px; line-height: 20px; }
+    .think-chev-box { display: flex; align-items: center; justify-content: center; width: 20px; height: 20px; flex: none; }
+    .think-chev { flex: none; color: #98a2b3; display: inline-flex; transition: transform .2s ease; }
+    .think-head[aria-expanded="true"] .think-chev { transform: rotate(180deg); }
+    .think-body { display: flex; flex-direction: column; align-items: flex-start; gap: 12px; width: 100%; }
+    .exec { width: min(436px, 100%); border: 1px solid #e7e9ee; border-radius: 12px; background: #fff; overflow: hidden; }
+    .exec-bar { display: flex; align-items: center; gap: 8px; min-height: 36px; padding: 8px 12px; color: #667085; font-size: 12px; line-height: 20px; }
+    .exec-title { font-weight: 500; }
+    .exec-list { list-style: none; margin: 0 10px 10px; padding: 8px 10px; border-radius: 8px; background: #f6f7f9; display: flex; flex-direction: column; gap: 8px; }
+    .exec-item { position: relative; display: flex; align-items: center; gap: 8px; min-height: 20px; color: #667085; font-size: 12px; line-height: 20px; }
+    .exec-item:not(:last-child)::before { content: ""; position: absolute; left: 3px; top: 50%; width: 1px; height: calc(100% + 8px); background: #d0d5dd; transform: translateX(-50%); }
+    .exec-dot { position: relative; z-index: 1; width: 6px; height: 6px; border-radius: 50%; flex: none; background: #98a2b3; }
+    .ai-face[data-scheme="2"] .ai-blink { position: absolute; left: 0; top: 0; width: 50.0452px; height: 50.0452px; transform-origin: 50% 46.6%; }
+    .ai-face[data-scheme="2"] .ai-shut { position: absolute; left: 0; top: 0; width: 50.0452px; height: 50.0452px; opacity: 0; pointer-events: none; }
+    .ai-face[data-scheme="2"] .ai-sclera,
+    .ai-face[data-scheme="2"] .ai-pupil { position: absolute; inset: 0; }
+    .ai-face[data-scheme="2"] .ai-face-orb,
+    .ai-blob-eyes { display: block; overflow: visible; }
+    .ai-blob-defs { position: absolute; width: 0; height: 0; overflow: hidden; }
+    html.theme-dark .think-name { color: var(--ink); }
+    html.theme-dark .think-status,
+    html.theme-dark .think-time,
+    html.theme-dark .think-status small,
+    html.theme-dark .exec-bar,
+    html.theme-dark .exec-item { color: var(--ink-3); }
+    html.theme-dark .exec { background: var(--card); border-color: var(--card-line); }
+    html.theme-dark .exec-list { background: #1c1d21; }
+    html.theme-dark .exec-item:not(:last-child)::before { background: #3a3c40; }
     .hp-think-turn { width: 100%; max-width: 100%; align-items: stretch; gap: 8px; margin: 0; }
     .hp-think-turn .hp-thinking { width: 100%; margin-top: 0; }
     .hp-think-turn .hp-thought-body { margin-top: 8px; }
@@ -1570,6 +1607,7 @@
   </style>
 </head>
 <body>
+  <svg class="ai-blob-defs" width="0" height="0" aria-hidden="true"><defs><filter id="ai-blob-shade" x="27.9938" y="36.9991" width="104.012" height="85.0068" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB"><feFlood flood-opacity="0" result="BackgroundImageFix"/><feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape"/><feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/><feOffset/><feGaussianBlur stdDeviation="16"/><feComposite in2="hardAlpha" operator="arithmetic" k2="-1" k3="1"/><feColorMatrix type="matrix" values="0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 1 0"/><feBlend mode="normal" in2="shape" result="effect1_innerShadow_0_4"/><feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/><feOffset/><feGaussianBlur stdDeviation="5.5"/><feComposite in2="hardAlpha" operator="arithmetic" k2="-1" k3="1"/><feColorMatrix type="matrix" values="0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 1 0"/><feBlend mode="normal" in2="effect1_innerShadow_0_4" result="effect2_innerShadow_0_4"/></filter></defs></svg>
   <header class="rev-toolbar" id="revToolbar" aria-label="演示评审工具栏"><div class="rev-toolbar-title">标注修改 <span>PPT 多标注 · 说明供开发与测试参考</span></div><div class="rev-toolbar-actions"><span class="demo-version" id="demoVersion">版本读取中…</span><div class="theme-switch" id="themeSwitch" role="group" aria-label="浅色深色"><button type="button" data-theme-mode="light" aria-pressed="true">浅色</button><button type="button" data-theme-mode="dark" aria-pressed="false">深色</button></div><div class="rev-mode" role="group" aria-label="切换预览和说明"><button type="button" data-rev-mode="preview" aria-pressed="true">预览</button><button type="button" data-rev-mode="annotation" aria-pressed="false">说明</button></div><button type="button" class="rev-export" id="revExport" hidden>导出 HTML</button></div></header>
   <div class="rev-shell">
   <div class="stage" id="stage">
@@ -1694,6 +1732,12 @@
               </button>
             </div>
             <input class="composer-file-input" id="composerFile" type="file" multiple tabindex="-1" aria-hidden="true">
+            <div class="plus-menu" id="plusMenu">
+              <button type="button" data-act="upload">上传文件</button>
+              <button type="button" data-act="kb">知识库</button>
+              <button type="button" data-act="tools">工具</button>
+              <button type="button" data-act="skills">技能</button>
+            </div>
           </form>
         </section>
       </div>
@@ -3148,12 +3192,13 @@ const roastPhotos = {green: "data:image/jpeg;base64,/9j/4QCARXhpZgAASUkqAAgAAAAF
       hpApplyReadyDemo(text);hpRefresh(true);
     }
     function hpThoughtHtml(){
-      const labels={paused:'已暂停',choosing:'已整理内容方向',preparing:'正在准备',generating:'正在生成页面',checking:'正在检查页面',assembling:'正在组装 PPTX',partial:'部分页面待重试',error:'组装未完成',done:'已思考'};
+      const labels={paused:'已暂停',choosing:'已整理内容方向',preparing:'正在准备',generating:'正在生成页面',checking:'正在检查页面',assembling:'正在组装 PPTX',partial:'部分页面待重试',error:'组装未完成',done:'已完成'};
       const progress=hp.pages.length&&hp.status!=='done'?`<p>整页图片已生成 ${hpReady()} / ${hp.pages.length} 页${hp.activeJobs?'，'+hp.activeJobs+' 页正在生成':''}。</p>`:'';
       const working=!['done','paused','error','partial'].includes(hp.status);
       const faceState=hp.status==='error'?'error':(working?'thinking':'idle');
       const head=moreaiThinkHeadHtml({label:labels[hp.status]||'思考中',time:hp.duration,open:hp.thoughtOpen,state:faceState,done:!working,attrs:'data-hp-thought',toggle:true});
-      const body=hp.thoughtOpen?`<div class="hp-thought-body">${hp.steps.map(x=>`<p>${esc(x)}</p>`).join('')}${progress}${hp.rolesShown?`<button class="hp-thought-toggle" type="button" data-hp-roles aria-expanded="${hp.rolesOpen}">${hp.rolesOpen?'⌄':'›'} 参与角色 · ${hp.rolesShown}</button>${hp.rolesOpen?`<div class="hp-roles">${PPT_ROLES.slice(0,hp.rolesShown).map(r=>`<div><button data-hp-open="${r.key}">${r.name}</button><span> · ${r.job}</span></div>`).join('')}</div>`:''}`:''}</div>`:'';
+      const extra=`${progress}${hp.rolesShown?`<button class="hp-thought-toggle" type="button" data-hp-roles aria-expanded="${hp.rolesOpen}">${hp.rolesOpen?'⌄':'›'} 参与角色 · ${hp.rolesShown}</button>${hp.rolesOpen?`<div class="hp-roles">${PPT_ROLES.slice(0,hp.rolesShown).map(r=>`<div><button data-hp-open="${r.key}">${r.name}</button><span> · ${r.job}</span></div>`).join('')}</div>`:''}`:''}`;
+      const body=hp.thoughtOpen?execThinkHtml(hp.steps,extra):'';
       return `<div class="moreai-turn hp-think-turn" id="hpThought">${head}${body}</div>`;
     }
     function hpBody(){
@@ -4011,7 +4056,10 @@ const roastPhotos = {green: "data:image/jpeg;base64,/9j/4QCARXhpZgAASUkqAAgAAAAF
       const label=rf.complete?'已处理':rf.paused?'已暂停':rf.status==='starting'?'正在检查':rf.assembling?'正在组装':rf.running?'正在恢复':'等待处理';
       const seconds=Math.max(1,Math.round(rf.elapsedMs/1000));
       const duration=seconds>=60?`${Math.floor(seconds/60)}分${seconds%60}秒`:`${seconds}秒`;
-      return `<section class="rf-thinking"><button class="rf-thought-toggle" data-rf-thought aria-expanded="${rf.thoughtOpen}"><span aria-hidden="true">${rf.thoughtOpen?'⌄':'›'}</span><span>${label}</span>${rf.complete?`<small>· 用时 ${duration}</small>`:''}</button>${rf.thoughtOpen?`<div class="rf-thought-body">${rf.steps.map(step=>`<p>${esc(step)}</p>`).join('')}${rf.status!=='starting'?`<details data-rf-details ${rf.detailsOpen?'open':''}><summary>错误详情与处理记录</summary><ol>${rf.log.map(x=>`<li>${esc(x)}</li>`).join('')}</ol></details>`:''}</div>`:''}</section>`;
+      const working=rf.running||rf.assembling||rf.status==='starting';
+      const details=rf.status!=='starting'?`<details data-rf-details ${rf.detailsOpen?'open':''}><summary>错误详情与处理记录</summary><ol>${rf.log.map(x=>`<li>${esc(x)}</li>`).join('')}</ol></details>`:'';
+      const head=moreaiThinkHeadHtml({label,time:rf.complete?duration:'',open:rf.thoughtOpen,state:working?'thinking':'idle',done:!working,attrs:'data-rf-thought',toggle:true});
+      return `<div class="moreai-turn hp-think-turn">${head}${rf.thoughtOpen?execThinkHtml(rf.steps,details):''}</div>`;
     }
     function rfBody(){
       if(rf.status==='starting')return rfThoughtHtml();
@@ -4749,13 +4797,33 @@ const roastPhotos = {green: "data:image/jpeg;base64,/9j/4QCARXhpZgAASUkqAAgAAAAF
       if (activeId === "roast") startRoast();
       else startDemo();
     });
-    document.querySelector(".composer .add").addEventListener("click", () => {
-      const button = document.querySelector(".composer .add");
+    function closePlusMenu() {
+      document.getElementById("plusMenu")?.classList.remove("show");
+      document.querySelector(".composer .add")?.classList.remove("open");
+    }
+    document.querySelector(".composer .add").addEventListener("click", event => {
+      event.stopPropagation();
+      const button = event.currentTarget;
       if (button.disabled) return;
-      const input = document.getElementById("composerFile");
-      input.value = "";
-      input.click();
+      const menu = document.getElementById("plusMenu");
+      const open = !menu.classList.contains("show");
+      menu.classList.toggle("show", open);
+      button.classList.toggle("open", open);
     });
+    document.getElementById("plusMenu").addEventListener("click", event => {
+      event.stopPropagation();
+      const act = event.target.closest("button")?.dataset.act;
+      if (!act) return;
+      closePlusMenu();
+      if (act === "upload") {
+        const input = document.getElementById("composerFile");
+        input.value = "";
+        input.click();
+        return;
+      }
+      notify({ kb: "知识库", tools: "工具", skills: "技能" }[act] || act);
+    });
+    document.addEventListener("click", closePlusMenu);
     document.getElementById("composerFile").addEventListener("change", () => {
       addComposerAssets(document.getElementById("composerFile").files);
     });
@@ -5131,6 +5199,45 @@ const DESIGN_MOUTH = "M6.61285 13.736C7.26704 14.5537 9.06605 16.1892 11.0286 16
       if (!faces.length) { faceRaf = 0; return; }
       const blink = faceBlinkScale(now, faces.some(el => el.dataset.state === "thinking"));
       faces.forEach(el => {
+        if (el.dataset.scheme === "2") {
+          const spring = faceSprings.get(el) || { x: 0, y: 0, t: now };
+          let tx = 0;
+          let ty = 0;
+          let tracked = false;
+          if (!faceReduced && facePointer.on && el.dataset.state !== "drag") {
+            const rect = el.getBoundingClientRect();
+            const dx = facePointer.x - (rect.left + rect.width / 2);
+            const dy = facePointer.y - (rect.top + rect.height / 2);
+            const dist = Math.hypot(dx, dy);
+            const near = 112;
+            if (dist < near) {
+              const edge = dist <= near - 36 ? 1 : (near - dist) / 36;
+              const reach = Math.min(1, dist / 72) * 4.5 * edge;
+              const angle = Math.atan2(dy, dx);
+              tx = Math.cos(angle) * reach;
+              ty = Math.sin(angle) * reach;
+              tracked = true;
+            }
+          }
+          const dt = Math.min(48, Math.max(0, now - (spring.t || now)));
+          spring.t = now;
+          const k = dt ? 1 - Math.exp(-dt / 110) : 0;
+          spring.x += (tx - spring.x) * k;
+          spring.y += (ty - spring.y) * k;
+          faceSprings.set(el, spring);
+          const unit = 50.0452 / 104;
+          const maxLead = 6 * unit;
+          let leadX = spring.x * 0.45;
+          let leadY = spring.y * 0.45;
+          const lead = Math.hypot(leadX, leadY);
+          if (lead > maxLead) { leadX *= maxLead / lead; leadY *= maxLead / lead; }
+          const homeX = tracked ? 0 : 4 * unit;
+          el.querySelectorAll(".ai-sclera").forEach(node => { node.style.transform = `translate(${spring.x.toFixed(3)}px, ${spring.y.toFixed(3)}px)`; });
+          el.querySelectorAll(".ai-pupil").forEach(node => { node.style.transform = `translate(${(spring.x + leadX + homeX).toFixed(3)}px, ${(spring.y + leadY).toFixed(3)}px)`; });
+          const open = el.closest(".think-row") ? 1 : blink;
+          el.querySelectorAll(".ai-blink").forEach(node => { node.style.transform = `scaleY(${open.toFixed(3)})`; });
+          return;
+        }
         const state = el.dataset.state || "idle";
         const expr = FACE_EXPR[state] || FACE_EXPR.idle;
         const spring = faceSprings.get(el) || { x: 0, y: 0, t: now, state, shut: state === "done" ? 0.36 : 1 };
@@ -5215,17 +5322,34 @@ const DESIGN_MOUTH = "M6.61285 13.736C7.26704 14.5537 9.06605 16.1892 11.0286 16
       });
       faceRaf = requestAnimationFrame(tickAiFaces);
     }
+    function aiFaceScheme2Html(state) {
+      const box = `viewBox="28 27.5 104 104" width="50.0452" height="50.0452"`;
+      return `<span class="ai-face" data-scheme="2" data-state="${state}"><span class="ai-face-rig"><span class="ai-face-art"><svg class="ai-face-orb" ${box} aria-hidden="true"><g filter="url(#ai-blob-shade)"><path d="M80 45.125C84.9976 39.4588 92.4898 36.3704 100.263 37.1064C110.226 38.0499 118.558 45.0772 121.169 54.7383L131.169 91.7383C134.627 104.534 127.057 117.711 114.262 121.169C107.018 123.127 99.6536 121.549 93.998 117.491C89.9933 120.367 85.1229 122 80 122C74.8769 122 70.0058 120.367 66.001 117.491C60.3456 121.549 52.9815 123.127 45.7383 121.169C32.9426 117.711 25.3728 104.534 28.8311 91.7383L38.8311 54.7383L38.958 54.2871C41.7034 44.859 49.9299 38.0352 59.7373 37.1064C67.5102 36.3704 75.0024 39.4588 80 45.125Z" fill="#8479FF"/></g></svg><span class="ai-blink"><span class="ai-sclera"><svg class="ai-blob-eyes" ${box} aria-hidden="true"><ellipse cx="65" cy="76" rx="12" ry="14" fill="#F7F7F8"/><ellipse cx="95" cy="76" rx="12" ry="14" fill="#F7F7F8"/></svg></span><span class="ai-pupil"><svg class="ai-blob-eyes" ${box} aria-hidden="true"><ellipse cx="65" cy="76" rx="6" ry="7" fill="#1C1B24"/><ellipse cx="95" cy="76" rx="6" ry="7" fill="#1C1B24"/></svg></span></span><span class="ai-shut"><svg class="ai-blob-eyes" ${box} aria-hidden="true"><g transform="translate(27.9938 36.9991)"><path d="M25.5388 31.0228C26.0094 29.6824 27.5046 28.9721 28.8789 29.4362L47.1257 35.5978C47.6505 35.7751 48.0813 36.0987 48.3876 36.5048C48.6637 36.8272 48.8637 37.2195 48.9523 37.6606C49.2318 39.0535 48.3022 40.4006 46.8767 40.6689L27.9499 44.2311C26.5244 44.4994 25.1426 43.588 24.8631 42.1951C24.5837 40.8022 25.5124 39.4558 26.9378 39.1875L36.4013 37.4056L27.1747 34.2899C25.8005 33.8258 25.0682 32.3633 25.5388 31.0228Z" fill="#fff"/><path d="M79.5195 31.0235C79.0489 29.6831 77.5528 28.9721 76.1785 29.4362L57.9316 35.5984C57.4055 35.7761 56.9738 36.1006 56.6673 36.5081C56.3926 36.8299 56.1942 37.2213 56.1059 37.661C55.8264 39.0538 56.7552 40.401 58.1806 40.6693L77.1075 44.2312C78.533 44.4995 79.9156 43.588 80.1951 42.1952C80.4746 40.8024 79.545 39.4561 78.1196 39.1878L68.6561 37.406L77.8828 34.2905C79.2568 33.8264 79.9899 32.3638 79.5195 31.0235Z" fill="#fff"/></g></svg></span></span></span></span>`;
+    }
     function moreaiHeadHtml(state) {
-      return `<span class="think-row">${aiFaceHtml(state || "idle")}<span class="think-name">MoreAI</span></span>`;
+      return `<span class="think-row">${aiFaceScheme2Html(state || "idle")}<span class="think-name">MoreAI</span></span>`;
+    }
+    function thinkTimeLabel(raw) {
+      if (!raw) return "";
+      const text = String(raw).trim();
+      if (text.includes("分")) return text;
+      return text.replace(/秒/g, "").trim() + " 秒";
+    }
+    const execDoneIcon = `<svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="6.2" fill="none" stroke="#12b76a" stroke-width="1.5"/><path d="M5.2 8.1 7.1 10 10.8 6.1" fill="none" stroke="#12b76a" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+    const thinkChev = `<span class="think-chev-box"><svg class="think-chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></span>`;
+    function execThinkHtml(steps, extra) {
+      const list = steps || [];
+      const rows = list.map(text => `<li class="exec-item done"><i class="exec-dot"></i><span>${esc(text)}</span></li>`).join("");
+      return `<div class="think-body"><div class="exec"><div class="exec-bar">${execDoneIcon}<span class="exec-title">已执行 ${list.length} 个步骤</span></div><ul class="exec-list">${rows}</ul></div>${extra || ""}</div>`;
     }
     function moreaiThinkHeadHtml(opts) {
       const open = !!opts.open;
-      const label = opts.label || "已思考";
-      const time = opts.time ? `<small>· 用时 ${esc(opts.time)}</small>` : "";
-      const chev = opts.toggle ? `<span class="think-chev" aria-hidden="true">${open ? "⌄" : "›"}</span>` : "";
+      const label = opts.label || "已完成";
+      const time = opts.time ? `<span class="think-time">${esc(thinkTimeLabel(opts.time))}</span>` : "";
+      const chev = opts.toggle ? thinkChev : "";
       const state = opts.state || (opts.done === false ? "thinking" : "idle");
       const attrs = opts.attrs || "";
-      return `<button class="think-head" type="button" ${attrs} aria-expanded="${open ? "true" : "false"}">${moreaiHeadHtml(state)}<span class="think-status">${chev}<span>${esc(label)}</span>${time}</span></button>`;
+      return `<button class="think-head" type="button" ${attrs} aria-expanded="${open ? "true" : "false"}">${moreaiHeadHtml(state)}<span class="think-status"><b>${esc(label)}</b><span class="think-meta">${time}${chev}</span></span></button>`;
     }
 
     function errIconHtml() {
@@ -5291,7 +5415,7 @@ const DESIGN_MOUTH = "M6.61285 13.736C7.26704 14.5537 9.06605 16.1892 11.0286 16
         if (item.type === "assistant") {
           const version = pptConv(id) && item.versionId ? hp.versions.find(entry => entry.id === item.versionId) : null;
           const thought = item.thoughts
-            ? `<div class="moreai-turn hp-think-turn anno-fail-thought">${moreaiThinkHeadHtml({label:"已思考",time:item.thoughtDuration,open:item.thoughtOpen,state:"idle",done:true,attrs:"data-anno-thought",toggle:true})}${item.thoughtOpen ? `<div class="hp-thought-body">${item.thoughts.map(step => `<p>${esc(step)}</p>`).join("")}</div>` : ""}</div>`
+            ? `<div class="moreai-turn hp-think-turn anno-fail-thought">${moreaiThinkHeadHtml({label:"已完成",time:item.thoughtDuration,open:item.thoughtOpen,state:"idle",done:true,attrs:"data-anno-thought",toggle:true})}${item.thoughtOpen ? execThinkHtml(item.thoughts) : ""}</div>`
             : `<div class="moreai-turn">${moreaiHeadHtml("idle")}</div>`;
           const results = item.results || [];
           const failed = results.filter(row => !row.ok);
