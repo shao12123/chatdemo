@@ -1106,10 +1106,124 @@
     .ask.is-locked .ask-next { pointer-events: none; }
     .ask-note { margin: 12px 0; font-size: 15px; line-height: 24px; color: var(--ink); }
 
+    html.theme-dark {
+      color-scheme: dark;
+      --page: #090b0e;
+      --card: #111216;
+      --card-line: #292b2e;
+      --ink: #ffffff;
+      --nav: rgba(255, 255, 255, .6);
+      --secondary: rgba(255, 255, 255, .6);
+      --muted: rgba(255, 255, 255, .6);
+      --label: rgba(255, 255, 255, .4);
+      --placeholder: rgba(255, 255, 255, .4);
+      --line: #292b2e;
+      --chip: rgba(255, 255, 255, .06);
+      --chip-line: #292b2e;
+      --hover: #292b2e;
+      --brand: #317af7;
+      --brand-deep: #317af7;
+      --brand-hover: #2762c6;
+      --brand-active: #2762c6;
+      --brand-soft: #0a1831;
+      --send: #317af7;
+      --sidebar: #111216;
+      --stage: #090b0e;
+      --shadow: none;
+    }
+    html.theme-dark body,
+    html.theme-dark #stage.stage { background: var(--page); color: var(--ink); }
+    html.theme-dark #stage > .rail {
+      background: #111216;
+    }
+    html.theme-dark #stage > .rail .rail-ico img { filter: invert(.86) hue-rotate(180deg); }
+    html.theme-dark #stage > .rail .rail-ico.on-gray,
+    html.theme-dark #stage > .rail .rail-ico:hover,
+    html.theme-dark .strip-btn,
+    html.theme-dark .strip-clock-wrap:hover .strip-clock,
+    html.theme-dark .strip-clock-wrap.is-open .strip-clock { background: rgba(255, 255, 255, .06); border-color: #292b2e; }
+    html.theme-dark #stage > .rail .rail-ico.on-blue,
+    html.theme-dark #stage > .rail .rail-ico.on-blue:hover,
+    html.theme-dark #stage > .rail .rail-avatar { background: #0a1831; }
+    html.theme-dark #stage > .history,
+    html.theme-dark #stage > .main,
+    html.theme-dark #stage > .doc,
+    html.theme-dark .panel,
+    html.theme-dark .card,
+    html.theme-dark .rev-toolbar,
+    html.theme-dark .rev-panel { background: var(--card); color: var(--ink); border-color: var(--card-line); }
+    html.theme-dark .rev-toolbar { border-bottom-color: #292b2e; }
+    html.theme-dark .rev-toolbar-title span,
+    html.theme-dark .rev-panel-sub { color: rgba(255, 255, 255, .4); }
+    html.theme-dark .rev-mode,
+    html.theme-dark .theme-switch { background: #191a1d; }
+    html.theme-dark .rev-mode button { color: rgba(255, 255, 255, .6); }
+    html.theme-dark .rev-mode button[aria-pressed="true"] { background: #292b2e; color: var(--brand); box-shadow: none; }
+    html.theme-dark .rev-export,
+    html.theme-dark .rev-input,
+    html.theme-dark .rev-textarea { background: #191a1d; color: var(--ink); border-color: #434448; }
+    html.theme-dark .rev-close:hover,
+    html.theme-dark .chats-toggle:hover,
+    html.theme-dark .rail-toggle:hover { background: #292b2e; color: var(--ink); }
+    html.theme-dark .composer,
+    html.theme-dark .menu,
+    html.theme-dark .pop,
+    html.theme-dark .hist-pop,
+    html.theme-dark .toast { background: #191a1d; border-color: #434448; color: var(--ink); box-shadow: none; }
+    html.theme-dark .composer textarea { color: var(--ink); }
+    html.theme-dark .plus:hover,
+    html.theme-dark .plus.open,
+    html.theme-dark .plus-menu button:hover,
+    html.theme-dark .menu button:hover,
+    html.theme-dark #histPopList button:hover,
+    html.theme-dark .more:hover { background: rgba(255, 255, 255, .08); color: var(--ink); }
+    html.theme-dark .msg.user,
+    html.theme-dark #stage .msg.user,
+    html.theme-dark #stage .msg.user:hover { background: #0a1831; color: #fff; }
+    html.theme-dark #stage .composer-dock .composer { background: #191a1d; border-color: #434448; box-shadow: none; }
+    html.theme-dark #stage .msg-quote { border-left-color: #434448; color: rgba(255, 255, 255, .6); }
+    html.theme-dark .think-name,
+    html.theme-dark .lead,
+    html.theme-dark .ask-note { color: var(--ink); }
+    html.theme-dark .think-status,
+    html.theme-dark .think-time,
+    html.theme-dark .think-chev { color: rgba(255, 255, 255, .6); }
+    html.theme-dark .exec { background: var(--card); border-color: #292b2e; }
+    html.theme-dark .exec-bar,
+    html.theme-dark .exec-item { color: rgba(255, 255, 255, .6); }
+    html.theme-dark .exec-list { background: #191a1d; }
+    html.theme-dark .exec-item:not(:last-child)::before { background: #434448; }
+    html.theme-dark .ask {
+      background: var(--card);
+      border-color: #292b2e;
+      color: var(--ink);
+    }
+    html.theme-dark .ask-title,
+    html.theme-dark .ask-opt,
+    html.theme-dark .ask-picked .ask-label,
+    html.theme-dark .ask-skip { color: var(--ink); }
+    html.theme-dark .ask-opt:hover,
+    html.theme-dark .ask-skip:hover { background: rgba(255, 255, 255, .06); }
+    html.theme-dark .ask-num { background: rgba(255, 255, 255, .06); color: rgba(255, 255, 255, .6); }
+    html.theme-dark .ask-opt.is-on .ask-num { background: var(--brand); color: #fff; }
+    html.theme-dark .ask-input,
+    html.theme-dark .ask-trigger,
+    html.theme-dark .ask-cal { background: #191a1d; border-color: #434448; color: var(--ink); }
+    html.theme-dark .ask-input::placeholder,
+    html.theme-dark .ask-trigger b .is-placeholder,
+    html.theme-dark .ask-range-sep,
+    html.theme-dark .ask-week span { color: rgba(255, 255, 255, .4); }
+    html.theme-dark .ask-cal-nav { color: rgba(255, 255, 255, .6); }
+    html.theme-dark .ask-cal-nav:hover:not(:disabled),
+    html.theme-dark .ask-cell:not(.is-in) .ask-day:hover:not(:disabled):not(.is-on) { background: #292b2e; color: var(--ink); }
+    html.theme-dark .ask-day.is-off,
+    html.theme-dark .ask-day:disabled { color: rgba(255, 255, 255, .2); }
+    html.theme-dark .ask-next { border-color: #2762c6; background: var(--brand); }
+
   </style>
 </head>
 <body>
-  <header class="rev-toolbar" id="revToolbar" aria-label="演示评审工具栏"><div class="rev-toolbar-title">天气场景 <span>七日预报卡片 · 标注供开发与测试参考</span></div><div class="rev-toolbar-actions"><div class="rev-mode" role="group" aria-label="切换预览和标注"><button type="button" data-rev-mode="preview" aria-pressed="true">预览</button><button type="button" data-rev-mode="annotation" aria-pressed="false">标注</button></div><button type="button" class="rev-export" id="revExport" hidden>导出 HTML</button></div></header>
+  <header class="rev-toolbar" id="revToolbar" aria-label="演示评审工具栏"><div class="rev-toolbar-title">天气场景 <span>七日预报卡片 · 标注供开发与测试参考</span></div><div class="rev-toolbar-actions"><div class="rev-mode theme-switch" id="themeSwitch" role="group" aria-label="浅色或深色"><button type="button" data-theme-mode="light" aria-pressed="true">浅色</button><button type="button" data-theme-mode="dark" aria-pressed="false">深色</button></div><div class="rev-mode" role="group" aria-label="切换预览和标注"><button type="button" data-rev-mode="preview" aria-pressed="true">预览</button><button type="button" data-rev-mode="annotation" aria-pressed="false">标注</button></div><button type="button" class="rev-export" id="revExport" hidden>导出 HTML</button></div></header>
   <div class="rev-shell">
   <div class="stage" id="stage">
     <aside class="rail" aria-label="主导航">
@@ -2248,6 +2362,17 @@ function aiFaceHtml(state) {
       persist();
       render();
     })();
+    function setTheme(mode) {
+      const dark = mode === "dark";
+      document.documentElement.classList.toggle("theme-dark", dark);
+      document.querySelectorAll("[data-theme-mode]").forEach(btn => btn.setAttribute("aria-pressed", String(btn.dataset.themeMode === (dark ? "dark" : "light"))));
+      try { localStorage.setItem("moreai-weather-theme", dark ? "dark" : "light"); } catch (err) {}
+    }
+    document.getElementById("themeSwitch").addEventListener("click", event => {
+      const btn = event.target.closest("[data-theme-mode]");
+      if (btn) setTheme(btn.dataset.themeMode);
+    });
+    try { setTheme(localStorage.getItem("moreai-weather-theme") || "light"); } catch (err) { setTheme("light"); }
   </script>
 
 </body>
