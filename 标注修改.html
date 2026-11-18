@@ -3651,10 +3651,10 @@ const roastPhotos = {green: "data:image/jpeg;base64,/9j/4QCARXhpZgAASUkqAAgAAAAF
       const busy=['preparing','generating','checking','assembling'].includes(hp.status);
       return `<span class="hp-progress-icon${busy?' busy':''}" aria-hidden="true"></span><span>${labels[hp.status]||'页面总览'}</span><b>${hpReady()} / ${hp.pages.length} 页${hp.activeJobs?` · ${hp.activeJobs} 页生成中`:''}</b>`;
     }
-    function hpStatusBadge(p,opts){
+    function hpStatusBadge(p){
       const ready=p.status==='ready';
-      if(ready&&opts&&opts.skipReady&&!p.updated)return '';
-      const badge=p.updated?'已更新':p.added&&ready?'新增 · 已生成':hpPageStatus(p);
+      if(ready&&!p.updated)return '';
+      const badge=p.updated?'已更新':hpPageStatus(p);
       const icon=ready?specCheckSvg:(p.status==='generating'?'<i class="hp-progress-icon busy" aria-hidden="true"></i>':p.status==='deleting'?'<i class="hp-delete-loading" aria-hidden="true"></i>':'');
       return `<span class="hp-page-status${ready?' hp-ready-badge':''}">${icon}${badge}</span>`;
     }
