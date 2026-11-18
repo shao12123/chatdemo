@@ -293,7 +293,7 @@
     /* 全站错误卡片：浅灰底、无描边、圆角 14，和提示块同一族；图标是块内唯一的颜色 */
     :root { --err-card: #eef0f3; --err-text: #000000; --err-text-2: rgba(0, 0, 0, .6); --err-icon: #e84026; --err-ok: #64bb5c; --err-x-hover: rgba(0, 0, 0, .06); }
     html.theme-dark { --err-card: #191a1d; --err-text: #ffffff; --err-text-2: rgba(255, 255, 255, .6); --err-icon: #e84026; --err-ok: #5ba854; --err-x-hover: rgba(255, 255, 255, .08); }
-    .net-wrap { align-self: flex-start; width: min(680px, 100%); display: flex; flex-direction: column; gap: 8px; }
+    .net-wrap { align-self: stretch; width: 100%; max-width: 100%; display: flex; flex-direction: column; gap: 8px; }
     .net-card { display: flex; flex-direction: column; gap: 8px; padding: 12px 16px; border: 0; border-radius: 14px; background: var(--err-card); }
     .net-main { margin: 0; display: flex; align-items: flex-start; gap: 8px; color: var(--err-text); font-size: 14px; line-height: 22px; }
     .net-main .msg-tone { color: var(--err-icon); }
@@ -6277,7 +6277,7 @@
       {
         id: "f-notice", cat: "feature", status: "已实现", anchor: ".msg-notice.msg-error",
         title: "错误提示消息样式",
-        body: "【两种样式】\n1、错误卡片（全站规范）：所有「生成中断 + 重试」都用它（断网重连中 / 恢复 / 失败、检索 3 次失败、服务繁忙）。和「提示块」同一族：浅灰底 #EEF0F3（深色 #191A1D）、无描边、圆角 14px、内边距 12px 16px、最宽 680px；左侧 16px 圆形叉号 #E84026，是卡内唯一的颜色；文案 14/22 主要文字色；右下「重试」（蓝色渐变主按钮）+ ×（次要文字色 60%）。网络恢复时图标换成绿色实心勾 #64BB5C。文案只说「发生了什么 + 已有内容在不在」，不写「点「重试」…」。× 只关卡片，关闭后不再保留重试入口；重试用过后按钮消失。\n2、普通提示：圆形叉号 + 一段文字，不套卡片，没有按钮。用于额度不足、文件读不了。\n【不算出错】用户停止、达到单次上限：不用红色图标，文字下方给「继续生成」。\n【文案】见「统一规则」：发生了什么 + 已有内容在不在 + 下一步怎么做。\n【验收】同一屏里的多条错误提示样式一致；不出现英文错误码。"
+        body: "【两种样式】\n1、错误卡片（全站规范）：所有「生成中断 + 重试」都用它（断网重连中 / 恢复 / 失败、检索 3 次失败、服务繁忙）。和「提示块」同一族：浅灰底 #EEF0F3（深色 #191A1D）、无描边、圆角 14px、内边距 12px 16px、与对话列 / 输入框同宽；左侧 16px 圆形叉号 #E84026，是卡内唯一的颜色；文案 14/22 主要文字色；右下「重试」（蓝色渐变主按钮）+ ×（次要文字色 60%）。网络恢复时图标换成绿色实心勾 #64BB5C。文案只说「发生了什么 + 已有内容在不在」，不写「点「重试」…」。× 只关卡片，关闭后不再保留重试入口；重试用过后按钮消失。\n2、普通提示：圆形叉号 + 一段文字，不套卡片，没有按钮。用于额度不足、文件读不了。\n【不算出错】用户停止、达到单次上限：不用红色图标，文字下方给「继续生成」。\n【文案】见「统一规则」：发生了什么 + 已有内容在不在 + 下一步怎么做。\n【验收】同一屏里的多条错误提示样式一致；不出现英文错误码。"
       },
       {
         id: "f-file", cat: "feature", status: "已实现（部分路径）", anchor: ".msg.user.has-files",
