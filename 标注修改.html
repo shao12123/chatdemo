@@ -998,7 +998,7 @@
     .anno-revision-card li span { display: block; color: var(--label); font-size: 12px; line-height: 18px; }
     .msg-user-block { align-self: stretch; display: flex; flex-direction: column; align-items: flex-end; gap: 6px; max-width: 100%; }
     .msg-shots { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 6px; max-width: 100%; }
-    .msg-shot { width: auto; height: auto; max-width: 168px; max-height: 54px; border-radius: 12px; display: block; background: #f6f0e4; }
+    .msg-shot { width: 54px; height: 54px; border-radius: 12px; object-fit: cover; display: block; background: #f6f0e4; }
     .msg-user-block .msg.user { width: max-content; max-width: 100%; background: #eef2ff; color: var(--ink); border-radius: 8px; padding: 10px 14px; }
     .msg-user-block .msg-tags { width: 100%; max-width: 100%; min-width: 0; margin: 0; flex-wrap: nowrap; justify-content: flex-end; gap: 4px; overflow: hidden; }
     .msg-anno-list { margin: 0; padding-left: 21px; }
@@ -1970,10 +1970,6 @@
             <button class="more" id="chatExpandPreview" type="button" aria-label="展开右侧预览区" data-tip="展开右侧预览区" hidden><svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M19.5 2C20.8807 2 22 3.1193 22 4.5V19.5C22 20.8807 20.8807 22 19.5 22H4.5C3.1193 22 2 20.8807 2 19.5V4.5C2 3.11929 3.11929 2 4.5 2H19.5ZM4.5 4C4.22386 4 4 4.22386 4 4.5V19.5C4 19.7762 4.22385 20 4.5 20H19.5C19.7762 20 20 19.7762 20 19.5V4.5C20 4.22385 19.7762 4 19.5 4H4.5ZM17 6C17.5523 6 18 6.44772 18 7V17C18 17.5523 17.5523 18 17 18H13C12.4477 18 12 17.5523 12 17V7C12 6.44772 12.4477 6 13 6H17Z" fill="#000" fill-opacity="0.6"/></svg></button>
           </header>
           <div class="thread" id="thread"></div>
-          <aside class="qnav" id="qnav" aria-label="消息目录" hidden>
-            <div class="qnav-rail" id="qnavRail"><div class="qnav-view"><div class="qnav-track" id="qnavTrack"></div></div></div>
-            <div class="qnav-card" id="qnavCard"></div>
-          </aside>
           <form class="composer" id="composer">
             <div class="composer-files" id="composerFiles" hidden>
               <button class="composer-file-nav prev" type="button" data-composer-scroll="-1" hidden aria-label="向左"><svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M5.2 3.2 9 7l-3.8 3.8" stroke="#1f2329" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
