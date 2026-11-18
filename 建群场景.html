@@ -1533,7 +1533,7 @@ const toastIcons = {
       if (draft.created) {
         const members = draft.selected.map(contactById).filter(Boolean);
         const names = members.map(item => item.name).join("、");
-        return `<article class="gc gc-result" id="groupCard" aria-label="群已创建"><div class="gc-result-main">${resultAvatar(draft)}<div class="gc-result-copy"><div class="gc-name">${esc(draft.title)}</div><p>${esc(names)}</p></div><button class="gc-info" type="button">参看群聊</button></div></article>`;
+        return `<article class="gc gc-result" id="groupCard" aria-label="群已创建"><div class="gc-result-main">${resultAvatar(draft)}<div class="gc-result-copy"><div class="gc-name">${esc(draft.title)}</div><p>${esc(names)}</p></div><button class="gc-info" type="button">查看群聊</button></div></article>`;
       }
       return `<article class="gc" id="groupCard" aria-label="创建群组"><div class="gc-head"><span>创建群组</span></div><div class="gc-row"><span>群名称</span><input class="gc-input" id="groupName" maxlength="60" placeholder="输入群名" value="${esc(draft.name)}"></div><div class="gc-row"><span>群头像</span><div class="gc-avatar-line"><button class="gc-avatar${draft.avatar && !isImageAvatar(draft.avatar) ? " has" : ""}" id="groupAvatar" type="button" data-avatar style="background:${isImageAvatar(draft.avatar) || !draft.avatar ? "transparent" : draft.avatar}">${avatarInner(draft)}</button><button class="gc-edit" type="button" data-avatar>点击修改</button></div></div><div class="gc-row members"><span>群成员</span><div class="gc-box"><div class="gc-side"><div class="gc-search-wrap"><svg class="gc-search-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path fill="currentColor" d="M10.5 1C15.7467 1.00002 20 5.25333 20 10.5C20 12.7634 19.2071 14.8407 17.8857 16.4727L21.5605 20.1465C21.951 20.537 21.9511 21.171 21.5605 21.5615C21.17 21.9516 20.5359 21.9518 20.1455 21.5615L16.4707 17.8867C14.839 19.2073 12.7626 20 10.5 20C5.25332 20 1 15.7467 1 10.5C1 5.25332 5.25332 1 10.5 1ZM10.5 3C6.35789 3 3 6.35789 3 10.5C3 14.6421 6.35788 18 10.5 18C14.6421 18 18 14.6421 18 10.5C18 6.3579 14.6421 3.00002 10.5 3Z"/></svg><input class="gc-search" id="groupQuery" placeholder="搜索姓名或手机号" value="${esc(draft.query)}"></div><div class="gc-list" id="groupList">${groupListHtml(draft)}</div></div><div class="gc-side"><div class="gc-count" id="groupCount">已选: ${draft.selected.length} 人</div><div class="gc-chosen" id="groupChosen">${groupChosenHtml(draft)}</div></div></div></div><div class="gc-foot"><button class="gc-create" id="groupCreate" type="button" data-group-create ${draft.selected.length ? "" : "disabled"}>创建</button></div></article>`;
     }
@@ -1960,12 +1960,12 @@ const toastIcons = {
         { id: "card", num: "1", group: "feature", title: "建群卡片", body: "【行为】建群在对话里的卡片上完成。左侧选人，选中的出现在右侧。没选人时「创建」不可点。" },
         { id: "members", num: "2", group: "feature", title: "选人和搜索", body: "【行为】可按姓名或手机号搜索。没有匹配时提示「没有找到相关联系人」。右侧为空时提示从左侧选择。" },
         { id: "name", num: "3", group: "feature", title: "群名和头像", body: "【行为】群名可以不填，创建后用成员名字，最多取前 4 位。点群头像打开本地文件，选择图片作为群头像。" },
-        { id: "enter", num: "4", group: "feature", title: "参看群聊", body: "【行为】点「参看群聊」进入群聊。" },
+        { id: "enter", num: "4", group: "feature", title: "查看群聊", body: "【行为】点「查看群聊」进入群聊。" },
         { id: "s1", group: "scene", title: "创建一个群聊", body: "【前置】打开左侧「创建一个群聊」。\n【期望】说明怎么选人、群名和头像。卡片是空的，创建不可点。选出成员后创建可点。\n【当前】点这条对话即可看到空的建群卡片。" },
         { id: "s2", group: "scene", title: "指定群名和成员", body: "【前置】打开左侧「指定群名和成员」。\n【期望】群名是项目同步，右侧已有张伟、李娜、王芳。创建可点。\n【当前】点这条对话即可看到已填好的卡片。" },
         { id: "s3", group: "scene", title: "不填群名直接建", body: "【前置】打开左侧「不填群名直接建」。\n【期望】没有群名，张伟和刘强已选上。创建后名称是「张伟、刘强」。\n【当前】点这条对话即可看到未填群名的卡片。" },
         { id: "s4", group: "scene", title: "找不到要拉的人", body: "【前置】打开左侧「找不到要拉的人」。\n【期望】搜索框是周杰，左侧提示没有找到，右侧为空，创建不可点。\n【当前】点这条对话即可看到找不到人的说明。" },
-        { id: "s5", group: "scene", title: "群已创建", body: "【前置】打开左侧「群已创建」。\n【期望】完成卡片是一张群名片：默认群头像、群名和成员名字。点「参看群聊」进入群聊。\n【当前】点这条对话即可看到群名片。" },
+        { id: "s5", group: "scene", title: "群已创建", body: "【前置】打开左侧「群已创建」。\n【期望】完成卡片是一张群名片：默认群头像、群名和成员名字。点「查看群聊」进入群聊。\n【当前】点这条对话即可看到群名片。" },
         { id: "s6", group: "scene", title: "指定头像", body: "【前置】打开左侧「指定头像」。\n【期望】用户消息上方有一张图片。建群卡片的头像和这张图片一致。\n【当前】点这条对话即可看到带图片的消息和同一张头像。" }
       ];
       const embedded = document.getElementById("revEmbedded");
