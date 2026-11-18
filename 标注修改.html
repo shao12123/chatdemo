@@ -998,7 +998,7 @@
     .anno-revision-card li span { display: block; color: var(--label); font-size: 12px; line-height: 18px; }
     .msg-user-block { align-self: stretch; display: flex; flex-direction: column; align-items: flex-end; gap: 6px; max-width: 100%; }
     .msg-shots { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 6px; max-width: 100%; }
-    .msg-shot { width: 54px; height: 54px; border-radius: 12px; object-fit: cover; display: block; background: #f6f0e4; }
+    .msg-shot { width: auto; height: auto; max-width: 168px; max-height: 54px; border-radius: 12px; display: block; background: #f6f0e4; }
     .msg-user-block .msg.user { width: max-content; max-width: 100%; background: #eef2ff; color: var(--ink); border-radius: 8px; padding: 10px 14px; }
     .msg-user-block .msg-tags { width: 100%; max-width: 100%; min-width: 0; margin: 0; flex-wrap: nowrap; justify-content: flex-end; gap: 4px; overflow: hidden; }
     .msg-anno-list { margin: 0; padding-left: 21px; }
@@ -5350,34 +5350,24 @@ const roastPhotos = {green: "data:image/jpeg;base64,/9j/4QCARXhpZgAASUkqAAgAAAAF
     function annoShotData(slideIndex, box) {
       const spec = PPT_SLIDES[slideIndex];
       if (!spec || !box || box.w == null || box.h == null) return "";
-      const sw = 960;
-      const sh = 540;
+      const sw = 1920;
+      const sh = 1080;
       const slide = document.createElement("canvas");
       slide.width = sw;
       slide.height = sh;
       drawHonglouSlide(slide.getContext("2d"), spec, sw, sh);
-      const x = box.x / 100 * sw;
-      const y = box.y / 100 * sh;
-      const w = Math.max(8, box.w / 100 * sw);
-      const h = Math.max(8, box.h / 100 * sh);
-      const cx = x + w / 2;
-      const cy = y + h / 2;
-      let side = Math.max(w, h, 140) * 1.55;
-      side = Math.min(side, sw, sh);
-      const sx = Math.max(0, Math.min(cx - side / 2, sw - side));
-      const sy = Math.max(0, Math.min(cy - side / 2, sh - side));
-      const size = 162;
+      const x = Math.max(0, Math.min(sw - 1, box.x / 100 * sw));
+      const y = Math.max(0, Math.min(sh - 1, box.y / 100 * sh));
+      const w = Math.max(8, Math.min(sw - x, box.w / 100 * sw));
+      const h = Math.max(8, Math.min(sh - y, box.h / 100 * sh));
+      const scale = Math.min(336 / w, 108 / h);
+      const dw = Math.max(2, Math.round(w * scale));
+      const dh = Math.max(2, Math.round(h * scale));
       const out = document.createElement("canvas");
-      out.width = size;
-      out.height = size;
-      const ctx = out.getContext("2d");
-      ctx.drawImage(slide, sx, sy, side, side, 0, 0, size, size);
-      const scale = size / side;
-      ctx.strokeStyle = "#3370ff";
-      ctx.lineWidth = 3;
-      pptRound(ctx, (x - sx) * scale, (y - sy) * scale, w * scale, h * scale, Math.min(10, w * scale / 5, h * scale / 5));
-      ctx.stroke();
-      return out.toDataURL("image/jpeg", 0.86);
+      out.width = dw;
+      out.height = dh;
+      out.getContext("2d").drawImage(slide, x, y, w, h, 0, 0, dw, dh);
+      return out.toDataURL("image/jpeg", 0.92);
     }
     function annoQuote(mark) {
       const layer = document.getElementById("annoLayer");
@@ -6654,7 +6644,7 @@ const DESIGN_MOUTH = "M6.61285 13.736C7.26704 14.5537 9.06605 16.1892 11.0286 16
     (() => {
       const key = "moreai-ppt-annotation-v1";
       const defaults = [
-        { id: "f1", num: "1", group: "feature", title: "多个标注一起发送修改", body: "【用途】多处修改先入队，再一次发给 Agent。\n【行为】打开标注后可跨页框选并入队。换页不丢，编号整稿连续，单页不限数量。卡片上的发送只入队并留下序号，不进对话。点胶囊右侧的「修改」，或在输入框写下「修改标注内容」这类要求后发送，都会把全部标注一次发出，输入的文字和附件一并带上。" },
+        { id: "f1", num: "1", group: "feature", title: "多个标注一起发送修改", body: "【用途】多处修改先入队，再一次发给 Agent。\n【行为】打开标注后可跨页框选并入队。换页不丢，编号整稿连续，单页不限数量。卡片上的发送只入队并留下序号，不进对话。点胶囊右侧的「修改」，或在输入框写下「修改标注内容」这类要求后发送，都会把全部标注一次发出，输入的文字和附件一并带上。对话里每条标注是一张只含框选内容的截图，不带整页。" },
         { id: "f2", num: "2", group: "feature", title: "存储标注的刘海和标注列表", body: "【用途】开启标注后，用顶部刘海查看未发送的标注。\n【行为】一进入标注模式，备注内容隐藏。刘海贴住预览框上沿，宽度 280，顶部两角是反向圆角，不盖住幻灯片。预览描边和刘海底色都是 #548BF9。左边是数量，中间是「几个标注」。展开箭头在分割线左侧，分割线右边是白底圆按钮，里面是朝右的箭头，悬停时在白底上叠一层 4% 的 #090B0E。数量圆标是浅蓝底、品牌色数字。有标注时点箭头展开队列，列表和刘海都是 280 宽，再点收起。新标注进队列时，左侧数字向上滚到新数量，数字不跳动。没有标注时箭头按钮不可用。每行显示序号和修改要求。未悬停时行的左右留白一致；悬停出现编辑和删除，按钮下用渐变盖住文字。方案切换不展示。" },
         { id: "f3", num: "3", group: "feature", title: "点击标注修改内容", body: "【行为】点击页上的标注序号，展开标注框，即可修改内容。再发送会更新队列里的这一条。" },
         { id: "f4", num: "4", group: "feature", title: "预览图上也展示标注", body: "【行为】右侧预览图按大图上的位置，展示标注功能留下的标注。" },
