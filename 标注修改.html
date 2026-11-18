@@ -1234,7 +1234,7 @@
     .oo-main{position:relative;flex:1;min-width:0;min-height:0;order:1;display:flex;flex-direction:column;background:#FBFBFB;overflow:hidden}
     .oo-app .hp-canvas{flex:1;min-width:0;min-height:0;overflow:hidden;background:#FBFBFB;padding:18px 18px 12px;align-items:center;justify-content:center;container-type:size;container-name:oocanvas}
     .oo-app .hp-canvas.is-zoomed{overflow:auto;align-items:safe center;justify-content:safe center;scrollbar-gutter:stable}
-    .hp-zoom{position:absolute;top:8px;right:8px;z-index:12;display:flex;align-items:center;gap:2px;height:30px;padding:4px;border:1px solid #e5e8ec;border-radius:99px;background:#fff;box-sizing:border-box}
+    .hp-zoom{position:absolute;top:8px;right:8px;z-index:12;display:flex;align-items:center;gap:2px;height:30px;padding:4px;border:1px solid var(--chip-line);border-radius:99px;background:#fff;box-sizing:border-box}
     .hp-zoom button{width:20px;height:20px;padding:0;border:0;border-radius:4px;background:transparent;color:#333;display:grid;place-items:center}
     .hp-zoom button[data-hp-scale="in"]{color:rgba(0,0,0,.6)}
     .hp-zoom button:hover:not(:disabled){background:#f2f3f5}
@@ -1675,6 +1675,7 @@
     html.theme-dark .upload-tip,
     html.theme-dark .toast,
     html.theme-dark .anno-store-list { background: #191a1d; border-color: #434448; color: var(--ink); box-shadow: none; }
+    html.theme-dark .composer { border-color: var(--chip-line); }
     html.theme-dark .composer textarea,
     html.theme-dark .anno-store-item .req { color: var(--ink); }
     html.theme-dark .add:hover:not(:disabled),
@@ -1774,7 +1775,7 @@
     html.theme-dark .composer-chip-text b { color: var(--ink); }
     html.theme-dark .artifact.is-active,
     html.theme-dark .artifact.is-active:hover { background: var(--brand-soft); border-color: var(--brand); }
-    html.theme-dark .hp-zoom { background: #191a1d; border-color: #434448; }
+    html.theme-dark .hp-zoom { background: #191a1d; border-color: var(--chip-line); }
     html.theme-dark .hp-zoom button,
     html.theme-dark .hp-zoom button[data-hp-scale="in"],
     html.theme-dark .hp-zoom [data-hp-zoom-label] { color: var(--ink-2); }
