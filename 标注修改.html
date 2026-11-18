@@ -994,7 +994,9 @@
     .anno-revision-card ol { margin: 0; padding-left: 18px; }
     .anno-revision-card li { margin: 4px 0; font-size: 13px; line-height: 20px; }
     .anno-revision-card li span { display: block; color: var(--label); font-size: 12px; line-height: 18px; }
-    .msg-user-block { align-self: stretch; display: flex; flex-direction: column; align-items: flex-end; gap: 4px; max-width: 100%; }
+    .msg-user-block { align-self: stretch; display: flex; flex-direction: column; align-items: flex-end; gap: 6px; max-width: 100%; }
+    .msg-shots { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 6px; max-width: 100%; }
+    .msg-shot { width: 54px; height: 54px; border-radius: 12px; object-fit: cover; display: block; background: #f6f0e4; }
     .msg-user-block .msg.user { width: max-content; max-width: 100%; background: #eef2ff; color: var(--ink); border-radius: 8px; padding: 10px 14px; }
     .msg-user-block .msg-tags { width: 100%; max-width: 100%; min-width: 0; margin: 0; flex-wrap: nowrap; justify-content: flex-end; gap: 4px; overflow: hidden; }
     .msg-anno-list { margin: 0; padding-left: 21px; }
@@ -3767,7 +3769,7 @@ const roastPhotos = {green: "data:image/jpeg;base64,/9j/4QCARXhpZgAASUkqAAgAAAAF
       sentText[conv]="帮我生成一份介绍《红楼梦》的 PPT。";
       sentFiles[conv]=[];
       annoFollow[conv]=[
-        {type:"user",text:"",tags:marks.map(spec=>({index:spec.no,page:"V1 · 第"+(spec.slide+1)+"页",note:spec.text})),extra:"",quotes:[],files:[]},
+        {type:"user",text:"",tags:marks.map(spec=>({index:spec.no,page:"V1 · 第"+(spec.slide+1)+"页",note:spec.text})),shots:marks.map(spec=>({src:annoShotData(spec.slide,spec),alt:"V1 · 第"+(spec.slide+1)+"页"})),extra:"",quotes:[],files:[]},
         {type:"assistant",text:reply,failText:reply,results,retry:!pause,composerAction:pause,retrying:false,thoughts,thoughtDuration:pause?"12秒":partial?"18秒":"16秒",thoughtOpen:false,retryLabel:pause?"继续修改":"重试",retryBusy:pause?"正在继续修改…":"正在重试…",busyText:pause?"正在继续按标注修改…":"正在重新按标注修改…",at:Date.now()-8000,typing:false,feedback:null}
       ];
       annotateOn=true;
@@ -5342,6 +5344,38 @@ const roastPhotos = {green: "data:image/jpeg;base64,/9j/4QCARXhpZgAASUkqAAgAAAAF
       if (!clean) return null;
       return { full: clean, short: clean.length > 72 ? clean.slice(0, 72) + "…" : clean };
     }
+    function annoShotData(slideIndex, box) {
+      const spec = PPT_SLIDES[slideIndex];
+      if (!spec || !box || box.w == null || box.h == null) return "";
+      const sw = 960;
+      const sh = 540;
+      const slide = document.createElement("canvas");
+      slide.width = sw;
+      slide.height = sh;
+      drawHonglouSlide(slide.getContext("2d"), spec, sw, sh);
+      const x = box.x / 100 * sw;
+      const y = box.y / 100 * sh;
+      const w = Math.max(8, box.w / 100 * sw);
+      const h = Math.max(8, box.h / 100 * sh);
+      const cx = x + w / 2;
+      const cy = y + h / 2;
+      let side = Math.max(w, h, 140) * 1.55;
+      side = Math.min(side, sw, sh);
+      const sx = Math.max(0, Math.min(cx - side / 2, sw - side));
+      const sy = Math.max(0, Math.min(cy - side / 2, sh - side));
+      const size = 162;
+      const out = document.createElement("canvas");
+      out.width = size;
+      out.height = size;
+      const ctx = out.getContext("2d");
+      ctx.drawImage(slide, sx, sy, side, side, 0, 0, size, size);
+      const scale = size / side;
+      ctx.strokeStyle = "#3370ff";
+      ctx.lineWidth = 3;
+      pptRound(ctx, (x - sx) * scale, (y - sy) * scale, w * scale, h * scale, Math.min(10, w * scale / 5, h * scale / 5));
+      ctx.stroke();
+      return out.toDataURL("image/jpeg", 0.86);
+    }
     function annoQuote(mark) {
       const layer = document.getElementById("annoLayer");
       const host = document.getElementById("docStage");
@@ -5702,13 +5736,16 @@ const DESIGN_MOUTH = "M6.61285 13.736C7.26704 14.5537 9.06605 16.1892 11.0286 16
           return `${thought}<div class="moreai-turn" data-qnav-anchor="a-${index}"><p class="lead anno-reply">${esc(shown)}${caret}</p>${version ? hpArtifact(version) : ""}${annoActionsHtml(item, index)}</div>`;
         }
         const tags = item.tags || [];
+        const shots = (item.shots || []).filter(shot => shot && shot.src);
         const files = msgFilesHtml(item.files);
         const title = tags.length ? tags.map(t => t.note || t.page).filter(Boolean).join("；") || "标注修改" : (item.text || "提问");
-        if (tags.length) {
-          const tagsHtml = `<div class="msg-tags" data-msg-tags>${tags.map(tag => `<span class="msg-tag">${tag.index ? `<b>${tag.index}</b>` : ""}<span>${esc(tag.page)}</span></span>`).join("")}</div>`;
+        if (shots.length || tags.length) {
+          const shotsHtml = shots.length
+            ? `<div class="msg-shots">${shots.map(shot => `<img class="msg-shot" alt="${esc(shot.alt || "标注截图")}" src="${shot.src}">`).join("")}</div>`
+            : `<div class="msg-tags" data-msg-tags>${tags.map(tag => `<span class="msg-tag">${tag.index ? `<b>${tag.index}</b>` : ""}<span>${esc(tag.page)}</span></span>`).join("")}</div>`;
           const extra = item.extra ? `<div class="msg-note">${esc(item.extra)}</div>` : "";
           const bubble = extra || files ? `<div class="msg user">${extra}${files}</div>` : "";
-          return `<div class="msg-user-block" data-qnav-anchor="u-${index}" data-qnav-title="${esc(title)}">${tagsHtml}${bubble}</div>`;
+          return `<div class="msg-user-block" data-qnav-anchor="u-${index}" data-qnav-title="${esc(title)}">${shotsHtml}${bubble}</div>`;
         }
         const quotes = (item.quotes || []).map(quote => `<div class="msg-quote" data-tip="${esc(quote.full)}"><span>${esc(quote.short)}</span></div>`).join("");
         const quoteBlock = quotes ? `<div class="msg-quotes">${quotes}</div>` : "";
@@ -6233,6 +6270,10 @@ const DESIGN_MOUTH = "M6.61285 13.736C7.26704 14.5537 9.06605 16.1892 11.0286 16
         item.page = annoTagLabel(slide);
         item.files = files;
         item.slide = slide;
+        item.x = mark.x;
+        item.y = mark.y;
+        item.w = mark.w;
+        item.h = mark.h;
       });
       annoCollapsed = true;
       annoDrag = null;
@@ -6268,10 +6309,11 @@ const DESIGN_MOUTH = "M6.61285 13.736C7.26704 14.5537 9.06605 16.1892 11.0286 16
       const notes = items.map(item => ({ note: item.note, quote: item.quote ? item.quote.short : "" }));
       const text = [items.map(item => item.note).filter(Boolean).join("\n"), extra].filter(Boolean).join("\n");
       const files = items.flatMap(item => item.files || []).concat(extraFiles || []);
+      const shots = items.map(item => ({ src: annoShotData(item.slide, item), alt: item.page || "标注截图" })).filter(shot => shot.src);
       const id = activeId;
       const key = annoKey();
       annoFollow[id] = annoFollow[id] || [];
-      annoFollow[id].push({ type: "user", text, tags, extra, quotes: [], files });
+      annoFollow[id].push({ type: "user", text, tags, shots, extra, quotes: [], files });
       annoFollow[id].push({ type: "pending" });
       annoRevisions[key] = annoRevisions[key] || [];
       annoRevisions[key].push(notes);
