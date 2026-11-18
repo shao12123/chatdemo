@@ -1609,7 +1609,7 @@
 <body>
   <header class="rev-toolbar" id="revToolbar" aria-label="演示评审工具栏"><div class="rev-toolbar-title">时间场景 <span>周四面试安排 · 标注供开发与测试参考</span></div><div class="rev-toolbar-actions"><div class="rev-mode theme-switch" id="themeSwitch" role="group" aria-label="浅色或深色"><button type="button" data-theme-mode="light" aria-pressed="true">浅色</button><button type="button" data-theme-mode="dark" aria-pressed="false">深色</button></div><div class="rev-mode" role="group" aria-label="切换预览和标注"><button type="button" data-rev-mode="preview" aria-pressed="true">预览</button><button type="button" data-rev-mode="annotation" aria-pressed="false">标注</button></div><button type="button" class="rev-export" id="revExport" hidden>导出 HTML</button></div></header>
   <div class="rev-shell">
-  <div class="stage" id="stage">
+  <div class="stage chats-collapsed" id="stage">
     <aside class="rail" aria-label="主导航">
       <div class="rail-mark">产</div>
       <nav class="rail-nav" aria-label="主导航">
@@ -1657,7 +1657,7 @@
     </aside>
     <section class="history" id="sidebar" aria-label="AI对话">
       <div class="history-collapsed-tools">
-        <button class="strip-btn strip-collapse" id="chatsExpand" type="button" hidden data-tip="展开历史对话" aria-label="展开历史对话">
+        <button class="strip-btn strip-collapse" id="chatsExpand" type="button" data-tip="展开历史对话" aria-label="展开历史对话">
           <img src="data:image/svg+xml;base64,PHN2ZyBwcmVzZXJ2ZUFzcGVjdFJhdGlvPSJub25lIiBvdmVyZmxvdz0idmlzaWJsZSIgc3R5bGU9ImRpc3BsYXk6IGJsb2NrOyIgd2lkdGg9IjE0IiBoZWlnaHQ9IjE0IiB2aWV3Qm94PSIwIDAgMTQgMTQiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxnIGlkPSImIzIzMDsmIzE0ODsmIzE4MjsmIzIzMjsmIzE4MTsmIzE4MzsiPgo8cGF0aCBpZD0iVW5pb24iIGQ9Ik0xMS4zNzUgMS4xNjY2N0MxMi4xODA0IDEuMTY2NjcgMTIuODMzMyAxLjgxOTU5IDEyLjgzMzMgMi42MjVWMTEuMzc1QzEyLjgzMzMgMTIuMTgwNCAxMi4xODA0IDEyLjgzMzMgMTEuMzc1IDEyLjgzMzNIMi42MjVDMS44MTk1OSAxMi44MzMzIDEuMTY2NjcgMTIuMTgwNCAxLjE2NjY3IDExLjM3NVYyLjYyNUMxLjE2NjY3IDEuODE5NTkgMS44MTk1OSAxLjE2NjY3IDIuNjI1IDEuMTY2NjdIMTEuMzc1Wk0yLjYyNSAyLjMzMzMzQzIuNDYzOTIgMi4zMzMzMyAyLjMzMzMzIDIuNDYzOTIgMi4zMzMzMyAyLjYyNVYxMS4zNzVDMi4zMzMzMyAxMS41MzYxIDIuNDYzOTEgMTEuNjY2NyAyLjYyNSAxMS42NjY3SDExLjM3NUMxMS41MzYxIDExLjY2NjcgMTEuNjY2NyAxMS41MzYxIDExLjY2NjcgMTEuMzc1VjIuNjI1QzExLjY2NjcgMi40NjM5MSAxMS41MzYxIDIuMzMzMzMgMTEuMzc1IDIuMzMzMzNIMi42MjVaTTYuNDE2NjcgMy41QzYuNzM4ODMgMy41IDcgMy43NjExNyA3IDQuMDgzMzNWOS45MTY2N0M3IDEwLjIzODggNi43Mzg4MyAxMC41IDYuNDE2NjcgMTAuNUg0LjA4MzMzQzMuNzYxMTcgMTAuNSAzLjUgMTAuMjM4OCAzLjUgOS45MTY2N1Y0LjA4MzMzQzMuNSAzLjc2MTE3IDMuNzYxMTcgMy41IDQuMDgzMzMgMy41SDYuNDE2NjdaIiBmaWxsPSJibGFjayIgZmlsbC1vcGFjaXR5PSIwLjYiLz4KPC9nPgo8L3N2Zz4K" width="14" height="14" alt="" />
         </button>
         <button class="strip-btn strip-plus" id="chatsNewMini" type="button" data-tip="新建对话" aria-label="新建对话">
@@ -2353,6 +2353,7 @@ const toastIcons = {
     newChat.addEventListener("click", showLanding);
     document.getElementById("chatsToggle").addEventListener("click", () => setChatsOpen(false));
     document.getElementById("chatsExpand").addEventListener("click", () => setChatsOpen(true));
+    setChatsOpen(false);
     document.getElementById("chatsNewMini").addEventListener("click", () => newChat.click());
     const histClockWrap = document.querySelector(".strip-clock-wrap");
     if (histClockWrap) {

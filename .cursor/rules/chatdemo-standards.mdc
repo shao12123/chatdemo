@@ -13,6 +13,7 @@ alwaysApply: true
 2. **列出不合规项**（缺什么、和哪条冲突、建议改法）。
 3. **问用户是否执行**；仅当用户说「修改 / 确认 / 执行」后再改。
 4. 用户说「先讨论不执行」时，只讨论不改文件。
+5. **用户已要求修改并执行后，改完直接发布**：`git pull --ff-only origin main`，递增 `version.json`（version / updatedAt / note），只提交本次相关文件，再 `git push origin main`。不必再等用户说「推送」。禁止 force push，不提交无关改动和密钥。
 
 ## 核对要点（摘要）
 
