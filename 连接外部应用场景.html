@@ -1272,7 +1272,7 @@
       height: 40px;
       flex: none;
       border: 1px solid var(--gc-line-soft);
-      border-radius: 12px;
+      border-radius: 8px;
       display: grid;
       place-items: center;
       color: var(--gc-ink);
@@ -1611,7 +1611,7 @@ const toastIcons = {
       return '<svg width="14" height="14" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="7" fill="currentColor"/><path d="M4.7 8.1 6.8 10.2 11.4 5.7" fill="none" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>';
     }
     function linkActions(scene) {
-      if (scene.state === "granted" || scene.state === "linked") return '<span class="link-done">已连接</span>';
+      if (scene.state === "granted" || scene.state === "linked") return '<span class="link-done">已授权</span>';
       if (scene.state === "failed") return '<button class="link-auth" type="button" data-link-retry>授权</button>';
       return '<button class="link-auth" type="button" data-link-auth>授权</button>';
     }
@@ -1945,7 +1945,7 @@ const toastIcons = {
         scene.seconds = Math.max(scene.seconds || 2, 3);
       }
       hideAuth();
-      notify("已连接 GitHub");
+      notify("已授权");
       renderThread(false);
     });
     const hoverTip = document.getElementById("hoverTip");
@@ -1982,14 +1982,14 @@ const toastIcons = {
     (() => {
       const key = "moreai-link-annotation-v1";
       const defaults = [
-        { id: "card", num: "1", group: "feature", title: "连接卡片", body: "【行为】连接外部应用在对话里完成。卡片写出应用名和用途。未连接和失败时都是授权，连上后只标已连接。" },
+        { id: "card", num: "1", group: "feature", title: "连接卡片", body: "【行为】连接外部应用在对话里完成。卡片写出应用名和用途。未连接和失败时都是授权，连上后只标已授权。" },
         { id: "go", num: "2", group: "feature", title: "授权确认", body: "【行为】点授权后先弹出确认。说明不会看到密码、权限由你决定、连接可以移除。点继续才算连上。关掉窗口则还没连接，对话会说明可以再授权。" },
-        { id: "done", num: "3", group: "feature", title: "已连接", body: "【行为】授权完成后，卡片只标已连接，不再放断开。对话改成已经连上，并说明可以按批准的权限使用。" },
-        { id: "cut", num: "4", group: "feature", title: "连接失败", body: "【行为】连接失败时，卡片右侧仍是授权，样式和文案都与未连接时一样。点授权重新确认，继续后变成已连接。关掉窗口则仍是失败。" },
-        { id: "s1", group: "scene", title: "连接 GitHub", body: "【前置】打开左侧「连接 GitHub」。\n【期望】先说明要授权才能使用。卡片上是授权。点授权出现确认窗，点继续后变成已连接，对话改成已经连上。关掉确认窗则还没连上。\n【当前】点这条对话即可从授权走到连上或关掉。" },
-        { id: "s2", group: "scene", title: "已经连上", body: "【前置】打开左侧「已经连上」。\n【期望】对话说明 GitHub 已经连接。卡片只标已连接，没有断开按钮。\n【当前】点这条对话即可看到已连接。" },
+        { id: "done", num: "3", group: "feature", title: "已授权", body: "【行为】授权完成后，卡片只标已授权，不再放断开。对话改成已经连上，并说明可以按批准的权限使用。" },
+        { id: "cut", num: "4", group: "feature", title: "连接失败", body: "【行为】连接失败时，卡片右侧仍是授权，样式和文案都与未连接时一样。点授权重新确认，继续后变成已授权。关掉窗口则仍是失败。" },
+        { id: "s1", group: "scene", title: "连接 GitHub", body: "【前置】打开左侧「连接 GitHub」。\n【期望】先说明要授权才能使用。卡片上是授权。点授权出现确认窗，点继续后变成已授权，对话改成已经连上。关掉确认窗则还没连上。\n【当前】点这条对话即可从授权走到连上或关掉。" },
+        { id: "s2", group: "scene", title: "已经连上", body: "【前置】打开左侧「已经连上」。\n【期望】对话说明 GitHub 已经连接。卡片只标已授权，没有断开按钮。\n【当前】点这条对话即可看到已授权。" },
         { id: "s3", group: "scene", title: "关掉授权窗口", body: "【前置】打开左侧「关掉授权窗口」。\n【期望】对话说明窗口已关掉、还没连上。卡片仍是授权，再点可以重新确认。\n【当前】点这条对话即可看到未完成的连接。" },
-        { id: "s4", group: "scene", title: "连接失败", body: "【前置】打开左侧「连接失败」。\n【期望】对话说明这次没有连上。卡片右侧按钮文案是授权，和未连接时一样。点授权出现确认窗，继续后变成已连接。\n【当前】点这条对话即可看到失败，并可再次授权。" }
+        { id: "s4", group: "scene", title: "连接失败", body: "【前置】打开左侧「连接失败」。\n【期望】对话说明这次没有连上。卡片右侧按钮文案是授权，和未连接时一样。点授权出现确认窗，继续后变成已授权。\n【当前】点这条对话即可看到失败，并可再次授权。" }
       ];
       const embedded = document.getElementById("revEmbedded");
       let saved = {};
