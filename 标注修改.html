@@ -1783,7 +1783,14 @@
     html.theme-dark .hp-zoom button:hover:not(:disabled) { background: #292b2e; color: var(--ink); }
     html.theme-dark .oo-app .hp-slide-zoom,
     html.theme-dark .oo-app .hp-preview-placeholder { box-shadow: 0 0 0 1px #292b2e; }
-    html.theme-dark .oo-app .hp-film-image { background: transparent; border-color: #292b2e; }
+    html.theme-dark .oo-app .hp-film-image,
+    html.theme-dark .oo-app .hp-film button[data-page-state=ready] .hp-film-image,
+    html.theme-dark .oo-app .hp-film button[aria-current=page][data-page-state=ready] .hp-film-image { background: transparent; border-color: #292b2e; }
+    html.theme-dark .oo-app .hp-film button[aria-current=page] .hp-film-image,
+    html.theme-dark .oo-app .hp-film button[aria-current=page][data-page-state=ready] .hp-film-image { border-color: var(--brand); }
+    html.theme-dark .oo-app .hp-film button[data-page-state=ready]:hover:not([aria-current=page]) .hp-film-image { border-color: #434448; }
+    html.theme-dark .hp-revise-status { background: #191a1d; color: var(--brand); box-shadow: none; }
+    html.theme-dark .hp-revise-status::before { background: var(--brand); box-shadow: 0 0 0 3px rgba(49, 122, 247, .24); }
     html.theme-dark .hp-history { background: var(--card); border-left-color: #292b2e; color: var(--ink); box-shadow: none; }
     html.theme-dark .hp-history header { border-bottom-color: #292b2e; }
     html.theme-dark .hp-history header button { color: var(--ink-2); }
@@ -1842,7 +1849,14 @@
     html.theme-dark .anno-dock .hint { color: var(--ink-3); }
     html.theme-dark .anno-dock { background: var(--card); border-left-color: #292b2e; }
     html.theme-dark .anno-field.is-capped::after { background: linear-gradient(180deg, rgba(25, 26, 29, 0), #191a1d); }
+    html.theme-dark .anno-store-item:hover,
+    html.theme-dark .anno-store-item:focus-within { background: #292b2e; }
+    html.theme-dark .anno-store-item .edit,
+    html.theme-dark .anno-store-item .del { color: var(--ink-2); }
     html.theme-dark .anno-store-item .ops { background: linear-gradient(90deg, rgba(25, 26, 29, 0), #191a1d 28px); }
+    html.theme-dark .anno-store-item:hover .ops,
+    html.theme-dark .anno-store-item:focus-within .ops { background: linear-gradient(90deg, rgba(41, 43, 46, 0), #292b2e 28px); }
+    html.theme-dark .anno-store-item .del:hover { background: rgba(232, 64, 38, .16); color: #ff8a7a; }
     html.theme-dark .anno-store-item .edit:hover,
     html.theme-dark .anno-icon-btn:hover,
     html.theme-dark .anno-del:hover,
