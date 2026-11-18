@@ -1019,6 +1019,7 @@
     .anno-fail-thought + .net-wrap,
     .anno-fail-thought + .moreai-turn { margin-top: 0; }
     .net-card .msg-tags { margin: 0; }
+    .net-card .msg-shots { justify-content: flex-start; }
     .net-card .msg-tag { background: rgba(0, 0, 0, .06); }
     .anno-result-list { display: flex; flex-wrap: wrap; gap: 6px; margin: 8px 0 0; padding: 0; list-style: none; max-width: 440px; }
     .anno-result-row { display: inline-flex; align-items: center; gap: 4px; height: 24px; max-width: 100%; padding: 0 8px 0 4px; border: 1px solid #ffccc7; border-radius: 6px; background: #fff1f0; }
@@ -3748,10 +3749,7 @@ const roastPhotos = {green: "data:image/jpeg;base64,/9j/4QCARXhpZgAASUkqAAgAAAAF
         :partial
           ?["收到 3 条标注修改，按序号逐页生成。","第 1 页「封面标题再短一点」已写进当前版本。","第 3 页「故事梗概收成三点」、第 6 页「大观园补一句由盛转衰」没有生成成功，预览里不再保留这两处标注。"]
           :["收到 3 条标注修改，按序号逐页生成。","第 1 页、第 3 页、第 6 页都没有生成成功。","不另开版本，原来的文件还在，预览里不再保留这三处标注。"];
-      const results=partial?[
-        {no:2,page:"V1 · 第3页",note:"故事梗概收成三点",ok:false},
-        {no:3,page:"V1 · 第6页",note:"大观园补一句由盛转衰",ok:false}
-      ]:null;
+      const results=partial?kept.map(spec=>({no:spec.no,note:spec.text,ok:false,shot:annoShotData(spec.slide,spec)})):null;
       hp.runId++;hp.timers.forEach(clearTimeout);hp.timers.clear();
       const size=hpSize();
       const pages=PPT_SLIDES.map((spec,i)=>{
@@ -5717,10 +5715,11 @@ const DESIGN_MOUTH = "M6.61285 13.736C7.26704 14.5537 9.06605 16.1892 11.0286 16
           const shown = item.typing ? (item.shown || "") : (item.text || "");
           const caret = item.typing ? `<i class="stream-caret"></i>` : "";
           if (failed.length || (item.retry && !item.composerAction && (item.failText || results.length))) {
-            const tags = failed.length ? `<div class="msg-tags">${failed.map(row => `<span class="msg-tag"><b>${row.no}</b><span>${esc(row.page)}</span></span>`).join("")}</div>` : "";
+            const shots = failed.filter(row => row.shot).map(row => `<img class="msg-shot" alt="${esc(row.note || "标注截图")}" src="${row.shot}">`).join("");
+            const shotsHtml = shots ? `<div class="msg-shots">${shots}</div>` : "";
             const retryBtn = item.retry ? `<button class="act-primary" type="button" data-anno-retry${item.retrying ? " disabled" : ""}>${item.retrying ? esc(item.retryBusy || "正在重试…") : esc(item.retryLabel || "重试")}</button>` : "";
             const closeBtn = `<button class="net-x" type="button" data-anno-fail-close aria-label="关闭"><svg width="10" height="10" viewBox="0 0 10 10" fill="none" aria-hidden="true"><path d="M2 2l6 6M8 2L2 8" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg></button>`;
-            return `${thought}<div class="net-wrap moreai-turn" data-qnav-anchor="a-${index}"><div class="net-card"><p class="net-main">${errIconHtml()}<span>${esc(item.retrying ? (item.busyText || lead) : lead)}</span></p>${tags}<div class="net-actions">${retryBtn}${closeBtn}</div></div>${version ? hpArtifact(version) : ""}${annoActionsHtml(item, index)}</div>`;
+            return `${thought}<div class="net-wrap moreai-turn" data-qnav-anchor="a-${index}"><div class="net-card"><p class="net-main">${errIconHtml()}<span>${esc(item.retrying ? (item.busyText || lead) : lead)}</span></p>${shotsHtml}<div class="net-actions">${retryBtn}${closeBtn}</div></div>${version ? hpArtifact(version) : ""}${annoActionsHtml(item, index)}</div>`;
           }
           if (item.composerAction || item.retry) {
             const retryBtn = item.retry ? `<button class="act-primary" type="button" data-anno-retry${item.retrying ? " disabled" : ""}>${item.retrying ? esc(item.retryBusy || "正在继续…") : esc(item.retryLabel || "继续修改")}</button>` : "";
@@ -6661,7 +6660,7 @@ const DESIGN_MOUTH = "M6.61285 13.736C7.26704 14.5537 9.06605 16.1892 11.0286 16
         { id: "s19", group: "scene", title: "序号很密，或贴着预览图边缘", body: "【前置】页面上有多条标注，序号靠得很近，或贴着预览图的上边、左边。\n【期望】靠得太近的序号会互相盖住。预览图里靠近上边或左边的序号，会被裁掉一截。悬停序号，或在队列里点击序号定位到某一条时，这一条的序号会露到最前面。点队列里的文字会打开这条标注来编辑。\n【验收】悬停或从队列点击序号定位时，对应序号在最前面。点文字会进入编辑。贴着上边或左边的序号仍会被裁掉一截。\n【当前】演示已按这个处理。" },
         { id: "s20", group: "scene", status: "待开发确认方案", title: "前后两个标注框选修改同一个内容", body: "【前置】前后两个标注框选的是同一个内容，并一起发送。\n【期望】发送需求后，按照标签顺序执行修改。\n【验收】多条标注一次发出后，修改按标注序号依次进行。\n【当前】待确认：发送多个标注修改后，AI 是否会按照标注顺序一次执行修改需求。" },
         { id: "s21", group: "scene", title: "多标注修改-修改失败", body: "【前置】PPT 已生成结束，一次发送了多条标注修改，结果全部失败。\n【期望】不生成新版本，窗口仍停在当前版本。标注功能不退出。失败的标注不留在 PPT 预览里。对话说明这次修改失败，并提供「重试」。\n【验收】预览页和缩略图上不再有这些序号，队列里也没有。重试不会把失败标注画回预览，也不会另开版本。\n【当前】演示已按这个处理。对话写明修改失败、原文件还在，下面是全站错误卡片（浅灰底、无描边、圆角 14）+「重试」主按钮。" },
-        { id: "s22", group: "scene", title: "部分标注生成失败", body: "【前置】一次发送了多条标注修改，其中一部分生成成功，一部分失败。\n【期望】不另开版本，窗口仍停在当前版本。成功的标注和失败的标注都不留在 PPT 预览里。对话说明哪些标注失败，并提供「重试」。\n【验收】预览页和缩略图上不再有失败标注的序号，队列里也没有。对话里仍能看到失败的标注标签。重试不会把失败标注画回预览，也不会另开版本。\n【当前】演示已按这个处理。对话先写失败说明，中间是失败的标注标签，下面是全站错误卡片（浅灰底、无描边、圆角 14）+「重试」主按钮。" }
+        { id: "s22", group: "scene", title: "部分标注生成失败", body: "【前置】一次发送了多条标注修改，其中一部分生成成功，一部分失败。\n【期望】不另开版本，窗口仍停在当前版本。成功的标注和失败的标注都不留在 PPT 预览里。对话说明哪些标注失败，并提供「重试」。\n【验收】预览页和缩略图上不再有失败标注的序号，队列里也没有。错误卡片里能看到失败选区的截图。重试不会把失败标注画回预览，也不会另开版本。\n【当前】演示已按这个处理。错误卡片写明失败说明，里面是失败选区的截图，下面是「重试」主按钮。卡片是浅灰底、无描边、圆角 14。" }
       ];
       const embedded = document.getElementById("revEmbedded");
       let saved = {};
