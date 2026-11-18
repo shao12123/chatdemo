@@ -1667,7 +1667,7 @@
     .rt-lead { margin: 0; color: var(--rt-text-1); font-size: 15px; line-height: 24px; }
     .rt-lead b { font-weight: 700; }
     .rt-pick { flex: none; height: 18px; padding: 0 6px; border-radius: 99px; background: var(--rt-pick-bg); color: var(--rt-pick-fg); font-style: normal; font-size: 12px; line-height: 18px; font-weight: 600; }
-    .rc-card { width: min(600px, 100%); border-radius: 16px; background: var(--rt-card); padding: 14px 16px; display: flex; flex-direction: column; gap: 8px; }
+    .rc-card { width: 100%; border-radius: 16px; background: var(--rt-card); padding: 14px 16px; display: flex; flex-direction: column; gap: 8px; }
     .rc-head { padding: 0 2px 4px; }
     .rc-kicker { margin: 0 0 2px; color: var(--rt-text-3); font-size: 12px; line-height: 18px; }
     .rc-trip { margin: 0; color: var(--rt-text-1); font-size: 14px; line-height: 22px; font-weight: 500; }
@@ -1687,7 +1687,7 @@
     .rc-seg { color: var(--rt-text-1); }
     .rc-sub { grid-column: 2; color: var(--rt-text-3); font-size: 12px; line-height: 18px; }
     .rc-foot { margin: 2px 2px 0; color: var(--rt-text-3); font-size: 12px; line-height: 18px; }
-    .rp-plan { width: min(680px, 100%); display: flex; flex-direction: column; gap: 6px; margin-top: 4px; }
+    .rp-plan { width: 100%; display: flex; flex-direction: column; gap: 6px; margin-top: 4px; }
     .rp-title { display: flex; align-items: center; gap: 8px; margin: 0; color: var(--rt-text-1); font-size: 15px; line-height: 24px; font-weight: 700; }
     .rp-sub { margin: -4px 0 0; color: var(--rt-text-2); font-size: 13px; line-height: 20px; font-weight: 500; }
     .rp-fit, .rp-sum { margin: 0; color: var(--rt-text-2); font-size: 14px; line-height: 22px; }
@@ -1703,7 +1703,7 @@
     .rd-table td small { display: block; margin-top: 2px; color: var(--rt-text-3); font-size: 12px; line-height: 18px; }
     .rd-table td:first-child { width: 112px; }
     .rd-num { white-space: nowrap; font-variant-numeric: tabular-nums; }
-    .rt-tips { width: min(680px, 100%); margin-top: 4px; padding: 12px 16px 14px; border-radius: 14px; background: var(--rt-card); }
+    .rt-tips { width: 100%; margin-top: 4px; padding: 12px 16px 14px; border-radius: 14px; background: var(--rt-card); }
     .rt-tips-h { display: flex; align-items: center; gap: 6px; margin: 0 0 8px; color: var(--rt-text-1); font-size: 14px; line-height: 22px; font-weight: 700; }
     .rt-tips-h svg { flex: none; color: var(--rt-tip-icon); }
     .rt-tips ul { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 6px; }
@@ -4504,7 +4504,7 @@
         "status": "已实现",
         "anchor": "",
         "title": "行程对比：UI 样式规范",
-        "body": "【层级】最多两层。卡片：行程对比大卡、出行提示、地图入口；正文（不包卡片）：结论句、方案小标题、适用说明、表格、小结。卡片内只再分一层块（对比卡里的方案块），块里不再套块。\n【间距】回复内各组件间距 12px；对比卡内边距 14px 16px，块间距 8px；方案块内边距 12px 16px；出行提示内边距 12px 16px 14px。\n【宽度】对比卡 ≤ 600px；方案明细、出行提示 ≤ 680px；地图入口卡 ≤ 360px；窄屏时 100%，表格在边框内横向滚动（最小宽 520px）。\n【圆角】卡片 16px；块 14px；表格、地图入口卡 12px。\n【颜色】全部走 token，浅色 / 深色两套取值见「深浅模式颜色 token」。浅色下：卡片 #f5f6f8；方案块 #e9ecf1；表格白底、1px #eceef2 描边，表头 #f7f8fa。\n【文字】详见「信息分级」。结论句 15/24 #1c2330；方案一级标题 15px 700 #1c2330；副标题 13/20 500 #344054；适用说明、小结 14/22 #344054；对比卡骨架 14/22 #1c2330（截止时间 / 住几晚加粗）；表格正文 13/20 #1c2330，表头 12px #667085；表格内次要信息、对比卡说明 12/18 #667085；时间数字用等宽数字。\n【颜色只表达层级】\n1、方案色只用在对比卡的时间线圆点和竖线：方案一 #3b6de0、方案二 #d9822b、方案三 #2f8f6a；推荐方案竖线实色，其他 35% 透明度；\n2、「推荐」标签只给推荐方案：底 #e7f8ef、字 #067647；\n3、出行提示的灯泡图标 #d4920b 是这一块唯一的颜色；\n4、品牌蓝 #0a59f7 只用于链接、主按钮、悬停态。\n【地图线型】地铁 / 高铁实线 #3b6de0；打车 / 专车虚线 #d9822b；飞机点线 #667085；渡轮虚线 #2f8f6a。起终点相同时合并成一个点，编号写「1·4」。\n【交互样式】表格复制图标在表格右上角，灰色，悬停有气泡「复制表格」。"
+        "body": "【层级】最多两层。卡片：行程对比大卡、出行提示、地图入口；正文（不包卡片）：结论句、方案小标题、适用说明、表格、小结。卡片内只再分一层块（对比卡里的方案块），块里不再套块。\n【间距】回复内各组件间距 12px；对比卡内边距 14px 16px，块间距 8px；方案块内边距 12px 16px；出行提示内边距 12px 16px 14px。\n【宽度】对比卡、方案明细、出行提示与对话列 / 输入框同宽（吃满 `.messages-inner`，与 `.composer` 的 min(736px,…) 持平）；地图入口卡仍 ≤ 360px；窄屏时 100%，表格在边框内横向滚动（最小宽 520px）。\n【圆角】卡片 16px；块 14px；表格、地图入口卡 12px。\n【颜色】全部走 token，浅色 / 深色两套取值见「深浅模式颜色 token」。浅色下：卡片 #f5f6f8；方案块 #e9ecf1；表格白底、1px #eceef2 描边，表头 #f7f8fa。\n【文字】详见「信息分级」。结论句 15/24 #1c2330；方案一级标题 15px 700 #1c2330；副标题 13/20 500 #344054；适用说明、小结 14/22 #344054；对比卡骨架 14/22 #1c2330（截止时间 / 住几晚加粗）；表格正文 13/20 #1c2330，表头 12px #667085；表格内次要信息、对比卡说明 12/18 #667085；时间数字用等宽数字。\n【颜色只表达层级】\n1、方案色只用在对比卡的时间线圆点和竖线：方案一 #3b6de0、方案二 #d9822b、方案三 #2f8f6a；推荐方案竖线实色，其他 35% 透明度；\n2、「推荐」标签只给推荐方案：底 #e7f8ef、字 #067647；\n3、出行提示的灯泡图标 #d4920b 是这一块唯一的颜色；\n4、品牌蓝 #0a59f7 只用于链接、主按钮、悬停态。\n【地图线型】地铁 / 高铁实线 #3b6de0；打车 / 专车虚线 #d9822b；飞机点线 #667085；渡轮虚线 #2f8f6a。起终点相同时合并成一个点，编号写「1·4」。\n【交互样式】表格复制图标在表格右上角，灰色，悬停有气泡「复制表格」。"
       },
       {
         "id": "f-theme",

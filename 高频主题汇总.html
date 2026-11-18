@@ -429,14 +429,14 @@
     }
     @media (max-width: 560px) {
       .chat-head { padding: 0 12px; }
-      .composer { width: calc(100% - 24px); }
+      .composer, .messages-inner, .stage.digest-chat .messages-inner { width: calc(100% - 24px); }
     }
     @media (max-height: 680px) {
       .nav { top: 58px; gap: 12px; }
       .avatar { bottom: 10px; }
     }
 
-    .messages-inner { width: min(680px, 100%); margin: 0 auto; display: flex; flex-direction: column; gap: 12px; }
+    .messages-inner { width: min(736px, calc(100% - 40px)); margin: 0 auto; display: flex; flex-direction: column; gap: 12px; }
     .msg { max-width: 86%; font-size: 14px; line-height: 22px; }
     .msg.user { align-self: flex-end; background: #eef2ff; color: var(--ink); border-radius: 8px; padding: 10px 14px; }
     .lead { margin: 20px 0 0; max-width: 440px; font-size: 15px; line-height: 24px; }
@@ -960,7 +960,7 @@
       display: flex;
       flex-direction: column;
       gap: 10px;
-      width: min(680px, 100%);
+      width: min(736px, calc(100% - 40px));
       align-items: stretch;
     }
     .digest-msg {

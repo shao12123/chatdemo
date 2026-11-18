@@ -293,7 +293,7 @@
     /* 全站错误卡片：浅灰底、无描边、圆角 14，和提示块同一族；图标是块内唯一的颜色 */
     :root { --err-card: #eef0f3; --err-text: #000000; --err-text-2: rgba(0, 0, 0, .6); --err-icon: #e84026; --err-ok: #64bb5c; --err-x-hover: rgba(0, 0, 0, .06); }
     html.theme-dark { --err-card: #191a1d; --err-text: #ffffff; --err-text-2: rgba(255, 255, 255, .6); --err-icon: #e84026; --err-ok: #5ba854; --err-x-hover: rgba(255, 255, 255, .08); }
-    .net-wrap { align-self: flex-start; width: min(680px, 100%); display: flex; flex-direction: column; gap: 8px; }
+    .net-wrap { align-self: stretch; width: 100%; max-width: 100%; display: flex; flex-direction: column; gap: 8px; }
     .net-card { display: flex; flex-direction: column; gap: 8px; padding: 12px 16px; border: 0; border-radius: 14px; background: var(--err-card); }
     .net-main { margin: 0; display: flex; align-items: flex-start; gap: 8px; color: var(--err-text); font-size: 14px; line-height: 22px; }
     .net-main .msg-tone { color: var(--err-icon); }
@@ -6132,7 +6132,7 @@
       {
         id: "f-netcard", cat: "feature", status: "已实现", anchor: ".net-card",
         title: "断网提示卡片",
-        body: "【用途】网络断开时告诉用户发生了什么、已写的内容在不在、接下来会怎样。\n【展示条件】写文档过程中网络断开时出现，位置在文档卡片下方。\n【交互】重连中：卡片下方 8px 处显示灰字倒计时「正在检查网络… 5 秒后重试」，自动重连 5 次；「立即重试」跳过倒计时；× 只关闭卡片。5 次都失败：卡片变成「多次重连没有成功。已写好的 N 节保留在文档里。」，给出「重试」，点击从中断的那一节接着写。\n【样式】全站「错误卡片」：浅灰底 #EEF0F3（深色 #191A1D）、无描边、圆角 14px、内边距 12px 16px、最宽 680px；左侧 16px 圆形叉号 #E84026 是唯一的颜色；「重试」在卡内右下。详见《生成异常与恢复》Demo。\n【规范】不提供「检查网络」入口；关闭卡片后页面上不再保留重试入口；关闭按钮没有悬停气泡。\n【验收】重连期间不判定失败；5 次失败后思考区标题为「生成中断」。\n【实现情况】已实现（断网为模拟）。"
+        body: "【用途】网络断开时告诉用户发生了什么、已写的内容在不在、接下来会怎样。\n【展示条件】写文档过程中网络断开时出现，位置在文档卡片下方。\n【交互】重连中：卡片下方 8px 处显示灰字倒计时「正在检查网络… 5 秒后重试」，自动重连 5 次；「立即重试」跳过倒计时；× 只关闭卡片。5 次都失败：卡片变成「多次重连没有成功。已写好的 N 节保留在文档里。」，给出「重试」，点击从中断的那一节接着写。\n【样式】全站「错误卡片」：浅灰底 #EEF0F3（深色 #191A1D）、无描边、圆角 14px、内边距 12px 16px、与对话列 / 输入框同宽；左侧 16px 圆形叉号 #E84026 是唯一的颜色；「重试」在卡内右下。详见《生成异常与恢复》Demo。\n【规范】不提供「检查网络」入口；关闭卡片后页面上不再保留重试入口；关闭按钮没有悬停气泡。\n【验收】重连期间不判定失败；5 次失败后思考区标题为「生成中断」。\n【实现情况】已实现（断网为模拟）。"
       },
       {
         id: "f-resume", cat: "feature", status: "已实现", anchor: ".msg-notice .act-primary, .net-card .act-primary",
