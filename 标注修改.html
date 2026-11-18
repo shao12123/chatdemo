@@ -5701,21 +5701,19 @@ const DESIGN_MOUTH = "M6.61285 13.736C7.26704 14.5537 9.06605 16.1892 11.0286 16
           }
           return `${thought}<div class="moreai-turn" data-qnav-anchor="a-${index}"><p class="lead anno-reply">${esc(shown)}${caret}</p>${version ? hpArtifact(version) : ""}${annoActionsHtml(item, index)}</div>`;
         }
-        const quotes = (item.quotes || []).map(quote => `<div class="msg-quote" data-tip="${esc(quote.full)}"><span>${esc(quote.short)}</span></div>`).join("");
         const tags = item.tags || [];
-        const quoteBlock = tags.length
-          ? `<div class="msg-tags" data-msg-tags>${tags.map(tag => `<span class="msg-tag">${tag.index ? `<b>${tag.index}</b>` : ""}<span>${esc(tag.page)}</span></span>`).join("")}</div>`
-          : quotes ? `<div class="msg-quotes">${quotes}</div>` : "";
-        const listItems = tags.map(tag => `<li>${esc(tag.note || "未填写")}</li>`);
-        if (item.extra) listItems.push(`<li>${esc(item.extra)}</li>`);
-        const note = tags.length
-          ? `<ol class="msg-anno-list">${listItems.join("")}</ol>`
-          : item.text ? `<div class="msg-note">${esc(item.text)}</div>` : "";
         const files = msgFilesHtml(item.files);
         const title = tags.length ? tags.map(t => t.note || t.page).filter(Boolean).join("；") || "标注修改" : (item.text || "提问");
-        return tags.length
-          ? `<div class="msg-user-block" data-qnav-anchor="u-${index}" data-qnav-title="${esc(title)}">${quoteBlock}<div class="msg user">${note}${files}</div></div>`
-          : `<div class="msg user has-quote" data-qnav-anchor="u-${index}" data-qnav-title="${esc(title)}">${quoteBlock}${note}${files}</div>`;
+        if (tags.length) {
+          const tagsHtml = `<div class="msg-tags" data-msg-tags>${tags.map(tag => `<span class="msg-tag">${tag.index ? `<b>${tag.index}</b>` : ""}<span>${esc(tag.page)}</span></span>`).join("")}</div>`;
+          const extra = item.extra ? `<div class="msg-note">${esc(item.extra)}</div>` : "";
+          const bubble = extra || files ? `<div class="msg user">${extra}${files}</div>` : "";
+          return `<div class="msg-user-block" data-qnav-anchor="u-${index}" data-qnav-title="${esc(title)}">${tagsHtml}${bubble}</div>`;
+        }
+        const quotes = (item.quotes || []).map(quote => `<div class="msg-quote" data-tip="${esc(quote.full)}"><span>${esc(quote.short)}</span></div>`).join("");
+        const quoteBlock = quotes ? `<div class="msg-quotes">${quotes}</div>` : "";
+        const note = item.text ? `<div class="msg-note">${esc(item.text)}</div>` : "";
+        return `<div class="msg user has-quote" data-qnav-anchor="u-${index}" data-qnav-title="${esc(title)}">${quoteBlock}${note}${files}</div>`;
       }).join("");
     }
     function paintAnnoRevision() {
