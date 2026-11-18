@@ -726,6 +726,8 @@
     .doc-tab-main { display: flex; align-items: center; gap: 6px; min-width: 0; }
     .doc-tab .favicon { width: 24px; height: 24px; flex: none; border-radius: 8px; background: #e6eefe; display: grid; place-items: center; }
     .doc-tab .favicon img { width: 12px; height: 12px; }
+    .doc-tab .favicon.is-pptx { background: #ffe6ed; }
+    .doc-tab .favicon.is-pptx svg { width: 12px; height: 12px; }
     .doc-tab .title { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 14px; line-height: 20px; font-weight: 400; color: #1e293b; }
     .doc-tab .x { width: 24px; height: 24px; padding: 0; border-radius: 6px; background: transparent; display: grid; place-items: center; }
     .doc-tab .x img { width: 14px; height: 14px; }
@@ -1713,6 +1715,7 @@
     html.theme-dark .doc-tab.is-active,
     html.theme-dark .doc-tab .title { color: var(--ink); }
     html.theme-dark .doc-tab .favicon { background: var(--brand-soft); }
+    html.theme-dark .doc-tab .favicon.is-pptx { background: #ffe6ed; }
     html.theme-dark .doc-tab .x:hover,
     html.theme-dark .doc-tools .tool:hover,
     html.theme-dark .doc-meta .tool:hover { background: #292b2e; color: var(--ink); }
@@ -4089,14 +4092,15 @@ const roastPhotos = {green: "data:image/jpeg;base64,/9j/4QCARXhpZgAASUkqAAgAAAAF
       if(kind===hp.active){const next=Object.keys(hp.docs).find(k=>hp.docs[k].open);if(next)hp.active=next;else panels.honglou=false;}
       hpRefresh();if(panels.honglou)document.getElementById('docScroll').scrollTop=hp.docs[hp.active].scroll;
     }
-    function hpDocTabHtml(title, on, openAttr, closeAttr, icon){
-      return `<div class="doc-tab${on?' is-active':''}" role="presentation"><button class="doc-tab-main" type="button" role="tab" aria-selected="${on}" aria-controls="docArticle" tabindex="${on?0:-1}" ${openAttr}><i class="favicon" aria-hidden="true">${icon}</i><span class="title">${esc(title)}</span></button><button class="x" type="button" ${closeAttr} aria-label="关闭${esc(title)}"><svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.2" aria-hidden="true"><path d="m4 4 6 6m0-6-6 6"/></svg></button></div>`;
+    function hpDocTabHtml(title, on, openAttr, closeAttr, icon, iconClass){
+      return `<div class="doc-tab${on?' is-active':''}" role="presentation"><button class="doc-tab-main" type="button" role="tab" aria-selected="${on}" aria-controls="docArticle" tabindex="${on?0:-1}" ${openAttr}><i class="favicon${iconClass?' '+iconClass:''}" aria-hidden="true">${icon}</i><span class="title">${esc(title)}</span></button><button class="x" type="button" ${closeAttr} aria-label="关闭${esc(title)}"><svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.2" aria-hidden="true"><path d="m4 4 6 6m0-6-6 6"/></svg></button></div>`;
     }
     function hpPaintTabs(){
       document.getElementById('docTab').hidden=true;const strip=document.getElementById('digestWorkspaceTabs');strip.hidden=false;const icon=document.querySelector('#docTab .favicon')?.innerHTML||'';
+      const pptIcon=fileTypeIcon.pptx;
       const current=hp.historyId||hp.versions[0]?.id;
       const versions=hp.docs.pptx.open?hp.versions.filter(version=>version.tabOpen!==false):[];
-      const versionTabs=versions.length?[...versions].reverse().map(version=>hpDocTabHtml(hpCardFileName(version),hp.active==='pptx'&&version.id===current,`data-hp-version-tab="${version.id}"`,`data-hp-version-close="${version.id}"`,icon)).join(''):(hp.docs.pptx.open?hpDocTabHtml(hp.docs.pptx.title,hp.active==='pptx','data-hp-open="pptx"','data-hp-close="pptx"',icon):'');
+      const versionTabs=versions.length?[...versions].reverse().map(version=>hpDocTabHtml(hpCardFileName(version),hp.active==='pptx'&&version.id===current,`data-hp-version-tab="${version.id}"`,`data-hp-version-close="${version.id}"`,pptIcon,'is-pptx')).join(''):(hp.docs.pptx.open?hpDocTabHtml(hp.docs.pptx.title,hp.active==='pptx','data-hp-open="pptx"','data-hp-close="pptx"',pptIcon,'is-pptx'):'');
       const rest=Object.entries(hp.docs).filter(([kind,doc])=>doc.open&&kind!=='pptx').map(([kind,doc])=>hpDocTabHtml(doc.title,kind===hp.active,`data-hp-open="${kind}"`,`data-hp-close="${kind}"`,icon)).join('');
       strip.innerHTML=versionTabs+rest;
     }
