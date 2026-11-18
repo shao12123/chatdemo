@@ -1484,6 +1484,13 @@
     html.theme-dark .hover-tip { background: #191a1d; border-color: #434448; color: var(--ink); }
     html.theme-dark .think-name { color: var(--ink); }
     .ai-face { position: relative; width: 38.86px; height: 50px; flex: none; pointer-events: none; }
+    .ai-float {
+      --float-scale: 2;
+      position: fixed; right: 20px; bottom: calc(20px - 12.3px * var(--float-scale)); z-index: 45;
+      width: 38.86px; height: 50px; pointer-events: none;
+    }
+    .ai-float .ai-face { display: block; transform: scale(var(--float-scale)); transform-origin: right bottom; pointer-events: auto; cursor: grab; touch-action: none; }
+    .ai-float.is-dragging .ai-face { cursor: grabbing; }
     .ai-face-rig { position: absolute; inset: 0; transform-origin: 24px 29px; }
     .ai-face-art { position: absolute; left: 8.83px; top: 9.83px; width: 50.0452px; height: 50.0452px; transform: scale(0.6, 0.6071); transform-origin: top left; }
     .ai-face-orb { position: absolute; left: 0; top: 0; display: block; }
@@ -1712,6 +1719,7 @@
     html.theme-dark .qnav-row.is-current .qnav-dash,
     html.theme-dark .qnav-row:hover .qnav-dash { background: var(--ink); }
     html.theme-dark .ai-face-orb g { filter: url(#ai-blob-shade-dark); }
+    html.theme-dark .ai-float .ai-face-orb path { fill: #978EFF; }
     html.theme-dark .doc-tab .favicon img { filter: none; }
     html.theme-dark .doc-tab,
     html.theme-dark .doc-tab.is-active,
@@ -5462,6 +5470,42 @@ const DESIGN_MOUTH = "M6.61285 13.736C7.26704 14.5537 9.06605 16.1892 11.0286 16
       setTimeout(finish, 980);
     }
     function mountAiFaces() {
+      let floater = document.querySelector(".ai-float");
+      if (!floater) {
+        floater = document.createElement("div");
+        floater.className = "ai-float";
+        floater.setAttribute("aria-hidden", "true");
+        document.body.appendChild(floater);
+      }
+      if (!floater.querySelector(".ai-face")) floater.innerHTML = aiFaceScheme2Html("idle");
+      const floatFace = floater.querySelector(".ai-face");
+      if (floatFace && !floatFace.dataset.drag) {
+        floatFace.dataset.track = "page";
+        floatFace.dataset.drag = "1";
+        let drag = null;
+        floatFace.addEventListener("pointerdown", event => {
+          if (event.button !== 0) return;
+          event.preventDefault();
+          drag = { x: event.clientX, y: event.clientY, dx: floater._dx || 0, dy: floater._dy || 0 };
+          floatFace.dataset.state = "drag";
+          floatFace.setPointerCapture(event.pointerId);
+          floater.classList.add("is-dragging");
+        });
+        const move = event => {
+          if (!drag) return;
+          floater._dx = drag.dx + event.clientX - drag.x;
+          floater._dy = drag.dy + event.clientY - drag.y;
+          floater.style.transform = `translate(${floater._dx}px, ${floater._dy}px)`;
+        };
+        const end = () => {
+          drag = null;
+          floater.classList.remove("is-dragging");
+          if (floatFace.dataset.state === "drag") floatFace.dataset.state = "idle";
+        };
+        floatFace.addEventListener("pointermove", move);
+        floatFace.addEventListener("pointerup", end);
+        floatFace.addEventListener("pointercancel", end);
+      }
       document.querySelectorAll(".ai-face").forEach(el => {
         const mouth = el.querySelector(".ai-mouth");
         if (mouth) mouth.setAttribute("d", FACE_MOUTH[el.dataset.state] || FACE_MOUTH.idle);
@@ -5489,14 +5533,15 @@ const DESIGN_MOUTH = "M6.61285 13.736C7.26704 14.5537 9.06605 16.1892 11.0286 16
           let tx = 0;
           let ty = 0;
           let tracked = false;
+          const pageTrack = el.dataset.track === "page";
           if (!faceReduced && facePointer.on && el.dataset.state !== "drag") {
             const rect = el.getBoundingClientRect();
             const dx = facePointer.x - (rect.left + rect.width / 2);
             const dy = facePointer.y - (rect.top + rect.height / 2);
             const dist = Math.hypot(dx, dy);
             const near = 112;
-            if (dist < near) {
-              const edge = dist <= near - 36 ? 1 : (near - dist) / 36;
+            if (pageTrack || dist < near) {
+              const edge = pageTrack || dist <= near - 36 ? 1 : (near - dist) / 36;
               const reach = Math.min(1, dist / 72) * 4.5 * edge;
               const angle = Math.atan2(dy, dx);
               tx = Math.cos(angle) * reach;
@@ -6968,6 +7013,7 @@ const DESIGN_MOUTH = "M6.61285 13.736C7.26704 14.5537 9.06605 16.1892 11.0286 16
       });
       window.addEventListener("resize", () => { if (host.classList.contains("open")) placeQnavCard(); });
     })();
+    mountAiFaces();
     loadDemoVersion();
 
   </script>
