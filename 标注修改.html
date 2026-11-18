@@ -314,7 +314,7 @@
     .strip-plus {
       margin-top: 20px;
       background: rgba(9, 11, 14, 0.04);
-      border: 1px solid #e9ebee;
+      border: 1px solid var(--chip-line);
     }
     .strip-clock-wrap { position: relative; margin-top: 10px; }
     .strip-btn:hover { background: rgba(9, 11, 14, 0.04); }
@@ -998,7 +998,8 @@
     .anno-revision-card li span { display: block; color: var(--label); font-size: 12px; line-height: 18px; }
     .msg-user-block { align-self: stretch; display: flex; flex-direction: column; align-items: flex-end; gap: 6px; max-width: 100%; }
     .msg-shots { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 6px; max-width: 100%; }
-    .msg-shot { width: 54px; height: 54px; border-radius: 12px; object-fit: cover; display: block; background: #f6f0e4; }
+    .msg-shot-frame { flex: none; width: 54px; height: 54px; box-sizing: content-box; border: 1px solid #eef0f3; border-radius: 12px; overflow: hidden; display: block; background: transparent; }
+    .msg-shot { width: 54px; height: 54px; border-radius: 0; object-fit: cover; display: block; background: transparent; }
     .msg-user-block .msg.user { width: max-content; max-width: 100%; background: #eef2ff; color: var(--ink); border-radius: 8px; padding: 10px 14px; }
     .msg-user-block .msg-tags { width: 100%; max-width: 100%; min-width: 0; margin: 0; flex-wrap: nowrap; justify-content: flex-end; gap: 4px; overflow: hidden; }
     .msg-anno-list { margin: 0; padding-left: 21px; }
@@ -1849,6 +1850,8 @@
     html.theme-dark .strip-clock-wrap:focus-within .strip-clock { background: rgba(255, 255, 255, .06); border-color: #434448; }
     html.theme-dark .strip-plus:hover,
     html.theme-dark .strip-collapse:hover { background: rgba(255, 255, 255, .1); }
+    html.theme-dark .strip-plus,
+    html.theme-dark .strip-plus:hover { border-color: var(--chip-line); }
     html.theme-dark.is-anno-scheme-2 .oo-main.is-anno-on::after { box-shadow: inset 0 0 0 1px #317af7; }
     html.theme-dark .anno-store.is-notch .anno-batch { background: #317af7; border-color: #317af7; }
     html.theme-dark .anno-store.is-notch .anno-batch::before { background: radial-gradient(circle at 0 100%, transparent 11px, #317af7 12px); }
@@ -5701,7 +5704,7 @@ const DESIGN_MOUTH = "M6.61285 13.736C7.26704 14.5537 9.06605 16.1892 11.0286 16
           const shown = item.typing ? (item.shown || "") : (item.text || "");
           const caret = item.typing ? `<i class="stream-caret"></i>` : "";
           if (failed.length || (item.retry && !item.composerAction && (item.failText || results.length))) {
-            const shots = failed.filter(row => row.shot).map(row => `<img class="msg-shot" alt="${esc(row.note || "标注截图")}" src="${row.shot}">`).join("");
+            const shots = failed.filter(row => row.shot).map(row => `<span class="msg-shot-frame"><img class="msg-shot" alt="${esc(row.note || "标注截图")}" src="${row.shot}"></span>`).join("");
             const shotsHtml = shots ? `<div class="msg-shots">${shots}</div>` : "";
             const retryBtn = item.retry ? `<button class="act-primary" type="button" data-anno-retry${item.retrying ? " disabled" : ""}>${item.retrying ? esc(item.retryBusy || "正在重试…") : esc(item.retryLabel || "重试")}</button>` : "";
             const closeBtn = `<button class="net-x" type="button" data-anno-fail-close aria-label="关闭"><svg width="10" height="10" viewBox="0 0 10 10" fill="none" aria-hidden="true"><path d="M2 2l6 6M8 2L2 8" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg></button>`;
@@ -5719,7 +5722,7 @@ const DESIGN_MOUTH = "M6.61285 13.736C7.26704 14.5537 9.06605 16.1892 11.0286 16
         const title = tags.length ? tags.map(t => t.note || t.page).filter(Boolean).join("；") || "标注修改" : (item.text || "提问");
         if (shots.length || tags.length) {
           const shotsHtml = shots.length
-            ? `<div class="msg-shots">${shots.map(shot => `<img class="msg-shot" alt="${esc(shot.alt || "标注截图")}" src="${shot.src}">`).join("")}</div>`
+            ? `<div class="msg-shots">${shots.map(shot => `<span class="msg-shot-frame"><img class="msg-shot" alt="${esc(shot.alt || "标注截图")}" src="${shot.src}"></span>`).join("")}</div>`
             : "";
           const listItems = tags.map(tag => `<li>${esc(tag.note || "未填写")}</li>`);
           if (item.extra) listItems.push(`<li>${esc(item.extra)}</li>`);
