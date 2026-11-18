@@ -5742,9 +5742,11 @@ const DESIGN_MOUTH = "M6.61285 13.736C7.26704 14.5537 9.06605 16.1892 11.0286 16
         if (shots.length || tags.length) {
           const shotsHtml = shots.length
             ? `<div class="msg-shots">${shots.map(shot => `<img class="msg-shot" alt="${esc(shot.alt || "标注截图")}" src="${shot.src}">`).join("")}</div>`
-            : `<div class="msg-tags" data-msg-tags>${tags.map(tag => `<span class="msg-tag">${tag.index ? `<b>${tag.index}</b>` : ""}<span>${esc(tag.page)}</span></span>`).join("")}</div>`;
-          const extra = item.extra ? `<div class="msg-note">${esc(item.extra)}</div>` : "";
-          const bubble = extra || files ? `<div class="msg user">${extra}${files}</div>` : "";
+            : "";
+          const listItems = tags.map(tag => `<li>${esc(tag.note || "未填写")}</li>`);
+          if (item.extra) listItems.push(`<li>${esc(item.extra)}</li>`);
+          const note = listItems.length ? `<ol class="msg-anno-list">${listItems.join("")}</ol>` : "";
+          const bubble = note || files ? `<div class="msg user">${note}${files}</div>` : "";
           return `<div class="msg-user-block" data-qnav-anchor="u-${index}" data-qnav-title="${esc(title)}">${shotsHtml}${bubble}</div>`;
         }
         const quotes = (item.quotes || []).map(quote => `<div class="msg-quote" data-tip="${esc(quote.full)}"><span>${esc(quote.short)}</span></div>`).join("");
