@@ -1306,7 +1306,23 @@
         linear-gradient(90deg, rgba(10, 89, 247, 0.5), rgba(10, 89, 247, 0.5)),
         linear-gradient(180deg, #4a85ff 0%, #3370ff 100%);
     }
-    .link-done { flex: none; color: var(--brand); font-size: 13px; line-height: 20px; font-weight: 400; }
+    .link-manage {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      height: 30px;
+      flex: none;
+      padding: 0 16px;
+      border: 1px solid var(--gc-line);
+      border-radius: 8px;
+      background: var(--gc-bg);
+      color: var(--gc-ink);
+      font-size: 14px;
+      font-weight: 400;
+      line-height: 22px;
+      font-family: inherit;
+    }
+    .link-manage:hover { background: var(--gc-hover); }
     .link-fail { flex: none; color: #e84026; font-size: 13px; line-height: 20px; font-weight: 650; }
     .auth-mask {
       position: fixed;
@@ -1331,17 +1347,19 @@
     }
     .auth-x {
       position: absolute;
-      top: 12px;
-      right: 12px;
-      width: 28px;
-      height: 28px;
+      top: 16px;
+      right: 16px;
+      width: 24px;
+      height: 24px;
+      padding: 0;
       border: 0;
-      border-radius: 6px;
+      border-radius: 8px;
       background: transparent;
-      color: var(--gc-muted);
-      font-size: 18px;
-      line-height: 1;
+      color: rgba(0, 0, 0, .6);
+      display: grid;
+      place-items: center;
     }
+    .auth-x svg { display: block; }
     .auth-x:hover { background: var(--gc-hover); color: var(--gc-ink); }
     .auth-logo {
       width: 64px;
@@ -1372,6 +1390,7 @@
     .auth-note { margin: 14px 0; text-align: center; color: var(--gc-muted); font-size: 12px; line-height: 18px; }
     .auth-go { width: 100%; }
     html.theme-dark .auth-mask { background: rgba(0, 0, 0, .62); }
+    html.theme-dark .auth-x { color: rgba(255, 255, 255, .6); }
     html.theme-dark .link-auth,
     html.theme-dark .link-retry,
     html.theme-dark .auth-go { border-color: #2762c6; background: var(--brand); color: #fff; }
@@ -1497,14 +1516,14 @@
   <div class="hover-tip" id="hoverTip"></div>
   <div class="auth-mask" id="authMask" hidden>
     <div class="auth" role="dialog" aria-modal="true" aria-labelledby="authTitle">
-      <button class="auth-x" type="button" data-auth-close aria-label="关闭">×</button>
+      <button class="auth-x" type="button" data-auth-close aria-label="关闭"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M16.293 6.293a1 1 0 0 1 1.414 0 1 1 0 0 1 0 1.414L13.414 12l4.293 4.293a1 1 0 0 1 0 1.414 1 1 0 0 1-1.414 0L12 13.414l-4.293 4.293a1 1 0 0 1-1.414 0 1 1 0 0 1 0-1.414L10.586 12 6.293 7.707a1 1 0 0 1 0-1.414 1 1 0 0 1 1.414 0L12 10.586l4.293-4.293Z"/></svg></button>
       <div class="auth-logo" aria-hidden="true"><svg width="32" height="32" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82A7.68 7.68 0 0 1 8 3.87c.68.003 1.36.092 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg></div>
       <h2 id="authTitle">连接到 GitHub</h2>
       <p class="auth-sub">允许 AI Chat 代表你访问和使用此应用</p>
       <div class="auth-points">
-        <div><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 8.2 6.2 11.4 13 4.6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg><b>安全登录你的 GitHub 账号</b><span>AI Chat 永远不会看到你的密码</span></div>
-        <div><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 8.2 6.2 11.4 13 4.6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg><b>AI Chat 能做什么由你决定</b><span>AI Chat 只会获得你批准的访问权限</span></div>
-        <div><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 8.2 6.2 11.4 13 4.6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg><b>已连接的应用由你掌控</b><span>随时移除与 GitHub 的连接</span></div>
+        <div><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M19.293 6.293a1 1 0 0 1 1.414 0 1 1 0 0 1 0 1.414l-10 10a1 1 0 0 1-1.414 0l-5-5a1 1 0 0 1 1.414-1.414L10 15.586 19.293 6.293Z"/></svg><b>安全登录你的 GitHub 账号</b><span>AI Chat 永远不会看到你的密码</span></div>
+        <div><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M19.293 6.293a1 1 0 0 1 1.414 0 1 1 0 0 1 0 1.414l-10 10a1 1 0 0 1-1.414 0l-5-5a1 1 0 0 1 1.414-1.414L10 15.586 19.293 6.293Z"/></svg><b>AI Chat 能做什么由你决定</b><span>AI Chat 只会获得你批准的访问权限</span></div>
+        <div><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M19.293 6.293a1 1 0 0 1 1.414 0 1 1 0 0 1 0 1.414l-10 10a1 1 0 0 1-1.414 0l-5-5a1 1 0 0 1 1.414-1.414L10 15.586 19.293 6.293Z"/></svg><b>已连接的应用由你掌控</b><span>随时移除与 GitHub 的连接</span></div>
       </div>
       <p class="auth-note">你可以随时断开与 GitHub 的连接</p>
       <button class="auth-go" type="button" data-auth-go>继续</button>
@@ -1611,7 +1630,7 @@ const toastIcons = {
       return '<svg width="14" height="14" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="7" fill="currentColor"/><path d="M4.7 8.1 6.8 10.2 11.4 5.7" fill="none" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>';
     }
     function linkActions(scene) {
-      if (scene.state === "granted" || scene.state === "linked") return '<span class="link-done">已授权</span>';
+      if (scene.state === "granted" || scene.state === "linked") return '<button class="link-manage" type="button" data-link-manage>管理</button>';
       if (scene.state === "failed") return '<button class="link-auth" type="button" data-link-retry>授权</button>';
       return '<button class="link-auth" type="button" data-link-auth>授权</button>';
     }
@@ -1982,14 +2001,14 @@ const toastIcons = {
     (() => {
       const key = "moreai-link-annotation-v1";
       const defaults = [
-        { id: "card", num: "1", group: "feature", title: "连接卡片", body: "【行为】连接外部应用在对话里完成。卡片写出应用名和用途。未连接和失败时都是授权，连上后只标已授权。" },
+        { id: "card", num: "1", group: "feature", title: "连接卡片", body: "【行为】连接外部应用在对话里完成。卡片写出应用名和用途。未连接和失败时都是授权，连上后变成二级按钮「管理」。" },
         { id: "go", num: "2", group: "feature", title: "授权确认", body: "【行为】点授权后先弹出确认。说明不会看到密码、权限由你决定、连接可以移除。点继续才算连上。关掉窗口则还没连接，对话会说明可以再授权。" },
-        { id: "done", num: "3", group: "feature", title: "已授权", body: "【行为】授权完成后，卡片只标已授权，不再放断开。对话改成已经连上，并说明可以按批准的权限使用。" },
-        { id: "cut", num: "4", group: "feature", title: "连接失败", body: "【行为】连接失败时，卡片右侧仍是授权，样式和文案都与未连接时一样。点授权重新确认，继续后变成已授权。关掉窗口则仍是失败。" },
-        { id: "s1", group: "scene", title: "连接 GitHub", body: "【前置】打开左侧「连接 GitHub」。\n【期望】先说明要授权才能使用。卡片上是授权。点授权出现确认窗，点继续后变成已授权，对话改成已经连上。关掉确认窗则还没连上。\n【当前】点这条对话即可从授权走到连上或关掉。" },
-        { id: "s2", group: "scene", title: "已经连上", body: "【前置】打开左侧「已经连上」。\n【期望】对话说明 GitHub 已经连接。卡片只标已授权，没有断开按钮。\n【当前】点这条对话即可看到已授权。" },
+        { id: "done", num: "3", group: "feature", title: "管理", body: "【行为】授权完成后，卡片右侧变成二级按钮，文案是管理。不再放断开。对话改成已经连上，并说明可以按批准的权限使用。" },
+        { id: "cut", num: "4", group: "feature", title: "连接失败", body: "【行为】连接失败时，卡片右侧仍是授权，样式和文案都与未连接时一样。点授权重新确认，继续后变成管理。关掉窗口则仍是失败。" },
+        { id: "s1", group: "scene", title: "连接 GitHub", body: "【前置】打开左侧「连接 GitHub」。\n【期望】先说明要授权才能使用。卡片上是授权。点授权出现确认窗，点继续后变成管理，对话改成已经连上。关掉确认窗则还没连上。\n【当前】点这条对话即可从授权走到连上或关掉。" },
+        { id: "s2", group: "scene", title: "已经连上", body: "【前置】打开左侧「已经连上」。\n【期望】对话说明 GitHub 已经连接。卡片右侧是二级按钮「管理」，没有断开按钮。\n【当前】点这条对话即可看到管理。" },
         { id: "s3", group: "scene", title: "关掉授权窗口", body: "【前置】打开左侧「关掉授权窗口」。\n【期望】对话说明窗口已关掉、还没连上。卡片仍是授权，再点可以重新确认。\n【当前】点这条对话即可看到未完成的连接。" },
-        { id: "s4", group: "scene", title: "连接失败", body: "【前置】打开左侧「连接失败」。\n【期望】对话说明这次没有连上。卡片右侧按钮文案是授权，和未连接时一样。点授权出现确认窗，继续后变成已授权。\n【当前】点这条对话即可看到失败，并可再次授权。" }
+        { id: "s4", group: "scene", title: "连接失败", body: "【前置】打开左侧「连接失败」。\n【期望】对话说明这次没有连上。卡片右侧按钮文案是授权，和未连接时一样。点授权出现确认窗，继续后变成管理。\n【当前】点这条对话即可看到失败，并可再次授权。" }
       ];
       const embedded = document.getElementById("revEmbedded");
       let saved = {};
@@ -2039,7 +2058,7 @@ const toastIcons = {
         const specs = [
           ["card", "1", [".link"]],
           ["go", "2", [".auth", ".link-auth"]],
-          ["done", "3", [".link-done"]],
+          ["done", "3", [".link-manage"]],
           ["cut", "4", [".link [data-link-retry]"]]
         ];
         specs.forEach(([id, num, selectors]) => {
