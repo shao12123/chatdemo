@@ -845,7 +845,9 @@
       --gc-shadow: none;
     }
     #stage .msg.assistant:has(> .gc:not(.gc-result)) { width: min(520px, 100%); }
-    #stage .msg.assistant:has(> .gc.gc-result) { width: min(436px, 100%); }
+    #stage .msg.assistant:has(> .gc.gc-result),
+    #stage .msg.assistant:has(> .create-think) { width: min(436px, 100%); }
+    .exec-item.run .exec-dot { background: var(--brand); box-shadow: 0 0 0 3px color-mix(in srgb, var(--brand) 18%, transparent); }
     .gc {
       width: 520px;
       max-width: 100%;
@@ -1581,6 +1583,22 @@ const toastIcons = {
       const body = open ? `<div class="think-body"><div class="exec"><div class="exec-bar">${execDoneIcon}<span class="exec-title">已执行 ${steps.length} 个步骤</span></div><ul class="exec-list">${rows}</ul></div></div>` : "";
       return `<div class="think done${open ? " open" : ""}"><button class="think-head" type="button" data-think aria-expanded="${open ? "true" : "false"}"><span class="think-row">${aiFaceHtml("idle")}<span class="think-name">MoreAI</span></span><span class="think-status"><b>已完成</b><span class="think-meta"><span class="think-time">${scene.seconds || 2} 秒</span>${thinkChev}</span></span></button>${body}</div>`;
     }
+    const createSteps = ["确认群名和成员", "创建群组", "生成群名片"];
+    function createThinkHtml(scene) {
+      const running = !!scene.draft.creating;
+      const shown = running ? scene.draft.createStep : createSteps.length;
+      const open = scene.createThinkOpen !== false;
+      const rows = createSteps.slice(0, shown).map((text, index) => {
+        const state = !running || index < shown - 1 ? "done" : "run";
+        return `<li class="exec-item ${state}"><i class="exec-dot"></i><span>${esc(text)}</span></li>`;
+      }).join("");
+      const title = running ? "正在创建群组" : `已执行 ${createSteps.length} 个步骤`;
+      const status = running
+        ? `<b>思考中</b>`
+        : `<b>已完成</b><span class="think-meta"><span class="think-time">2 秒</span>${thinkChev}</span>`;
+      const body = open ? `<div class="think-body"><div class="exec"><div class="exec-bar">${running ? "" : execDoneIcon}<span class="exec-title">${title}</span></div><ul class="exec-list">${rows}</ul></div></div>` : "";
+      return `<div class="think create-think${running ? "" : " done"}${open ? " open" : ""}"><button class="think-head" type="button" data-think="create" aria-expanded="${open ? "true" : "false"}"><span class="think-row">${aiFaceHtml(running ? "think" : "idle")}<span class="think-name">MoreAI</span></span><span class="think-status">${status}</span></button>${body}</div>`;
+    }
     const faceSprings = new WeakMap();
     const facePointer = { x: 0, y: 0, on: false, bound: false };
     const faceBlink = { phase: "wait", t0: 0, dur: 0, next: 0 };
@@ -1703,7 +1721,10 @@ const toastIcons = {
 
     function groupHtml(sceneId) {
       const scene = sceneById(sceneId);
-      return `${thinkHtml(scene)}<div class="msg assistant"><p class="lead">${leadHtml(scene)}</p>${groupCardHtml(scene)}</div>`;
+      const process = scene.draft.creating || scene.draft.fromCreate ? createThinkHtml(scene) : "";
+      const card = scene.draft.creating ? "" : groupCardHtml(scene);
+      const lead = scene.draft.creating ? "正在创建群组。" : leadHtml(scene);
+      return `${thinkHtml(scene)}<div class="msg assistant"><p class="lead">${lead}</p>${process}${card}</div>`;
     }
     function messageHtml(item) {
       if (item.type === "user") {
@@ -1745,7 +1766,39 @@ const toastIcons = {
       messages.innerHTML = "";
       clearComposer();
     }
+    let createTimer = 0;
+    function finishCreate(scene) {
+      clearTimeout(createTimer);
+      if (!scene || !scene.draft.creating) return;
+      scene.draft.creating = false;
+      scene.draft.created = true;
+      scene.draft.fromCreate = true;
+      scene.draft.title = scene.draft.title || resolvedGroupName(scene.draft);
+      scene.createThinkOpen = true;
+    }
+    function startCreate(scene) {
+      const draft = scene.draft;
+      draft.creating = true;
+      draft.createStep = 1;
+      draft.title = resolvedGroupName(draft);
+      scene.createThinkOpen = true;
+      renderThread(true);
+      const tick = () => {
+        if (!draft.creating || current()?.id !== scene.id) return;
+        if (draft.createStep < createSteps.length) {
+          draft.createStep += 1;
+          renderThread(false);
+          createTimer = setTimeout(tick, 700);
+          return;
+        }
+        finishCreate(scene);
+        renderThread(true);
+      };
+      clearTimeout(createTimer);
+      createTimer = setTimeout(tick, 700);
+    }
     function openSession(id) {
+      if (activeId && activeId !== id) finishCreate(sceneById(activeId));
       activeId = id;
       main.classList.add("chatting");
       renderSessions();
@@ -1896,9 +1949,11 @@ const toastIcons = {
     messages.addEventListener("click", event => {
       const scene = sceneById(current()?.id);
       if (!scene) return;
-      if (event.target.closest("[data-think]")) {
+      const think = event.target.closest("[data-think]");
+      if (think) {
         readFields(scene);
-        scene.thinkOpen = !scene.thinkOpen;
+        if (think.dataset.think === "create") scene.createThinkOpen = scene.createThinkOpen === false;
+        else scene.thinkOpen = !scene.thinkOpen;
         renderThread(false);
         return;
       }
@@ -1916,11 +1971,9 @@ const toastIcons = {
         refreshGroupList(draft);
         return;
       }
-      if (event.target.closest("[data-group-create]") && draft.selected.length) {
-        draft.created = true;
-        draft.title = resolvedGroupName(draft);
+      if (event.target.closest("[data-group-create]") && draft.selected.length && !draft.creating) {
         draft.palette = false;
-        renderThread(false);
+        startCreate(scene);
       }
     });
     const hoverTip = document.getElementById("hoverTip");
@@ -1961,6 +2014,7 @@ const toastIcons = {
         { id: "members", num: "2", group: "feature", title: "选人和搜索", body: "【行为】可按姓名或手机号搜索。没有匹配时提示「没有找到相关联系人」。右侧为空时提示从左侧选择。" },
         { id: "name", num: "3", group: "feature", title: "群名和头像", body: "【行为】群名可以不填，创建后用成员名字，最多取前 4 位。点群头像打开本地文件，选择图片作为群头像。" },
         { id: "enter", num: "4", group: "feature", title: "查看群聊", body: "【行为】点「查看群聊」进入群聊。" },
+        { id: "create", num: "5", group: "feature", title: "创建", body: "【行为】点「创建」开始建群，先展示创建群组的思考过程。建完后出现「查看群聊」卡片。" },
         { id: "s1", group: "scene", title: "创建一个群聊", body: "【前置】打开左侧「创建一个群聊」。\n【期望】说明怎么选人、群名和头像。卡片是空的，创建不可点。选出成员后创建可点。\n【当前】点这条对话即可看到空的建群卡片。" },
         { id: "s2", group: "scene", title: "指定群名和成员", body: "【前置】打开左侧「指定群名和成员」。\n【期望】群名是项目同步，右侧已有张伟、李娜、王芳。创建可点。\n【当前】点这条对话即可看到已填好的卡片。" },
         { id: "s3", group: "scene", title: "不填群名直接建", body: "【前置】打开左侧「不填群名直接建」。\n【期望】没有群名，张伟和刘强已选上。创建后名称是「张伟、刘强」。\n【当前】点这条对话即可看到未填群名的卡片。" },
@@ -2017,7 +2071,8 @@ const toastIcons = {
           ["card", "1", [".gc"]],
           ["members", "2", [".gc-box"]],
           ["name", "3", [".gc-avatar-line"]],
-          ["enter", "4", [".gc-info"]]
+          ["enter", "4", [".gc-info"]],
+          ["create", "5", [".gc-create"]]
         ];
         specs.forEach(([id, num, selectors]) => {
           const target = selectors.map(selector => document.querySelector(selector)).find(node => {
