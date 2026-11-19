@@ -1,6 +1,7 @@
-# card_id 命名（v1.6 · 通用壳）
+# card_id 命名（v1.7 · 仅 Chat 区）
 
 > 卡按 **UI 壳 / 模式** 命名，不按业务故事。场景差异在触发规则与 payload。  
+> **范围：只收对话区（含输入框附件）出现的卡。** 右侧文档台 / 标注台 / PPT 预览等展示区 **不进卡片库**。  
 > 形态墙见各子目录 `morph-wall.html`。
 
 ---
@@ -16,10 +17,9 @@
 | 5 | **思考过程不算卡** |
 | 6 | **输入框附件 ≠ chat 用户文件**：拆成 `composer_file` + `user_file`（2026-11-19） |
 | 7 | **`ask_form` = host_only**：无 `present_` Tool（2026-11-19） |
-| 8 | **补输入只有一张 `ask_form`**（2026-11-19）：天气编号壳为 canonical；多题 / 多选走 payload；路线 radio·多选·分步旧 `.ask` **不另开卡**，待收敛进本壳 |
-| 9 | **文档类四张 A 壳补形态墙**（2026-11-19，v1.6）：`doc_summary` · `course_paper` · `paper_compare_pick` · `annotation_edit`，不新增 card_id |
-| 10 | **`course_paper` 偏 host**：Tool 名 `present_course_paper` 保留，但本期 Demo 多为 host 文档台（右侧 aside#doc）；对话里的 `.artifact` 入口条归 `doc_entry` |
-| 11 | **`annotation_edit` 双 preset**：`ppt`（刘海 + 标注框 + pop）｜`course_doc`（右侧 mark-dock）；同一 Tool，payload 用 `preset` 区分，不拆两张卡 |
+| 8 | **补输入只有一张 `ask_form`**（2026-11-19）：天气编号壳为 canonical；多题 / 多选走 payload；路线旧 `.ask` 不另开卡 |
+| 9 | **卡片库只保留 Chat 区**（2026-11-19，v1.7）：右侧文档台、标注 dock、PPT 预览等 **不做 card_id / 形态墙** |
+| 10 | 已撤出库：`course_paper` · `annotation_edit`（原 A 区；形态墙已删）。对话入口条仍用 `doc_entry` |
 
 ---
 
@@ -28,6 +28,7 @@
 | 规则 | 说明 |
 |---|---|
 | 语义 | **壳能力**，不是业务故事名 |
+| 表面 | 必须出现在 **Chat / 输入框**；右侧台面不算卡 |
 | Tool | 仅 `agent_invoke: tool`：`present_{card_id}` |
 | 场景 | payload + Tool description；可选 `preset` |
 | 别名 | 旧 id / Demo 名进 `aliases[]` |
@@ -36,21 +37,19 @@
 
 ## 卡片清单
 
-### A. 通用壳 · 有 Tool
+### A. 通用壳 · 有 Tool（Chat 内）
 
 | card_id | 人话 | Tool | 别名 |
 |---|---|---|---|
 | `option_compare` | 多方案对比卡 | `present_option_compare` | `route_compare` |
 | `data_table` | 明细表卡 | `present_data_table` | `route_detail` |
 | `doc_summary` | 总结报告卡 | `present_doc_summary` | |
-| `course_paper` | 长文文档台 | `present_course_paper` | 偏 host；见 D 节说明 |
 | `paper_compare_pick` | 对比选择卡 | `present_paper_compare_pick` | 仅「对比哪些文件」 |
-| `annotation_edit` | 标注修改卡 | `present_annotation_edit` | preset：`ppt` · `course_doc` |
 | `weather_card` | 天气卡 | `present_weather_card` | `天气场景` · `wx` |
 | `map_align` | 映射对照卡 | `present_map_align` | |
 | `push_digest` | 推送汇总卡 | `present_push_digest` | 暂缓 |
 
-### B. 全站件 · 无 Tool
+### B. 全站件 · 无 Tool（Chat / 输入框）
 
 | card_id | 人话 | 形态墙 | 备注 |
 |---|---|---|---|
@@ -58,19 +57,27 @@
 | `error_card` | 错误卡片 | [有](error_card/morph-wall.html) | `.net-card` |
 | `composer_file` | 输入框附件 | [有](composer_file/morph-wall.html) | 悬停角标 × / 上传中 |
 | `user_file` | 对话用户文件 | [有](user_file/morph-wall.html) | 类型色；无移除 |
-| `doc_entry` | 文档/产物入口 | [有](doc_entry/morph-wall.html) | artifact |
-| `ask_form` | 补充信息卡 | [有](ask_form/morph-wall.html) | host_only；见下方「ask_form 范围」 |
-| `map_entry` | 地图入口卡 | 本期不做 | |
+| `doc_entry` | 文档/产物入口 | [有](doc_entry/morph-wall.html) | chat 内 artifact；点开右侧台 **不是卡** |
+| `ask_form` | 补充信息卡 | [有](ask_form/morph-wall.html) | host_only |
+| `map_entry` | 地图入口卡 | 本期不做 | 若落在 chat 再做 |
 
 > 旧 `file_chip` → aliases，分别映射到 `composer_file` / `user_file`。
 
-### C. 候选尚未收名（下批）
+### C. 候选尚未收名（须先确认在 Chat）
 
 `group_form` · `group_result` · `app_link` · `schedule_preview` · `agenda_list` · `analysis_card`
 
-> `group_form` 仅当建群交互**明显不是**「补问壳」时再拆；否则先用 `ask_form` + preset。
+### E. 不进库（右侧 / 预览台）
 
-### D. 已有形态墙
+| 原名 / 区域 | 说明 |
+|---|---|
+| 右侧文档台（原 `course_paper`） | `aside#doc` 写入 / Tab / 任务板 / 对比板 |
+| 标注台（原 `annotation_edit`） | PPT 刘海队列 · 课程 `mark-dock` |
+| 地图全屏 / 预览台 | 非 chat 气泡 |
+
+---
+
+## D. 已有形态墙
 
 | card_id | 路径 |
 |---|---|
@@ -84,20 +91,7 @@
 | `ask_form` | [ask_form/morph-wall.html](ask_form/morph-wall.html) |
 | `weather_card` | [weather_card/morph-wall.html](weather_card/morph-wall.html) |
 | `doc_summary` | [doc_summary/morph-wall.html](doc_summary/morph-wall.html) |
-| `course_paper` | [course_paper/morph-wall.html](course_paper/morph-wall.html) |
 | `paper_compare_pick` | [paper_compare_pick/morph-wall.html](paper_compare_pick/morph-wall.html) |
-| `annotation_edit` | [annotation_edit/morph-wall.html](annotation_edit/morph-wall.html) |
-
-### D.1 文档类四卡补充（v1.6）
-
-| card_id | 说明 |
-|---|---|
-| `doc_summary` | 七壳 `metric / points / material / spec / ledger / catalog / notes` + 模块闸门；多文件一文件一外框；卡外 tip 走 `tip_block`，墙内不复制 |
-| `course_paper` | 简化文档台：空 / 写入中 / Tab / 目录 / 任务 / 对比板 / 历史 / 标注中。**host 偏重**：本期 Demo 多为 host 文档台，Tool 化后置 |
-| `paper_compare_pick` | 只收「对比哪些文件」；`COMPARE_MAX = 3`；确认后进 `course_paper` 对比板 |
-| `annotation_edit` | `preset: ppt`（`.anno-bar` 刘海 / `.anno-pop`）｜`preset: course_doc`（`.mark-dock` / `.mark` / `.is-marking`）；失败用 `error_card` |
-
-> **`doc_entry` ↔ `course_paper`**：对话里的 `.artifact` 文档/产物入口条 = `doc_entry`（host_only，无 Tool）；点开后右侧展开的文档台 = `course_paper`。形态墙里 `course_paper` **不画** `.artifact`。
 
 ---
 
@@ -105,11 +99,9 @@
 
 | 算本卡 | 不算本卡 / 待办 |
 |---|---|
-| 天气编号选项 + 自定义行 + 确认/跳过 ± 日历（canonical） | 三个路线方案 **radio / 方框多选 / 分步幻灯** 旧 DOM —— **遗留，收敛进本壳**，不新开 `route_ask` |
-| `mode: multi`：多行可同时 `is-on`（仍用 `.ask-num`） | |
-| 多题：host 多次挂载，或一卡多 field（`fields[]`） | |
-| `conversations` / 标注的多题 `askCard` 语义 | 问卷步进 UI 应对齐本壳，不另开 id |
-| 结果旁挂的 `weather_card` 等 | 结果卡用各自 card_id，不塞进 ask |
+| 天气编号选项 + 自定义行 + 确认/跳过 ± 日历（canonical） | 三个路线方案旧 `.ask` —— 遗留，收敛进本壳 |
+| `mode: multi` / 多题 `fields[]` / host 换题 | |
+| 结果旁挂的 chat 卡（如 `weather_card`） | 右侧台面 |
 
 ---
 
@@ -118,7 +110,8 @@
 | | `composer_file` | `user_file` | `doc_entry` |
 |---|---|---|---|
 | 谁产生 | 用户选文件（未发/待发） | 用户已发送 | AI / 系统产物 |
-| 位置 | 输入框 | 用户消息 | AI 回复 |
+| 位置 | 输入框 | 用户消息 | AI 回复（chat） |
 | 移除 | 悬停角标 × | 无 | 无 |
 | 下载 | 无 | 无 | 可有预览/下载 |
 | Agent | 不调 Tool | 不调 Tool | 不调 Tool |
+| 点开后 | — | — | 右侧文档台（**非卡**） |

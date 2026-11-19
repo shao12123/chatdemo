@@ -1,5 +1,5 @@
 {
-  "version": "2026.11.19-16",
-  "updatedAt": "2026-11-19 17:20",
-  "note": "文档四卡形态墙：doc_summary / course_paper / paper_compare_pick / annotation_edit；命名 v1.6"
+  "version": "2026.11.19-17",
+  "updatedAt": "2026-11-19 17:45",
+  "note": "卡片库收口仅 Chat 区：撤 course_paper / annotation_edit；命名 v1.7"
 }

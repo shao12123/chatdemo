@@ -107,25 +107,11 @@
       "summary": "总结报告卡 present_doc_summary：七壳 metric/points/material/spec/ledger/catalog/notes、多文件多外框、模块闸门、深色；tip 见 tip_block"
     },
     {
-      "id": "card-course-paper-wall",
-      "title": "卡片库 · course_paper 形态墙",
-      "file": "chat-cards/course_paper/morph-wall.html",
-      "owner": "共同维护",
-      "summary": "长文文档台 present_course_paper（本期偏 host）：空态/写入中/Tab/目录/任务板/对比板/历史/标注中；artifact 入口属 doc_entry"
-    },
-    {
       "id": "card-paper-compare-pick-wall",
       "title": "卡片库 · paper_compare_pick 形态墙",
       "file": "chat-cards/paper_compare_pick/morph-wall.html",
       "owner": "共同维护",
-      "summary": "对比选择卡 present_paper_compare_pick「对比哪些文件」：空槽/部分/就绪/三槽/下拉/预填/锁定/提示文案"
-    },
-    {
-      "id": "card-annotation-edit-wall",
-      "title": "卡片库 · annotation_edit 形态墙",
-      "file": "chat-cards/annotation_edit/morph-wall.html",
-      "owner": "共同维护",
-      "summary": "标注修改卡 present_annotation_edit：preset ppt（刘海/pop/队列/失败）与 course_doc（mark-dock/mark/已发送）"
+      "summary": "Chat 内对比选择卡 present_paper_compare_pick；确认后右侧文档台对比（非卡）"
     },
     {
       "id": "gen-fault",
