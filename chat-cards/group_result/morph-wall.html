@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>card_id · group_result · 形态墙</title>
+  <style>
+    :root {
+      --page: #f5f6f8; --ink: #000; --muted: rgba(0,0,0,.6); --faint: rgba(0,0,0,.4);
+      --line: #e3e4e7; --brand: #0a59f7; --chip: #fff; --chip-line: #e3e4e7;
+    }
+    html.theme-dark {
+      color-scheme: dark;
+      --page: #090b0e; --ink: #fff; --muted: rgba(255,255,255,.6); --faint: rgba(255,255,255,.4);
+      --line: #292b2e; --brand: #317af7; --chip: #191a1d; --chip-line: #434448;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: "PingFang SC", "Helvetica Neue", sans-serif; background: var(--page); color: var(--ink); }
+    .top {
+      position: sticky; top: 0; z-index: 20; display: flex; flex-wrap: wrap; gap: 12px; justify-content: space-between;
+      padding: 16px 24px; border-bottom: 1px solid var(--line);
+      background: color-mix(in srgb, var(--page) 92%, transparent); backdrop-filter: blur(8px);
+    }
+    .top h1 { margin: 0; font-size: 18px; line-height: 26px; }
+    .top p { margin: 4px 0 0; color: var(--muted); font-size: 13px; line-height: 20px; max-width: 48rem; }
+    .meta { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+    .meta code { padding: 4px 10px; border-radius: 8px; background: var(--chip); border: 1px solid var(--chip-line); font-size: 12px; }
+    .meta code b { color: var(--faint); }
+    .tools { display: flex; flex-wrap: wrap; gap: 8px; align-content: flex-start; }
+    .tools a, .tools button {
+      display: inline-flex; align-items: center; height: 32px; padding: 0 12px; border-radius: 8px;
+      border: 1px solid var(--chip-line); background: var(--chip); color: var(--ink); font-size: 13px;
+      text-decoration: none; cursor: pointer; font-family: inherit;
+    }
+    .layout { display: grid; grid-template-columns: 210px minmax(0,1fr); }
+    nav { padding: 16px 12px 32px 24px; border-right: 1px solid var(--line); }
+    nav a { display: block; padding: 8px 10px; border-radius: 8px; color: var(--muted); text-decoration: none; font-size: 13px; }
+    nav a:hover { background: var(--chip); color: var(--ink); }
+    nav a small { display: block; color: var(--faint); font-size: 11px; margin-top: 2px; }
+    main { padding: 20px 24px 64px; max-width: 780px; }
+    .panel { scroll-margin-top: 96px; margin: 0 0 24px; padding: 16px; border: 1px solid var(--line); border-radius: 16px; background: var(--chip); }
+    .panel-head h2 { margin: 0; font-size: 15px; }
+    .panel-head p { margin: 6px 0 12px; color: var(--muted); font-size: 12px; line-height: 18px; }
+    .tag { display: inline-block; margin-left: 8px; height: 20px; padding: 0 8px; border-radius: 99px; background: #f3f7ff; color: var(--brand); font-size: 11px; line-height: 20px; font-weight: 600; }
+    html.theme-dark .tag { background: #0a1831; }
+    .tag.gray { background: var(--page); color: var(--muted); }
+    .stage { max-width: 736px; display: flex; flex-direction: column; gap: 10px; align-items: flex-start; }
+    .note { margin: 12px 0 0; padding: 10px 12px; border-radius: 10px; background: var(--page); color: var(--muted); font-size: 12px; line-height: 18px; }
+    .note code, .panel-head code { font-size: 11px; }
+    .note a, .panel-head a { color: var(--brand); }
+    .cap { margin: 0; color: var(--faint); font-size: 12px; line-height: 18px; }
+    .lead { margin: 0; font-size: 14px; line-height: 24px; font-weight: 400; color: var(--ink); max-width: 100%; }
+    .toast-lite { padding: 8px 12px; border-radius: 10px; background: var(--page); color: var(--muted); font-size: 12px; line-height: 18px; }
+    @media (max-width: 800px) {
+      .layout { grid-template-columns: 1fr; }
+      nav { display: flex; gap: 4px; overflow-x: auto; border-right: 0; border-bottom: 1px solid var(--line); }
+      nav a { white-space: nowrap; }
+      nav a small { display: none; }
+    }
+
+    /* tokens ← 建群场景.html --gc-*（浅 / 深） */
+    :root {
+      --gc-bg: #ffffff; --gc-ink: #1f2329; --gc-muted: #646a73; --gc-faint: #8f959e; --gc-placeholder: #bbbfc4;
+      --gc-line: #e5e6eb; --gc-line-soft: #eef0f3; --gc-input: #ffffff; --gc-hover: #f5f6f7; --gc-check: #ffffff;
+      --gc-avatar: #eef0ff; --gc-avatar-ink: #7b83ff; --gc-pop: #ffffff; --gc-shadow: 0 8px 20px rgba(31, 35, 41, .12);
+      --brand-hover: #1e61ea;
+    }
+    html.theme-dark {
+      --gc-bg: #191a1d; --gc-ink: #ffffff; --gc-muted: rgba(255,255,255,.62); --gc-faint: rgba(255,255,255,.45);
+      --gc-placeholder: rgba(255,255,255,.35); --gc-line: #434448; --gc-line-soft: #292b2e; --gc-input: #111216;
+      --gc-hover: rgba(255,255,255,.06); --gc-check: #111216; --gc-avatar: #1c2140; --gc-avatar-ink: #b7c0ff;
+      --gc-pop: #191a1d; --gc-shadow: none; --brand-hover: #2762c6;
+    }
+
+    /* ← 建群场景.html article.gc（host overlay / 右侧面板不进本墙） */
+    .gc {
+      width: 520px;
+      max-width: 100%;
+      margin-top: 0;
+      border: 1px solid var(--gc-line-soft);
+      border-radius: 12px;
+      background: var(--gc-bg);
+      color: var(--gc-ink);
+      overflow: hidden;
+    }
+    .gc.gc-result { width: 436px; max-width: 100%; }
+    .gc-result-main { display: flex; align-items: center; gap: 12px; padding: 12px 12px 12px 16px; }
+    .gc-default-ava { position: relative; width: 36px; height: 36px; flex: none; }
+    .gc-default-ava-bg { position: absolute; left: 0; top: 0; width: 36px; height: 36px; }
+    .gc-default-ava-icon { position: absolute; left: 10.59px; top: 9.53px; }
+    .gc-group-mark {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      flex: none;
+      color: #fff;
+      font-size: 12px;
+      line-height: 22px;
+      font-weight: 500;
+    }
+    .gc-result-copy { min-width: 0; flex: 1; }
+    .gc-result-copy .gc-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 14px; line-height: 24px; font-weight: 500; }
+    .gc-result-copy p { margin: 2px 0 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--gc-muted); font-size: 12px; line-height: 22px; font-weight: 400; }
+    .gc-info {
+      flex: none;
+      margin: 0;
+      padding: 7px 17px;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      background: #fff;
+      color: #020618;
+      font-size: 14px;
+      font-weight: 400;
+      line-height: 24px;
+    }
+    .gc-info:hover,
+    .gc-result.is-open .gc-info {
+      background-color: #fff;
+      background-image: linear-gradient(90deg, rgba(9, 11, 14, 0.04) 0%, rgba(9, 11, 14, 0.04) 100%), linear-gradient(90deg, #fff 0%, #fff 100%);
+    }
+    html.theme-dark .gc-info {
+      border-color: #434448;
+      background: var(--gc-bg);
+      color: #fff;
+    }
+    html.theme-dark .gc-info:hover,
+    html.theme-dark .gc-result.is-open .gc-info {
+      background-color: var(--gc-bg);
+      background-image: linear-gradient(90deg, rgba(255, 255, 255, 0.04) 0%, rgba(255, 255, 255, 0.04) 100%), linear-gradient(90deg, var(--gc-bg) 0%, var(--gc-bg) 100%);
+    }
+    .gc-info-panel { display: none; padding: 4px 8px 10px; border-top: 1px solid var(--gc-line-soft); }
+    .gc-result.is-open .gc-info-panel { display: block; }
+    .gc-info-kicker { margin: 8px 8px 4px; color: var(--gc-faint); font-size: 12px; line-height: 22px; font-weight: 400; }
+    .gc-info-line { display: flex; align-items: center; gap: 10px; min-height: 40px; padding: 6px 8px; border-radius: 8px; }
+    .gc-info-line:hover { background: var(--gc-hover); }
+    .gc-info-line b { display: block; font-size: 14px; line-height: 24px; font-weight: 500; color: var(--gc-ink); }
+    .gc-info-line small { display: block; color: var(--gc-faint); font-size: 12px; line-height: 22px; font-weight: 400; }
+    .gc-ava { width: 28px; height: 28px; border-radius: 50%; color: #fff; display: grid; place-items: center; flex: none; font-size: 12px; line-height: 22px; font-weight: 500; }
+    .gc-info-line > span:last-child { min-width: 0; }
+    .gc-name { font-size: 14px; line-height: 24px; font-weight: 500; color: var(--gc-ink); }
+    html.theme-dark .gc-create { border-color: #2762c6; background: var(--brand); }
+    html.theme-dark .gc-create:hover:not(:disabled) { background: var(--brand-hover); }
+    html.theme-dark .gc-colors button { box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .2); }
+
+  </style>
+</head>
+<body>
+  <header class="top">
+    <div>
+      <h1>形态墙 · group_result</h1>
+      <p>建群结果卡：群头像 + 群名 + 成员名拼接 + 次级按钮「查看群聊」。承接 group_form 创建成功。只含 chat 内 <code>article.gc.gc-result</code>。Agent 经 <code>present_group_result</code> 出卡。</p>
+      <div class="meta">
+        <code><b>card_id</b> group_result</code>
+        <code><b>tool</b> present_group_result</code>
+        <code><b>section</b> A · 通用壳 · 有 Tool</code>
+        <code><b>aliases</b> 群已创建 · 建群结果卡</code>
+        <code><b>source</b> 建群场景.html · article.gc.gc-result</code>
+      </div>
+    </div>
+    <div class="tools">
+      <button type="button" id="themeBtn">深色</button>
+      <a href="../group_form/morph-wall.html">group_form</a>
+      <a href="../app_link/morph-wall.html">app_link</a>
+      <a href="../doc_entry/morph-wall.html">doc_entry</a>
+      <a href="../../建群场景.html">Demo</a>
+      <a href="../CARD_ID-NAMING.md">命名</a>
+    </div>
+  </header>
+
+  <div class="layout">
+    <nav>
+      <a href="#v1"><b>V1</b> 默认头像<small>canonical</small></a>
+      <a href="#v2"><b>V2</b> 照片头像<small>gc-group-photo</small></a>
+      <a href="#v3"><b>V3</b> 色块头像<small>gc-group-mark</small></a>
+      <a href="#v4"><b>V4</b> 长名省略<small>ellipsis</small></a>
+      <a href="#v5"><b>V5</b> 展开成员<small>.is-open</small></a>
+    </nav>
+    <main>
+      <section class="panel" id="v1">
+        <div class="panel-head">
+          <h2>V1 · 默认头像<span class="tag">canonical</span></h2>
+          <p>默认群头像 + 群名 + 成员名拼接 + 次级按钮「查看群聊」。无群名时标题用成员名（最多 4 人）。</p>
+        </div>
+        <div class="stage" data-mount="def"></div>
+        <p class="note">范围：<code>article.gc.gc-result</code>，宽 436。一张卡一个操作；按钮为次级描边，无主按钮。payload：<code>title</code> · <code>avatar</code> · <code>members[]</code>。</p>
+      </section>
+      <section class="panel" id="v2">
+        <div class="panel-head">
+          <h2>V2 · 照片头像<span class="tag">photo</span></h2>
+          <p><code>img.gc-group-photo</code> 36×36 圆。</p>
+        </div>
+        <div class="stage" data-mount="photo"></div>
+      </section>
+      <section class="panel" id="v3">
+        <div class="panel-head">
+          <h2>V3 · 色块头像<span class="tag">color mark</span></h2>
+          <p><code>.gc-group-mark</code> 纯色圆 + 群名前两字，白字 12/22。</p>
+        </div>
+        <div class="stage" data-mount="color"></div>
+      </section>
+      <section class="panel" id="v4">
+        <div class="panel-head">
+          <h2>V4 · 长名省略<span class="tag">ellipsis</span></h2>
+          <p>群名与成员行均 <code>text-overflow: ellipsis</code>，按钮不被挤压（<code>.gc-info</code> flex:none）。</p>
+        </div>
+        <div class="stage" data-mount="long"></div>
+      </section>
+      <section class="panel" id="v5">
+        <div class="panel-head">
+          <h2>V5 · 展开成员<span class="tag">is-open</span></h2>
+          <p>CSS 已有：<code>.gc-result.is-open .gc-info-panel</code> 展开成员列表（kicker +「<code>.gc-info-line</code>」）。<b>注：</b>源 Demo 目前未渲染该面板，本面板按 CSS 手绘示意；上线前需评审是否保留。</p>
+        </div>
+        <div class="stage" data-mount="open"></div>
+        <p class="note">如不保留，删 <code>.gc-info-panel</code> 相关 CSS 并从本墙撤 V5。</p>
+      </section>
+
+    </main>
+  </div>
+
+  <script>
+
+    const PHOTO = "../../assets/group-request-photo.png";
+    const contacts = [
+      { id: "c1", name: "张伟", phone: "19521176234", color: "#f54a45" },
+      { id: "c2", name: "李娜", phone: "19521176234", color: "#4c7dff" },
+      { id: "c3", name: "王芳", phone: "19521176234", color: "#7b61ff" },
+      { id: "c4", name: "刘强", phone: "19521176234", color: "#3370ff" },
+      { id: "c5", name: "陈静", phone: "19521176234", color: "#4c88ff" },
+      { id: "c6", name: "杨光", phone: "19521176234", color: "#f54a45" }
+    ];
+    const esc = v => String(v).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+    const contactById = id => contacts.find(c => c.id === id);
+    const groupMark = name => String(name || "群").slice(0, 2);
+    const isImg = v => typeof v === "string" && /^(data:|blob:|assets\/|\.\.\/)/.test(v);
+    const defaultAva = '<span class="gc-default-ava" aria-hidden="true"><img class="gc-default-ava-bg" src="../../assets/group-avatar-bg.png" width="36" height="36" alt=""><img class="gc-default-ava-icon" src="../../assets/group-avatar-peoples.svg" width="16.9412" height="16.9412" alt=""></span>';
+    const lead = t => `<p class="lead">${t}</p>`;
+
+    function avaHtml(avatar, title) {
+      if (isImg(avatar)) return `<img class="gc-group-photo" src="${esc(avatar)}" alt="">`;
+      if (avatar) return `<span class="gc-group-mark" style="background:${avatar}">${esc(groupMark(title))}</span>`;
+      return defaultAva;
+    }
+    function resultCard({ title, avatar = "", ids, open = false, namesOverride }) {
+      const members = ids.map(contactById).filter(Boolean);
+      const names = namesOverride || members.map(m => m.name).join("、");
+      const panel = open ? `<div class="gc-info-panel"><div class="gc-info-kicker">群成员 · ${members.length} 人</div>${members.map(m => `<div class="gc-info-line"><span class="gc-ava" style="background:${m.color}">${esc(groupMark(m.name))}</span><span><b>${esc(m.name)}</b><small>${esc(m.phone)}</small></span></div>`).join("")}</div>` : "";
+      return `<article class="gc gc-result${open ? " is-open" : ""}" aria-label="群已创建"><div class="gc-result-main">${avaHtml(avatar, title)}<div class="gc-result-copy"><div class="gc-name">${esc(title)}</div><p>${esc(names)}</p></div><button class="gc-info" type="button">查看群聊</button></div>${panel}</article>`;
+    }
+    const mounts = {
+      def: () => lead("群已创建。名称是「张伟、刘强」，一共 2 位成员。") + resultCard({ title: "张伟、刘强", ids: ["c1", "c4"] }),
+      photo: () => lead("群已创建。名称是「家长群」，一共 2 位成员。") + resultCard({ title: "家长群", avatar: PHOTO, ids: ["c2", "c5"] }),
+      color: () => lead("群已创建。名称是「项目同步」，一共 3 位成员。") + resultCard({ title: "项目同步", avatar: "#7b61ff", ids: ["c1", "c2", "c3"] }),
+      long: () => lead("群已创建。") + resultCard({ title: "2026 年第四季度跨部门产品评审与项目同步工作群（含外部合作方）", avatar: "#3370ff", ids: ["c1", "c2", "c3", "c4", "c5", "c6"], namesOverride: "张伟、李娜、王芳、刘强、陈静、杨光、赵一二三四五六七八九十、钱多多多多多多多" }),
+      open: () => lead("群已创建。点查看群聊可展开成员。") + resultCard({ title: "项目同步", avatar: "#7b61ff", ids: ["c1", "c2", "c3"], open: true })
+    };
+    document.querySelectorAll("[data-mount]").forEach(el => { el.innerHTML = mounts[el.dataset.mount](); });
+    document.addEventListener("click", e => {
+      const b = e.target.closest(".gc-info");
+      if (b) b.closest(".gc-result").classList.toggle("is-open");
+    });
+
+    document.getElementById("themeBtn").onclick = () => {
+      const on = document.documentElement.classList.toggle("theme-dark");
+      themeBtn.textContent = on ? "浅色" : "深色";
+    };
+  </script>
+</body>
+</html>

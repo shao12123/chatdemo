@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>card_id · group_form · 形态墙</title>
+  <style>
+    :root {
+      --page: #f5f6f8; --ink: #000; --muted: rgba(0,0,0,.6); --faint: rgba(0,0,0,.4);
+      --line: #e3e4e7; --brand: #0a59f7; --chip: #fff; --chip-line: #e3e4e7;
+    }
+    html.theme-dark {
+      color-scheme: dark;
+      --page: #090b0e; --ink: #fff; --muted: rgba(255,255,255,.6); --faint: rgba(255,255,255,.4);
+      --line: #292b2e; --brand: #317af7; --chip: #191a1d; --chip-line: #434448;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: "PingFang SC", "Helvetica Neue", sans-serif; background: var(--page); color: var(--ink); }
+    .top {
+      position: sticky; top: 0; z-index: 20; display: flex; flex-wrap: wrap; gap: 12px; justify-content: space-between;
+      padding: 16px 24px; border-bottom: 1px solid var(--line);
+      background: color-mix(in srgb, var(--page) 92%, transparent); backdrop-filter: blur(8px);
+    }
+    .top h1 { margin: 0; font-size: 18px; line-height: 26px; }
+    .top p { margin: 4px 0 0; color: var(--muted); font-size: 13px; line-height: 20px; max-width: 48rem; }
+    .meta { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+    .meta code { padding: 4px 10px; border-radius: 8px; background: var(--chip); border: 1px solid var(--chip-line); font-size: 12px; }
+    .meta code b { color: var(--faint); }
+    .tools { display: flex; flex-wrap: wrap; gap: 8px; align-content: flex-start; }
+    .tools a, .tools button {
+      display: inline-flex; align-items: center; height: 32px; padding: 0 12px; border-radius: 8px;
+      border: 1px solid var(--chip-line); background: var(--chip); color: var(--ink); font-size: 13px;
+      text-decoration: none; cursor: pointer; font-family: inherit;
+    }
+    .layout { display: grid; grid-template-columns: 210px minmax(0,1fr); }
+    nav { padding: 16px 12px 32px 24px; border-right: 1px solid var(--line); }
+    nav a { display: block; padding: 8px 10px; border-radius: 8px; color: var(--muted); text-decoration: none; font-size: 13px; }
+    nav a:hover { background: var(--chip); color: var(--ink); }
+    nav a small { display: block; color: var(--faint); font-size: 11px; margin-top: 2px; }
+    main { padding: 20px 24px 64px; max-width: 780px; }
+    .panel { scroll-margin-top: 96px; margin: 0 0 24px; padding: 16px; border: 1px solid var(--line); border-radius: 16px; background: var(--chip); }
+    .panel-head h2 { margin: 0; font-size: 15px; }
+    .panel-head p { margin: 6px 0 12px; color: var(--muted); font-size: 12px; line-height: 18px; }
+    .tag { display: inline-block; margin-left: 8px; height: 20px; padding: 0 8px; border-radius: 99px; background: #f3f7ff; color: var(--brand); font-size: 11px; line-height: 20px; font-weight: 600; }
+    html.theme-dark .tag { background: #0a1831; }
+    .tag.gray { background: var(--page); color: var(--muted); }
+    .stage { max-width: 736px; display: flex; flex-direction: column; gap: 10px; align-items: flex-start; }
+    .note { margin: 12px 0 0; padding: 10px 12px; border-radius: 10px; background: var(--page); color: var(--muted); font-size: 12px; line-height: 18px; }
+    .note code, .panel-head code { font-size: 11px; }
+    .note a, .panel-head a { color: var(--brand); }
+    .cap { margin: 0; color: var(--faint); font-size: 12px; line-height: 18px; }
+    .lead { margin: 0; font-size: 14px; line-height: 24px; font-weight: 400; color: var(--ink); max-width: 100%; }
+    .toast-lite { padding: 8px 12px; border-radius: 10px; background: var(--page); color: var(--muted); font-size: 12px; line-height: 18px; }
+    @media (max-width: 800px) {
+      .layout { grid-template-columns: 1fr; }
+      nav { display: flex; gap: 4px; overflow-x: auto; border-right: 0; border-bottom: 1px solid var(--line); }
+      nav a { white-space: nowrap; }
+      nav a small { display: none; }
+    }
+
+    /* tokens ← 建群场景.html --gc-*（浅 / 深） */
+    :root {
+      --gc-bg: #ffffff; --gc-ink: #1f2329; --gc-muted: #646a73; --gc-faint: #8f959e; --gc-placeholder: #bbbfc4;
+      --gc-line: #e5e6eb; --gc-line-soft: #eef0f3; --gc-input: #ffffff; --gc-hover: #f5f6f7; --gc-check: #ffffff;
+      --gc-avatar: #eef0ff; --gc-avatar-ink: #7b83ff; --gc-pop: #ffffff; --gc-shadow: 0 8px 20px rgba(31, 35, 41, .12);
+      --brand-hover: #1e61ea;
+    }
+    html.theme-dark {
+      --gc-bg: #191a1d; --gc-ink: #ffffff; --gc-muted: rgba(255,255,255,.62); --gc-faint: rgba(255,255,255,.45);
+      --gc-placeholder: rgba(255,255,255,.35); --gc-line: #434448; --gc-line-soft: #292b2e; --gc-input: #111216;
+      --gc-hover: rgba(255,255,255,.06); --gc-check: #111216; --gc-avatar: #1c2140; --gc-avatar-ink: #b7c0ff;
+      --gc-pop: #191a1d; --gc-shadow: none; --brand-hover: #2762c6;
+    }
+
+    /* ← 建群场景.html article.gc（host overlay / 右侧面板不进本墙） */
+    .gc {
+      width: 520px;
+      max-width: 100%;
+      margin-top: 0;
+      border: 1px solid var(--gc-line-soft);
+      border-radius: 12px;
+      background: var(--gc-bg);
+      color: var(--gc-ink);
+      overflow: hidden;
+    }
+    .gc-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 16px 2px;
+      font-size: 14px;
+      line-height: 24px;
+      font-weight: 500;
+      color: var(--gc-ink);
+    }
+    .gc-row {
+      display: grid;
+      grid-template-columns: 60px minmax(0, 1fr);
+      gap: 8px;
+      align-items: center;
+      padding: 8px 16px;
+    }
+    .gc-row.members { align-items: start; padding-bottom: 12px; }
+    .gc-row > span { font-size: 14px; line-height: 24px; font-weight: 400; color: var(--gc-ink); }
+    .gc-row.members > span { padding-top: 8px; }
+    .gc-input, .gc-search {
+      width: 100%;
+      height: 32px;
+      border: 1px solid #e3e4e7;
+      border-radius: 8px;
+      background: #fff;
+      color: #000;
+      font: inherit;
+      font-size: 14px;
+      line-height: 24px;
+      font-weight: 400;
+      outline: none;
+    }
+    .gc-input { padding: 0 12px; }
+    .gc-input::placeholder, .gc-search::placeholder { color: rgba(0, 0, 0, 0.4); }
+    .gc-input:hover:not(:disabled),
+    .gc-search:hover:not(:disabled),
+    .gc-input:focus:not(:disabled),
+    .gc-search:focus:not(:disabled) { border-color: #0a59f7; }
+    .gc-input:disabled, .gc-search:disabled {
+      background: rgba(9, 11, 14, 0.04);
+      border-color: #e3e4e7;
+      color: rgba(0, 0, 0, 0.4);
+    }
+    html.theme-dark .gc-input,
+    html.theme-dark .gc-search {
+      border-color: #434448;
+      background: transparent;
+      color: #fff;
+    }
+    html.theme-dark .gc-input::placeholder,
+    html.theme-dark .gc-search::placeholder { color: rgba(255, 255, 255, 0.4); }
+    html.theme-dark .gc-input:hover:not(:disabled),
+    html.theme-dark .gc-search:hover:not(:disabled),
+    html.theme-dark .gc-input:focus:not(:disabled),
+    html.theme-dark .gc-search:focus:not(:disabled) { border-color: var(--brand); }
+    html.theme-dark .gc-input:disabled,
+    html.theme-dark .gc-search:disabled {
+      background: rgba(255, 255, 255, 0.04);
+      border-color: #434448;
+      color: rgba(255, 255, 255, 0.4);
+    }
+    .gc-avatar-line { position: relative; display: flex; align-items: center; gap: 8px; min-height: 32px; }
+    .gc-avatar {
+      width: 36px;
+      height: 36px;
+      border: 0;
+      border-radius: 50%;
+      overflow: hidden;
+      background: transparent;
+      color: var(--gc-avatar-ink);
+      display: grid;
+      place-items: center;
+      padding: 0;
+      flex: none;
+    }
+    .gc-avatar.has { color: #fff; font-size: 12px; line-height: 22px; font-weight: 500; }
+    .gc-avatar-photo, .gc-group-photo { width: 36px; height: 36px; object-fit: cover; display: block; }
+    .gc-group-photo { border-radius: 50%; flex: none; }
+    .gc-edit { border: 0; background: transparent; color: var(--brand); padding: 0; font-size: 14px; line-height: 24px; font-weight: 400; }
+    .gc-colors {
+      display: none;
+      position: absolute;
+      z-index: 2;
+      left: 40px;
+      top: 36px;
+      gap: 6px;
+      padding: 8px;
+      border: 1px solid var(--gc-line);
+      border-radius: 10px;
+      background: var(--gc-pop);
+      box-shadow: var(--gc-shadow);
+    }
+    .gc-colors.show { display: flex; }
+    .gc-colors button { width: 18px; height: 18px; border: 0; border-radius: 50%; padding: 0; box-shadow: inset 0 0 0 1px rgba(0, 0, 0, .12); }
+    .gc-box {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      height: 236px;
+      border: 1px solid var(--gc-line);
+      border-radius: 8px;
+      overflow: hidden;
+      background: var(--gc-input);
+    }
+    .gc-side { min-width: 0; min-height: 0; display: flex; flex-direction: column; background: var(--gc-bg); }
+    .gc-side + .gc-side { border-left: 1px solid var(--gc-line-soft); }
+    .gc-search-wrap {
+      position: relative;
+      height: 44px;
+      display: flex;
+      align-items: center;
+      padding: 0 8px;
+      border-bottom: 1px solid var(--gc-line-soft);
+      flex: none;
+      background: var(--gc-bg);
+    }
+    .gc-search-icon {
+      position: absolute;
+      left: 18px;
+      top: 15px;
+      width: 14px;
+      height: 14px;
+      color: rgba(0, 0, 0, 0.6);
+      z-index: 1;
+      pointer-events: none;
+    }
+    html.theme-dark .gc-search-icon { color: rgba(255, 255, 255, 0.6); }
+    .gc-search { height: 32px; padding: 0 8px 0 28px; border-radius: 8px; }
+    .gc-list, .gc-chosen { flex: 1; min-height: 0; overflow: auto; background: var(--gc-bg); }
+    .gc-person {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      width: 100%;
+      height: 48px;
+      padding: 0 8px 0 10px;
+      border: 0;
+      background: var(--gc-bg);
+      color: var(--gc-ink);
+      text-align: left;
+      flex: none;
+    }
+    .gc-person:hover { background: var(--gc-hover); }
+    .gc-check {
+      width: 14px;
+      height: 14px;
+      border: 0;
+      padding: 0;
+      display: block;
+      flex: none;
+      background: var(--gc-check);
+      color: rgba(0, 0, 0, 0.2);
+    }
+    html.theme-dark .gc-check { color: var(--gc-line); }
+    .gc-check svg { display: block; width: 14px; height: 14px; }
+    .gc-person.on .gc-check { background: #fff; color: var(--brand); }
+    .gc-ava {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      color: #fff;
+      display: grid;
+      place-items: center;
+      flex: none;
+      font-size: 12px;
+      line-height: 22px;
+      font-weight: 500;
+    }
+    .gc-person > span:last-child { min-width: 0; }
+    .gc-person b { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 14px; line-height: 24px; font-weight: 500; color: var(--gc-ink); }
+    .gc-person small { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--gc-faint); font-size: 12px; line-height: 22px; font-weight: 400; }
+    .gc-count {
+      height: 44px;
+      display: flex;
+      align-items: center;
+      padding: 0 12px;
+      color: var(--gc-muted);
+      font-size: 12px;
+      line-height: 22px;
+      font-weight: 400;
+      flex: none;
+      background: var(--gc-bg);
+    }
+    .gc-picked-empty,
+    .gc-empty {
+      padding: 28px 12px;
+      color: var(--gc-faint);
+      font-size: 12px;
+      line-height: 22px;
+      font-weight: 400;
+      text-align: center;
+    }
+    .gc-foot {
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px 10px;
+      border-top: 1px solid var(--gc-line-soft);
+      background: var(--gc-bg);
+    }
+    .gc-create {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      height: 30px;
+      min-width: 64px;
+      padding: 0 16px;
+      border: 1px solid #84acfb;
+      border-radius: 8px;
+      background: linear-gradient(180deg, #4a85ff 0%, #3370ff 100%);
+      color: #fff;
+      font-size: 14px;
+      font-weight: 400;
+      line-height: 24px;
+    }
+    .gc-create:hover:not(:disabled) {
+      background:
+        linear-gradient(90deg, rgba(10, 89, 247, 0.5), rgba(10, 89, 247, 0.5)),
+        linear-gradient(180deg, #4a85ff 0%, #3370ff 100%);
+    }
+    .gc-create:disabled { opacity: 0.3; cursor: default; }
+    html.theme-dark .gc-create { border-color: #2762c6; background: var(--brand); }
+    html.theme-dark .gc-create:hover:not(:disabled) { background: var(--brand-hover); }
+    html.theme-dark .gc-colors button { box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .2); }
+    .mock-think { width: min(436px, 100%); padding: 10px 12px; border-radius: 12px; background: var(--page); }
+    .mock-think-bar { display: flex; align-items: center; gap: 8px; font-size: 13px; line-height: 20px; }
+    .mock-think ul { list-style: none; margin: 8px 0 0 7px; padding: 0 0 0 14px; border-left: 1px solid var(--line); }
+    .mock-think li { position: relative; display: flex; align-items: center; min-height: 24px; color: var(--muted); font-size: 12px; }
+    .mock-think li i { position: absolute; left: -18px; width: 7px; height: 7px; border-radius: 50%; background: #12b76a; }
+
+  </style>
+</head>
+<body>
+  <header class="top">
+    <div>
+      <h1>形态墙 · group_form</h1>
+      <p>建群表单卡：群名 + 群头像 + 左右双栏选人 + 单主按钮「创建」。多字段事务壳，<b>不是</b> ask_form。只含 chat 内 <code>article.gc</code>；创建中卡隐藏（仅 lead + think）。Agent 经 <code>present_group_form</code> 出卡。</p>
+      <div class="meta">
+        <code><b>card_id</b> group_form</code>
+        <code><b>tool</b> present_group_form</code>
+        <code><b>section</b> A · 通用壳 · 有 Tool</code>
+        <code><b>aliases</b> 建群卡 · 创建群组</code>
+        <code><b>source</b> 建群场景.html · article.gc / groupCardHtml()</code>
+        <code><b>≠</b> ask_form（多字段事务壳）</code>
+      </div>
+    </div>
+    <div class="tools">
+      <button type="button" id="themeBtn">深色</button>
+      <a href="../group_result/morph-wall.html">group_result</a>
+      <a href="../ask_form/morph-wall.html">ask_form</a>
+      <a href="../app_link/morph-wall.html">app_link</a>
+      <a href="../../建群场景.html">Demo</a>
+      <a href="../CARD_ID-NAMING.md">命名</a>
+    </div>
+  </header>
+
+  <div class="layout">
+    <nav>
+      <a href="#v1"><b>V1</b> 空白禁用创建<small>canonical</small></a>
+      <a href="#v2"><b>V2</b> 有群名 + 成员<small>named</small></a>
+      <a href="#v3"><b>V3</b> 无群名 + 成员<small>noname</small></a>
+      <a href="#v4"><b>V4</b> 搜索未命中<small>空列表</small></a>
+      <a href="#v5"><b>V5</b> 照片头像<small>gc-avatar-photo</small></a>
+      <a href="#v6"><b>V6</b> 色块头像<small>gc-avatar.has</small></a>
+      <a href="#v7"><b>V7</b> 默认头像<small>defaultGroupAvatar</small></a>
+      <a href="#v8"><b>V8</b> 创建中<small>卡隐藏</small></a>
+    </nav>
+    <main>
+      <section class="panel" id="v1">
+        <div class="panel-head">
+          <h2>V1 · 空白 · 创建禁用<span class="tag">canonical</span></h2>
+          <p>群名空、头像默认、成员未选；<code>.gc-create:disabled</code> 透明度 .3。本墙可点左侧联系人、输入搜索，创建按钮随「已选」启用。</p>
+        </div>
+        <div class="stage" data-mount="empty"></div>
+        <p class="note">范围：只画 <code>article.gc</code>（表单态）。<b>不是</b> <code>ask_form</code>：多字段事务壳（群名 / 头像 / 左右双栏选人），一卡一个主按钮「创建」。payload：<code>name</code> · <code>avatar</code> · <code>selected[]</code> · <code>query</code>。</p>
+      </section>
+      <section class="panel" id="v2">
+        <div class="panel-head">
+          <h2>V2 · 有群名 + 成员<span class="tag">named</span></h2>
+          <p>「项目同步」已填，右侧已选张伟 / 李娜 / 王芳；创建可用。</p>
+        </div>
+        <div class="stage" data-mount="named"></div>
+      </section>
+      <section class="panel" id="v3">
+        <div class="panel-head">
+          <h2>V3 · 无群名 + 成员<span class="tag">noname</span></h2>
+          <p>群名留空显示 placeholder「输入群名」；创建后标题用成员名拼接（见 <a href="../group_result/morph-wall.html#v1">group_result</a>）。</p>
+        </div>
+        <div class="stage" data-mount="noname"></div>
+      </section>
+      <section class="panel" id="v4">
+        <div class="panel-head">
+          <h2>V4 · 搜索未命中<span class="tag">空态</span></h2>
+          <p>搜「周杰」：左栏 <code>.gc-empty</code>「没有找到相关联系人」；右栏空态；创建仍禁用。</p>
+        </div>
+        <div class="stage" data-mount="miss"></div>
+        <p class="note">找不到人时，lead 说明原因，不另出错误卡；用户可清空搜索继续选。</p>
+      </section>
+      <section class="panel" id="v5">
+        <div class="panel-head">
+          <h2>V5 · 照片头像<span class="tag">photo</span></h2>
+          <p>用户选本地图：<code>.gc-avatar</code> 背景透明 + <code>img.gc-avatar-photo</code>（36×36 圆）。</p>
+        </div>
+        <div class="stage" data-mount="photo"></div>
+      </section>
+      <section class="panel" id="v6">
+        <div class="panel-head">
+          <h2>V6 · 色块头像<span class="tag">color mark</span></h2>
+          <p>选色后头像为纯色圆 + 群名前两字（<code>.gc-avatar.has</code>）；下方 <code>.gc-colors.show</code> 为调色气泡（源 CSS 有，Demo 当前未接 UI）。</p>
+        </div>
+        <div class="stage" data-mount="color"></div>
+        <p class="note">色块值写入 <code>avatar</code>（非 <code>assets/</code> / <code>data:</code> 即视为色）。</p>
+      </section>
+      <section class="panel" id="v7">
+        <div class="panel-head">
+          <h2>V7 · 默认头像<span class="tag">default</span></h2>
+          <p>未选头像：<code>.gc-default-ava</code>（底图 + 人群 icon）。已有群名与成员，用于区别 V1 空白态。</p>
+        </div>
+        <div class="stage" data-mount="defava"></div>
+      </section>
+      <section class="panel" id="v8">
+        <div class="panel-head">
+          <h2>V8 · 创建中 · 卡隐藏<span class="tag">过渡</span></h2>
+          <p>点「创建」后 <code>groupCard</code> <b>不渲染</b>：只留 lead「正在创建群组。」+ create-think（<b>思考过程，不算卡</b>）；完成后原位换成 <a href="../group_result/morph-wall.html">group_result</a>。</p>
+        </div>
+        <div class="stage" data-mount="creating"></div>
+        <p class="note">本面板的灰块仅示意 think 行，真实样式见 <code>create-think</code> / <code>routeThinkHtml</code>；<b>无 article.gc</b> 是验收点。</p>
+      </section>
+
+    </main>
+  </div>
+
+  <script>
+
+    const PHOTO = "../../assets/group-request-photo.png";
+    const contacts = [
+      { id: "c1", name: "张伟", phone: "19521176234", color: "#f54a45" },
+      { id: "c2", name: "李娜", phone: "19521176234", color: "#4c7dff" },
+      { id: "c3", name: "王芳", phone: "19521176234", color: "#7b61ff" },
+      { id: "c4", name: "刘强", phone: "19521176234", color: "#3370ff" },
+      { id: "c5", name: "陈静", phone: "19521176234", color: "#4c88ff" },
+      { id: "c6", name: "杨光", phone: "19521176234", color: "#f54a45" }
+    ];
+    const esc = v => String(v).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+    const contactById = id => contacts.find(c => c.id === id);
+    const groupMark = name => String(name || "群").slice(0, 2);
+    const isImg = v => typeof v === "string" && /^(data:|blob:|assets\/|\.\.\/)/.test(v);
+    const defaultAva = '<span class="gc-default-ava" aria-hidden="true"><img class="gc-default-ava-bg" src="../../assets/group-avatar-bg.png" width="36" height="36" alt=""><img class="gc-default-ava-icon" src="../../assets/group-avatar-peoples.svg" width="16.9412" height="16.9412" alt=""></span>';
+    const lead = t => `<p class="lead">${t}</p>`;
+
+    const searchSvg = '<svg class="gc-search-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path fill="currentColor" d="M10.5 1C15.7467 1.00002 20 5.25333 20 10.5C20 12.7634 19.2071 14.8407 17.8857 16.4727L21.5605 20.1465C21.951 20.537 21.9511 21.171 21.5605 21.5615C21.17 21.9516 20.5359 21.9518 20.1455 21.5615L16.4707 17.8867C14.839 19.2073 12.7626 20 10.5 20C5.25332 20 1 15.7467 1 10.5C1 5.25332 5.25332 1 10.5 1ZM10.5 3C6.35789 3 3 6.35789 3 10.5C3 14.6421 6.35788 18 10.5 18C14.6421 18 18 14.6421 18 10.5C18 6.3579 14.6421 3.00002 10.5 3Z"/></svg>';
+    const checkOff = '<svg width="14" height="14" viewBox="2 2 20 20" aria-hidden="true"><path fill="currentColor" d="M20 4.5C20 4.22386 19.7761 4 19.5 4H4.5C4.22386 4 4 4.22386 4 4.5V19.5C4 19.7761 4.22386 20 4.5 20H19.5C19.7761 20 20 19.7761 20 19.5V4.5ZM22 19.5C22 20.8807 20.8807 22 19.5 22H4.5C3.11929 22 2 20.8807 2 19.5V4.5C2 3.11929 3.11929 2 4.5 2H19.5C20.8807 2 22 3.11929 22 4.5V19.5Z"/></svg>';
+    const checkOn = '<svg width="14" height="14" viewBox="2 2 20 20" aria-hidden="true"><path fill="currentColor" d="M19.5 2C20.8807 2 22 3.11929 22 4.5V19.5C22 20.8807 20.8807 22 19.5 22H4.5C3.11929 22 2 20.8807 2 19.5V4.5C2 3.11929 3.11929 2 4.5 2H19.5ZM17.707 8.29297C17.3165 7.90244 16.6835 7.90244 16.293 8.29297L11 13.5859L8.70703 11.293C8.31651 10.9024 7.68349 10.9024 7.29297 11.293C6.90244 11.6835 6.90244 12.3165 7.29297 12.707L10.293 15.707C10.6835 16.0976 11.3165 16.0976 11.707 15.707L17.707 9.70703C18.0976 9.31651 18.0976 8.68349 17.707 8.29297Z"/></svg>';
+
+    function filtered(d) {
+      const q = d.query.trim().toLowerCase();
+      return q ? contacts.filter(c => c.name.toLowerCase().includes(q) || c.phone.includes(q)) : contacts;
+    }
+    function personRow(d, c) {
+      const on = d.selected.includes(c.id);
+      return `<button class="gc-person${on ? " on" : ""}" type="button" data-person="${c.id}"><i class="gc-check">${on ? checkOn : checkOff}</i><span class="gc-ava" style="background:${c.color}">${esc(groupMark(c.name))}</span><span><b>${esc(c.name)}</b><small>${esc(c.phone)}</small></span></button>`;
+    }
+    const listHtml = d => { const r = filtered(d); return r.length ? r.map(c => personRow(d, c)).join("") : '<div class="gc-empty">没有找到相关联系人</div>'; };
+    const chosenHtml = d => { const r = d.selected.map(contactById).filter(Boolean); return r.length ? r.map(c => personRow(d, c)).join("") : '<div class="gc-picked-empty">请从左侧选择联系人</div>'; };
+    function avatarInner(d) {
+      if (isImg(d.avatar)) return `<img class="gc-avatar-photo" src="${esc(d.avatar)}" alt="">`;
+      if (d.avatar) return esc(groupMark(d.name.trim() || "群"));
+      return defaultAva;
+    }
+    const PALETTE = ["#f54a45", "#ff8800", "#f5c400", "#34c724", "#3370ff", "#7b61ff"];
+    function cardHtml(d) {
+      const photo = isImg(d.avatar);
+      const bg = photo || !d.avatar ? "transparent" : d.avatar;
+      const colors = d.palette ? `<div class="gc-colors show">${PALETTE.map(c => `<button type="button" style="background:${c}" aria-label="${c}"></button>`).join("")}</div>` : "";
+      return `<article class="gc" aria-label="创建群组"><div class="gc-head"><span>创建群组</span></div>
+        <div class="gc-row"><span>群名称</span><input class="gc-input" data-f="name" maxlength="60" placeholder="输入群名" value="${esc(d.name)}"></div>
+        <div class="gc-row"><span>群头像</span><div class="gc-avatar-line"><button class="gc-avatar${d.avatar && !photo ? " has" : ""}" type="button" style="background:${bg}">${avatarInner(d)}</button><button class="gc-edit" type="button">点击修改</button>${colors}</div></div>
+        <div class="gc-row members"><span>群成员</span><div class="gc-box"><div class="gc-side"><div class="gc-search-wrap">${searchSvg}<input class="gc-search" data-f="query" placeholder="搜索姓名或手机号" value="${esc(d.query)}"></div><div class="gc-list" data-list>${listHtml(d)}</div></div><div class="gc-side"><div class="gc-count" data-count>已选: ${d.selected.length} 人</div><div class="gc-chosen" data-chosen>${chosenHtml(d)}</div></div></div></div>
+        <div class="gc-foot"><button class="gc-create" type="button" data-create ${d.selected.length ? "" : "disabled"}>创建</button></div></article>`;
+    }
+    const blank = (x = {}) => Object.assign({ name: "", query: "", selected: [], avatar: "", palette: false }, x);
+    const data = {
+      empty: blank(),
+      named: blank({ name: "项目同步", selected: ["c1", "c2", "c3"] }),
+      noname: blank({ selected: ["c1", "c4"] }),
+      miss: blank({ query: "周杰" }),
+      photo: blank({ name: "家长群", avatar: PHOTO, selected: ["c2", "c5"] }),
+      color: blank({ name: "项目同步", avatar: "#7b61ff", palette: true, selected: ["c1", "c3"] }),
+      defava: blank({ name: "周末聚餐", selected: ["c2", "c3", "c6"] })
+    };
+    const leads = {
+      empty: "在这张卡片里建群。左侧选人，选中的会出现在右侧。<br>至少选一位才能创建。",
+      named: "「项目同步」已经填好，张伟、李娜、王芳在右侧。确认后点创建。",
+      noname: "还没写群名，创建后会用成员名字当群名。",
+      miss: "通讯录里没有找到「周杰」。可以改搜别的名字，或先用其他人建群。",
+      photo: "头像已选好。确认群名和成员后点创建。",
+      color: "头像用了色块，显示群名前两个字。",
+      defava: "头像没改，用默认群头像。"
+    };
+    function mountCard(el, key) {
+      const d = data[key];
+      el.innerHTML = lead(leads[key]) + cardHtml(d) + '<div class="toast-lite" data-hint hidden>→ host：隐藏本卡，仅留 lead +「正在创建群组」思考行；完成后换 group_result</div>';
+      el.addEventListener("click", e => {
+        const p = e.target.closest("[data-person]");
+        if (p) {
+          const id = p.dataset.person;
+          d.selected = d.selected.includes(id) ? d.selected.filter(x => x !== id) : [...d.selected, id];
+          el.querySelector("[data-list]").innerHTML = listHtml(d);
+          el.querySelector("[data-chosen]").innerHTML = chosenHtml(d);
+          el.querySelector("[data-count]").textContent = `已选: ${d.selected.length} 人`;
+          el.querySelector("[data-create]").disabled = !d.selected.length;
+        }
+        if (e.target.closest("[data-create]") && d.selected.length) {
+          const h = el.querySelector("[data-hint]"); h.hidden = false; setTimeout(() => { h.hidden = true; }, 2400);
+        }
+      });
+      el.addEventListener("input", e => {
+        const f = e.target.dataset.f; if (!f) return;
+        d[f] = e.target.value;
+        if (f === "query") { el.querySelector("[data-list]").innerHTML = listHtml(d); }
+        if (f === "name") {
+          const a = el.querySelector(".gc-avatar.has"); if (a) a.innerHTML = avatarInner(d);
+        }
+      });
+    }
+    const thinkCheck = '<svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="6.2" fill="none" stroke="#12b76a" stroke-width="1.5"/><path d="M5.2 8.1 7.1 10 10.8 6.1" fill="none" stroke="#12b76a" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+    function creatingHtml() {
+      const steps = ["确认群名和成员", "创建群组", "生成群名片"];
+      return lead("正在创建群组。") + `<div class="mock-think"><div class="mock-think-bar">${thinkCheck}<b>已执行 ${steps.length} 个步骤</b></div><ul>${steps.map(s => `<li><i></i>${s}</li>`).join("")}</ul></div><p class="cap">此处没有 article.gc —— 思考过程不算卡</p>`;
+    }
+    document.querySelectorAll("[data-mount]").forEach(el => {
+      const k = el.dataset.mount;
+      if (k === "creating") el.innerHTML = creatingHtml(); else mountCard(el, k);
+    });
+
+    document.getElementById("themeBtn").onclick = () => {
+      const on = document.documentElement.classList.toggle("theme-dark");
+      themeBtn.textContent = on ? "浅色" : "深色";
+    };
+  </script>
+</body>
+</html>

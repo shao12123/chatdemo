@@ -1,5 +1,5 @@
 {
-  "version": "2026.11.19-19",
-  "updatedAt": "2026-11-19 18:35",
-  "note": "日程 Chat 只留 doc_entry 日历入口；撤 schedule_preview；命名 v1.9"
+  "version": "2026.11.19-20",
+  "updatedAt": "2026-11-19 18:45",
+  "note": "建群两卡：group_form / group_result（不并 ask_form）；命名 v2.0"
 }

@@ -128,6 +128,20 @@
       "summary": "连接外部应用卡 present_app_link：待授权 / 已连接 / 失败 / 已取消；授权弹层为 host 浮层不入卡"
     },
     {
+      "id": "card-group-form-wall",
+      "title": "卡片库 · group_form 形态墙",
+      "file": "chat-cards/group_form/morph-wall.html",
+      "owner": "共同维护",
+      "summary": "建群表单卡 present_group_form（非 ask_form）：空白禁用 / 有群名 / 无群名 / 搜索未命中 / 照片·色块·默认头像 / 创建中卡隐藏"
+    },
+    {
+      "id": "card-group-result-wall",
+      "title": "卡片库 · group_result 形态墙",
+      "file": "chat-cards/group_result/morph-wall.html",
+      "owner": "共同维护",
+      "summary": "建群结果卡 present_group_result：默认 / 照片 / 色块头像、长名省略、展开成员（is-open）"
+    },
+    {
       "id": "gen-fault",
       "title": "生成异常与恢复",
       "file": "生成异常与恢复-PRD.html",
