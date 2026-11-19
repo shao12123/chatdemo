@@ -1,5 +1,5 @@
 {
-  "version": "2026.11.19-24",
-  "updatedAt": "2026-11-19 19:40",
-  "note": "入口拆成业务 Demo / 卡片库两组；demos.json 增 kind"
+  "version": "2026.11.19-25",
+  "updatedAt": "2026-11-19 19:42",
+  "note": "入口改为 Tab 切换：业务 Demo / 卡片库"
 }

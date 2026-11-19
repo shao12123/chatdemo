@@ -26,7 +26,7 @@
         var(--page);
     }
     main { width: min(760px, calc(100% - 40px)); margin: 0 auto; padding: 56px 0 80px; }
-    .hero { margin-bottom: 28px; }
+    .hero { margin-bottom: 24px; }
     .hero h1 { margin: 0 0 8px; font-size: 28px; line-height: 1.25; letter-spacing: -.02em; }
     .hero p { margin: 0; color: var(--muted); }
     .meta {
@@ -35,13 +35,29 @@
       border-radius: 999px; background: rgba(255,255,255,.8); color: var(--muted); font-size: 12px;
     }
     .meta b { color: var(--brand); font-weight: 600; }
-    .section { margin-top: 32px; }
-    .section:first-of-type { margin-top: 8px; }
-    .section-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-bottom: 12px; }
-    .section-head h2 { margin: 0; font-size: 15px; font-weight: 650; letter-spacing: -.01em; }
-    .section-head p { margin: 0; color: var(--muted); font-size: 12px; }
-    .section-head a { color: var(--brand); text-decoration: none; font-weight: 600; }
-    .section-head a:hover { text-decoration: underline; }
+    .tabs {
+      display: flex; gap: 4px; padding: 4px; margin: 0 0 16px;
+      border: 1px solid var(--line); border-radius: 12px; background: rgba(255,255,255,.72);
+      width: fit-content; max-width: 100%;
+    }
+    .tabs button {
+      appearance: none; border: 0; margin: 0; cursor: pointer;
+      padding: 8px 14px; border-radius: 8px; background: transparent;
+      color: var(--muted); font: inherit; font-size: 13px; font-weight: 600;
+      display: inline-flex; align-items: center; gap: 6px;
+    }
+    .tabs button:hover { color: var(--ink); }
+    .tabs button[aria-selected="true"] { background: #fff; color: var(--brand); box-shadow: 0 1px 3px rgba(28, 35, 48, .08); }
+    .tabs .count {
+      min-width: 18px; height: 18px; padding: 0 5px; border-radius: 999px;
+      background: #eef0f3; color: var(--muted); font-size: 11px; font-weight: 650;
+      display: inline-flex; align-items: center; justify-content: center;
+    }
+    .tabs button[aria-selected="true"] .count { background: #e8effe; color: var(--brand); }
+    .panel-desc { margin: 0 0 12px; color: var(--muted); font-size: 12px; }
+    .panel-desc a { color: var(--brand); text-decoration: none; font-weight: 600; }
+    .panel-desc a:hover { text-decoration: underline; }
+    .panel[hidden] { display: none; }
     .list { display: flex; flex-direction: column; gap: 12px; margin: 0; padding: 0; list-style: none; }
     .card {
       display: block; padding: 18px 20px; border: 1px solid var(--line); border-radius: 16px;
@@ -99,18 +115,38 @@
           </a>
         </li>`;
     }
-    function sectionHtml(title, desc, items, emptyText) {
-      const body = items.length
+    function listHtml(items, emptyText) {
+      return items.length
         ? `<ul class="list">${items.map(cardHtml).join("")}</ul>`
         : `<p class="empty">${esc(emptyText)}</p>`;
-      return `
-        <section class="section">
-          <div class="section-head">
-            <h2>${esc(title)}</h2>
-            <p>${desc}</p>
-          </div>
-          ${body}
-        </section>`;
+    }
+    function readTab() {
+      const hash = (location.hash || "").replace(/^#/, "");
+      if (hash === "card" || hash === "demo") return hash;
+      try {
+        const saved = sessionStorage.getItem("moreai-entry-tab");
+        if (saved === "card" || saved === "demo") return saved;
+      } catch (_) {}
+      return "demo";
+    }
+    function setTab(tab) {
+      const tabs = document.querySelectorAll(".tabs button");
+      const panels = {
+        demo: document.getElementById("panel-demo"),
+        card: document.getElementById("panel-card")
+      };
+      tabs.forEach(btn => {
+        const on = btn.dataset.tab === tab;
+        btn.setAttribute("aria-selected", on ? "true" : "false");
+        btn.tabIndex = on ? 0 : -1;
+      });
+      Object.entries(panels).forEach(([key, el]) => {
+        if (!el) return;
+        el.hidden = key !== tab;
+      });
+      const nextHash = "#" + tab;
+      if (location.hash !== nextHash) history.replaceState(null, "", nextHash);
+      try { sessionStorage.setItem("moreai-entry-tab", tab); } catch (_) {}
     }
     (async () => {
       const meta = document.getElementById("versionMeta");
@@ -126,14 +162,28 @@
           catalog.innerHTML = `<p class="empty">还没有登记条目。在 demos.json 里加一条即可。</p>`;
           return;
         }
-        catalog.innerHTML =
-          sectionHtml("业务 Demo", "场景故事 · PRD · 交互验收", demos, "暂无业务 Demo") +
-          sectionHtml(
-            "卡片库",
-            `Chat 区 UI 壳形态墙 · <a href="chat-cards/CARD_ID-NAMING.md" target="_blank" rel="noopener noreferrer">命名规范</a>`,
-            cards,
-            "暂无卡片形态墙"
-          );
+        catalog.innerHTML = `
+          <div class="tabs" role="tablist" aria-label="入口分类">
+            <button type="button" role="tab" data-tab="demo" id="tab-demo" aria-controls="panel-demo">
+              业务 Demo <span class="count">${demos.length}</span>
+            </button>
+            <button type="button" role="tab" data-tab="card" id="tab-card" aria-controls="panel-card">
+              卡片库 <span class="count">${cards.length}</span>
+            </button>
+          </div>
+          <div class="panel" role="tabpanel" id="panel-demo" aria-labelledby="tab-demo">
+            <p class="panel-desc">场景故事 · PRD · 交互验收</p>
+            ${listHtml(demos, "暂无业务 Demo")}
+          </div>
+          <div class="panel" role="tabpanel" id="panel-card" aria-labelledby="tab-card" hidden>
+            <p class="panel-desc">Chat 区 UI 壳形态墙 · <a href="chat-cards/CARD_ID-NAMING.md" target="_blank" rel="noopener noreferrer">命名规范</a></p>
+            ${listHtml(cards, "暂无卡片形态墙")}
+          </div>`;
+        catalog.querySelectorAll(".tabs button").forEach(btn => {
+          btn.addEventListener("click", () => setTab(btn.dataset.tab));
+        });
+        setTab(readTab());
+        window.addEventListener("hashchange", () => setTab(readTab()));
       } catch (e) {
         meta.textContent = "版本读取失败";
         err.hidden = false;
