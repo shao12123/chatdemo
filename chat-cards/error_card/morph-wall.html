@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>card_id · error_card · 形态墙</title>
+  <style>
+    :root {
+      --page: #f5f6f8; --ink: #000; --muted: rgba(0,0,0,.6); --faint: rgba(0,0,0,.4);
+      --line: #e3e4e7; --brand: #0a59f7; --chip: #fff; --chip-line: #e3e4e7;
+      --err-card: #eef0f3; --err-text: #000; --err-text-2: rgba(0,0,0,.6);
+      --err-icon: #e84026; --err-ok: #64bb5c; --err-x-hover: rgba(0,0,0,.06);
+    }
+    html.theme-dark {
+      color-scheme: dark;
+      --page: #090b0e; --ink: #fff; --muted: rgba(255,255,255,.6); --faint: rgba(255,255,255,.4);
+      --line: #292b2e; --brand: #317af7; --chip: #191a1d; --chip-line: #434448;
+      --err-card: #191a1d; --err-text: #fff; --err-text-2: rgba(255,255,255,.6);
+      --err-icon: #e84026; --err-ok: #5ba854; --err-x-hover: rgba(255,255,255,.08);
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: "PingFang SC", "Helvetica Neue", sans-serif; background: var(--page); color: var(--ink); }
+    .top {
+      position: sticky; top: 0; z-index: 20; display: flex; flex-wrap: wrap; gap: 12px;
+      justify-content: space-between; padding: 16px 24px; border-bottom: 1px solid var(--line);
+      background: color-mix(in srgb, var(--page) 92%, transparent); backdrop-filter: blur(8px);
+    }
+    .top h1 { margin: 0; font-size: 18px; line-height: 26px; }
+    .top p { margin: 4px 0 0; color: var(--muted); font-size: 13px; line-height: 20px; max-width: 48rem; }
+    .meta { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+    .meta code {
+      padding: 4px 10px; border-radius: 8px; background: var(--chip); border: 1px solid var(--chip-line);
+      font-size: 12px; line-height: 18px;
+    }
+    .meta code b { color: var(--faint); font-weight: 600; }
+    .tools button, .tools a {
+      display: inline-flex; align-items: center; height: 32px; padding: 0 12px; border-radius: 8px;
+      border: 1px solid var(--chip-line); background: var(--chip); color: var(--ink); font-size: 13px;
+      text-decoration: none; cursor: pointer;
+    }
+    .layout { display: grid; grid-template-columns: 220px minmax(0,1fr); }
+    nav { padding: 16px 12px 32px 24px; border-right: 1px solid var(--line); }
+    nav a { display: block; padding: 8px 10px; border-radius: 8px; color: var(--muted); text-decoration: none; font-size: 13px; }
+    nav a:hover { background: var(--chip); color: var(--ink); }
+    nav a small { display: block; color: var(--faint); font-size: 11px; margin-top: 2px; }
+    main { padding: 20px 24px 64px; max-width: 780px; }
+    .panel {
+      scroll-margin-top: 96px; margin: 0 0 24px; padding: 16px; border: 1px solid var(--line);
+      border-radius: 16px; background: var(--chip);
+    }
+    .panel-head h2 { margin: 0; font-size: 15px; }
+    .panel-head p { margin: 6px 0 12px; color: var(--muted); font-size: 12px; line-height: 18px; }
+    .tag {
+      display: inline-block; height: 20px; padding: 0 8px; border-radius: 99px; background: #f3f7ff;
+      color: var(--brand); font-size: 11px; line-height: 20px; font-weight: 600; margin-left: 8px;
+    }
+    html.theme-dark .tag { background: #0a1831; }
+    .stage { max-width: 736px; }
+    .note { margin: 12px 0 0; padding: 10px 12px; border-radius: 10px; background: var(--page); color: var(--muted); font-size: 12px; line-height: 18px; }
+    .bad {
+      margin-top: 12px; padding: 12px 14px; border: 1px solid #d0d5dd; border-radius: 12px; background: #fff;
+      color: var(--muted); font-size: 13px; line-height: 20px;
+    }
+    html.theme-dark .bad { background: #111216; border-color: #434448; }
+    .bad b { color: #e84026; }
+
+    .net-wrap { width: 100%; display: flex; flex-direction: column; gap: 8px; }
+    .net-card { display: flex; flex-direction: column; gap: 8px; padding: 12px 16px; border: 0; border-radius: 14px; background: var(--err-card); }
+    .net-main { margin: 0; display: flex; align-items: flex-start; gap: 8px; color: var(--err-text); font-size: 14px; line-height: 22px; }
+    .net-main .msg-tone { flex: none; color: var(--err-icon); display: inline-flex; }
+    .net-actions { display: flex; justify-content: flex-end; align-items: center; gap: 8px; }
+    .net-x {
+      width: 22px; height: 22px; border: 0; border-radius: 4px; background: transparent;
+      color: var(--err-text-2); display: inline-flex; align-items: center; justify-content: center; cursor: pointer;
+    }
+    .net-x:hover { background: var(--err-x-hover); color: var(--err-text); }
+    .net-status { margin: 0; color: var(--err-text-2); font-size: 13px; line-height: 20px; }
+    .act-primary {
+      display: inline-flex; align-items: center; justify-content: center; height: 30px; padding: 0 12px;
+      border: 1px solid #84acfb; border-radius: 8px;
+      background: linear-gradient(180deg, #4a85ff 0%, #3370ff 100%);
+      color: #fff; font-size: 14px; font-weight: 400; line-height: 22px; cursor: pointer;
+    }
+
+    @media (max-width: 800px) {
+      .layout { grid-template-columns: 1fr; }
+      nav { display: flex; gap: 4px; overflow-x: auto; border-right: 0; border-bottom: 1px solid var(--line); }
+      nav a { white-space: nowrap; }
+      nav a small { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <header class="top">
+    <div>
+      <h1>形态墙 · error_card</h1>
+      <p>全站错误卡片。抄自「生成异常与恢复」：灰底无描边、圆角 14、叉号 +「重试」。前端挂，无 Agent Tool。</p>
+      <div class="meta">
+        <code><b>card_id</b> error_card</code>
+        <code><b>tool</b> 无 · host_only</code>
+        <code><b>aliases</b> net-card · 错误卡片</code>
+      </div>
+    </div>
+    <div class="tools">
+      <button type="button" id="themeBtn">深色</button>
+      <a href="../tip_block/morph-wall.html">提示块</a>
+      <a href="../CARD_ID-NAMING.md">命名</a>
+    </div>
+  </header>
+
+  <div class="layout">
+    <nav>
+      <a href="#v-fail"><b>V1</b> 失败可重试<small>canonical</small></a>
+      <a href="#v-reconnecting"><b>V2</b> 重连中<small>状态文案</small></a>
+      <a href="#v-recovered"><b>V3</b> 已恢复<small>绿勾 · 约 1s 收</small></a>
+      <a href="#v-closed"><b>V4</b> 关闭后<small>× 不留入口</small></a>
+      <a href="#v-forbid"><b>V5</b> 禁止形态<small>对照反例</small></a>
+    </nav>
+    <main>
+      <section class="panel" id="v-fail">
+        <div class="panel-head">
+          <h2>V1 · 失败可重试<span class="tag">canonical</span></h2>
+          <p>圆形叉号 + 文案；右下「重试」主按钮 + ×。</p>
+        </div>
+        <div class="stage" data-mount="fail"></div>
+      </section>
+      <section class="panel" id="v-reconnecting">
+        <div class="panel-head">
+          <h2>V2 · 重连中</h2>
+          <p>卡下方可跟状态行（如第几次重连）。</p>
+        </div>
+        <div class="stage" data-mount="reconnecting"></div>
+      </section>
+      <section class="panel" id="v-recovered">
+        <div class="panel-head">
+          <h2>V3 · 已恢复</h2>
+          <p>绿勾替换叉号；约 1 秒后收起（本墙静态展示）。</p>
+        </div>
+        <div class="stage" data-mount="recovered"></div>
+      </section>
+      <section class="panel" id="v-closed">
+        <div class="panel-head">
+          <h2>V4 · 用户点 × 之后</h2>
+          <p>只关卡片，不留「重试」入口。</p>
+        </div>
+        <div class="stage"><div class="note" style="margin:0">卡片已关闭 · 对话中不再显示 error_card</div></div>
+      </section>
+      <section class="panel" id="v-forbid">
+        <div class="panel-head">
+          <h2>V5 · 禁止</h2>
+          <p>不要白底描边「重新生成」。出错用本卡「重试」。</p>
+        </div>
+        <div class="stage">
+          <div class="bad"><b>反例（禁止）</b><br/>白底 + 描边条 + 文案「生成失败」+ 次按钮「重新生成」——与全站 Error Card 不一致。</div>
+        </div>
+        <p class="note">操作栏的「重新生成」是另一套成功态动作，不要和错误卡混用文案。</p>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    const ERR = `<svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="7.33" fill="currentColor"/><path d="M5.2 5.2l5.6 5.6M10.8 5.2l-5.6 5.6" stroke="#fff" stroke-width="1.4" stroke-linecap="round"/></svg>`;
+    const OK = `<svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="7.33" fill="var(--err-ok)"/><path d="M5.1 8.1 7.1 10.1 10.9 6.1" fill="none" stroke="#fff" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+    const X = `<svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true"><path d="M3 3l6 6M9 3L3 9" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>`;
+
+    function card({ text, recovered = false, retry = true, status = "" }) {
+      const icon = recovered ? OK : ERR;
+      const actions = `${retry && !recovered ? `<button class="act-primary" type="button">重试</button>` : ""}<button class="net-x" type="button" aria-label="关闭">${X}</button>`;
+      return `<div class="net-wrap"><div class="net-card"><p class="net-main"><i class="msg-tone">${icon}</i><span>${text}</span></p><div class="net-actions">${actions}</div></div>${status ? `<p class="net-status">${status}</p>` : ""}</div>`;
+    }
+
+    const mounts = {
+      fail: () => card({ text: "网络中断，生成失败。请检查网络后重试。" }),
+      reconnecting: () => card({
+        text: "网络不稳定，正在尝试恢复连接…",
+        retry: true,
+        status: "自动重连 2 / 5 · 约 5 秒后重试"
+      }),
+      recovered: () => card({ text: "网络已恢复，可继续。", recovered: true, retry: false })
+    };
+
+    document.querySelectorAll("[data-mount]").forEach(el => {
+      el.innerHTML = mounts[el.dataset.mount]();
+    });
+    document.getElementById("themeBtn").onclick = () => {
+      const on = document.documentElement.classList.toggle("theme-dark");
+      themeBtn.textContent = on ? "浅色" : "深色";
+    };
+  </script>
+</body>
+</html>

@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>card_id · tip_block · 形态墙</title>
+  <style>
+    :root {
+      --page: #f5f6f8; --ink: #000; --muted: rgba(0,0,0,.6); --faint: rgba(0,0,0,.4);
+      --line: #e3e4e7; --brand: #0a59f7; --chip: #fff; --chip-line: #e3e4e7;
+      --rt-text-1: #000; --rt-text-2: rgba(0,0,0,.6); --rt-text-4: rgba(0,0,0,.4);
+      --rt-card: #eef0f3; --rt-tip-icon: #ed6f21;
+    }
+    html.theme-dark {
+      color-scheme: dark;
+      --page: #090b0e; --ink: #fff; --muted: rgba(255,255,255,.6); --faint: rgba(255,255,255,.4);
+      --line: #292b2e; --brand: #317af7; --chip: #191a1d; --chip-line: #434448;
+      --rt-text-1: #fff; --rt-text-2: rgba(255,255,255,.6); --rt-text-4: rgba(255,255,255,.4);
+      --rt-card: #191a1d; --rt-tip-icon: #db6b42;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: "PingFang SC", "Helvetica Neue", sans-serif; background: var(--page); color: var(--ink); }
+    .top {
+      position: sticky; top: 0; z-index: 20; display: flex; flex-wrap: wrap; gap: 12px;
+      justify-content: space-between; padding: 16px 24px; border-bottom: 1px solid var(--line);
+      background: color-mix(in srgb, var(--page) 92%, transparent); backdrop-filter: blur(8px);
+    }
+    .top h1 { margin: 0; font-size: 18px; line-height: 26px; }
+    .top p { margin: 4px 0 0; color: var(--muted); font-size: 13px; line-height: 20px; max-width: 48rem; }
+    .meta { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+    .meta code {
+      padding: 4px 10px; border-radius: 8px; background: var(--chip); border: 1px solid var(--chip-line);
+      font-size: 12px; line-height: 18px;
+    }
+    .meta code b { color: var(--faint); font-weight: 600; }
+    .tools button, .tools a {
+      display: inline-flex; align-items: center; height: 32px; padding: 0 12px; border-radius: 8px;
+      border: 1px solid var(--chip-line); background: var(--chip); color: var(--ink); font-size: 13px;
+      text-decoration: none; cursor: pointer;
+    }
+    .layout { display: grid; grid-template-columns: 200px minmax(0,1fr); }
+    nav { padding: 16px 12px 32px 24px; border-right: 1px solid var(--line); }
+    nav a { display: block; padding: 8px 10px; border-radius: 8px; color: var(--muted); text-decoration: none; font-size: 13px; }
+    nav a:hover { background: var(--chip); color: var(--ink); }
+    nav a small { display: block; color: var(--faint); font-size: 11px; margin-top: 2px; }
+    main { padding: 20px 24px 64px; max-width: 780px; }
+    .panel {
+      scroll-margin-top: 96px; margin: 0 0 24px; padding: 16px; border: 1px solid var(--line);
+      border-radius: 16px; background: var(--chip);
+    }
+    .panel-head h2 { margin: 0; font-size: 15px; }
+    .panel-head p { margin: 6px 0 12px; color: var(--muted); font-size: 12px; line-height: 18px; }
+    .tag {
+      display: inline-block; height: 20px; padding: 0 8px; border-radius: 99px; background: #f3f7ff;
+      color: var(--brand); font-size: 11px; line-height: 20px; font-weight: 600; margin-left: 8px;
+    }
+    html.theme-dark .tag { background: #0a1831; }
+    .stage { max-width: 736px; }
+    .note { margin: 12px 0 0; padding: 10px 12px; border-radius: 10px; background: var(--page); color: var(--muted); font-size: 12px; line-height: 18px; }
+    .gate {
+      padding: 28px 16px; border-radius: 14px; background: var(--rt-card); color: var(--muted);
+      text-align: center; font-size: 13px; line-height: 20px;
+    }
+
+    .rt-tips { width: 100%; padding: 12px 16px 14px; border-radius: 14px; background: var(--rt-card); }
+    .rt-tips-h {
+      display: flex; align-items: center; gap: 6px; margin: 0 0 8px;
+      color: var(--rt-text-1); font-size: 14px; line-height: 22px; font-weight: 700;
+    }
+    .rt-tips-h svg { flex: none; color: var(--rt-tip-icon); }
+    .rt-tips ul { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 6px; }
+    .rt-tips li { position: relative; padding-left: 12px; color: var(--rt-text-2); font-size: 13px; line-height: 21px; }
+    .rt-tips li::before {
+      content: ""; position: absolute; left: 1px; top: 9px; width: 4px; height: 4px;
+      border-radius: 50%; background: var(--rt-text-4);
+    }
+    .rt-tips li b { color: var(--rt-text-1); font-weight: 600; }
+
+    @media (max-width: 800px) {
+      .layout { grid-template-columns: 1fr; }
+      nav { display: flex; gap: 4px; overflow-x: auto; border-right: 0; border-bottom: 1px solid var(--line); }
+      nav a { white-space: nowrap; }
+      nav a small { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <header class="top">
+    <div>
+      <h1>形态墙 · tip_block</h1>
+      <p>全站提示块。前端挂载、无 Agent Tool。一条回复最多一个；灯泡为块内唯一彩色。</p>
+      <div class="meta">
+        <code><b>card_id</b> tip_block</code>
+        <code><b>tool</b> 无 · host_only</code>
+        <code><b>aliases</b> 出行提示 · Tip Block</code>
+      </div>
+    </div>
+    <div class="tools">
+      <button type="button" id="themeBtn">深色</button>
+      <a href="../error_card/morph-wall.html">错误卡</a>
+      <a href="../CARD_ID-NAMING.md">命名</a>
+    </div>
+  </header>
+
+  <div class="layout">
+    <nav>
+      <a href="#v-travel"><b>V1</b> 行程提示<small>多条 · 小标题：正文</small></a>
+      <a href="#v-single"><b>V2</b> 单条提示<small>最短形态</small></a>
+      <a href="#v-doc"><b>V3</b> 总结旁提示<small>文档场景文案</small></a>
+      <a href="#v-gate"><b>V4</b> 无数据闸门<small>tips 空 → 不渲染</small></a>
+    </nav>
+    <main>
+      <section class="panel" id="v-travel">
+        <div class="panel-head">
+          <h2>V1 · 行程提示<span class="tag">canonical</span></h2>
+          <p>标题「出行提示」+ 多条「小标题：正文」。</p>
+        </div>
+        <div class="stage" data-mount="travel"></div>
+      </section>
+      <section class="panel" id="v-single">
+        <div class="panel-head">
+          <h2>V2 · 单条</h2>
+          <p>只有一条时结构不变，不改成段落裸文。</p>
+        </div>
+        <div class="stage" data-mount="single"></div>
+      </section>
+      <section class="panel" id="v-doc">
+        <div class="panel-head">
+          <h2>V3 · 总结旁提示</h2>
+          <p>同一壳，换标题与条目即可（如「阅读提示」）。</p>
+        </div>
+        <div class="stage" data-mount="doc"></div>
+      </section>
+      <section class="panel" id="v-gate">
+        <div class="panel-head">
+          <h2>V4 · 闸门</h2>
+          <p>无 tips / tip 字段时不占位。</p>
+        </div>
+        <div class="stage"><div class="gate">tips 为空 → <b>不渲染</b> tip_block</div></div>
+        <p class="note">不用：错误失败、方案自身风险（进对比卡说明）、主结论。</p>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    const bulb = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18h6M10 22h4"/><path d="M12 2a7 7 0 0 0-4 12.7c.6.5 1 1.3 1 2.1V18h6v-1.2c0-.8.4-1.6 1-2.1A7 7 0 0 0 12 2z"/></svg>`;
+
+    function tipHtml(title, items) {
+      return `<aside class="rt-tips" aria-label="${title}"><p class="rt-tips-h">${bulb}${title}</p><ul>${
+        items.map(([h, b]) => `<li><b>${h}：</b>${b}</li>`).join("")
+      }</ul></aside>`;
+    }
+
+    const mounts = {
+      travel: () => tipHtml("出行提示", [
+        ["陆家嘴站步行时间", "站内出闸到写字楼前台通常需预留 8–10 分钟。"],
+        ["静安寺午餐时间", "12:00 面谈后约有 1 小时富余，可在附近处理邮件。"]
+      ]),
+      single: () => tipHtml("出行提示", [
+        ["高铁提前到站", "西班牙高铁进站要过行李安检，建议发车前 30 分钟到站。"]
+      ]),
+      doc: () => tipHtml("阅读提示", [
+        ["材料范围", "本次只基于你上传的 3 个文件，未检索外网。"],
+        ["下一步", "若要对照原文页码，可在右侧文档台点开对应附件。"]
+      ])
+    };
+
+    document.querySelectorAll("[data-mount]").forEach(el => {
+      el.innerHTML = mounts[el.dataset.mount]();
+    });
+    document.getElementById("themeBtn").onclick = () => {
+      const on = document.documentElement.classList.toggle("theme-dark");
+      themeBtn.textContent = on ? "浅色" : "深色";
+    };
+  </script>
+</body>
+</html>

@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>card_id · composer_file · 形态墙</title>
+  <style>
+    :root {
+      --page: #f5f6f8; --ink: #171717; --muted: rgba(0,0,0,.6); --faint: rgba(0,0,0,.4);
+      --line: #e3e4e7; --brand: #0a59f7; --chip: #fff; --chip-line: #e3e4e7;
+      --fc-border: #eef0f3; --fc-name: #171717; --fc-size: rgba(0,0,0,.4);
+      --ico-bg: #e6eefe; --ico: #3370ff;
+    }
+    html.theme-dark {
+      color-scheme: dark;
+      --page: #090b0e; --ink: #fff; --muted: rgba(255,255,255,.6); --faint: rgba(255,255,255,.4);
+      --line: #292b2e; --brand: #317af7; --chip: #191a1d; --chip-line: #434448;
+      --fc-border: #292b2e; --fc-name: #fff; --fc-size: rgba(255,255,255,.4);
+      --ico-bg: #0a1831; --ico: #317af7;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: "PingFang SC", "HarmonyOS Sans SC", "Helvetica Neue", sans-serif; background: var(--page); color: var(--ink); }
+    .top {
+      position: sticky; top: 0; z-index: 20; display: flex; flex-wrap: wrap; gap: 12px; justify-content: space-between;
+      padding: 16px 24px; border-bottom: 1px solid var(--line);
+      background: color-mix(in srgb, var(--page) 92%, transparent); backdrop-filter: blur(8px);
+    }
+    .top h1 { margin: 0; font-size: 18px; line-height: 26px; }
+    .top p { margin: 4px 0 0; color: var(--muted); font-size: 13px; line-height: 20px; max-width: 48rem; }
+    .meta { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+    .meta code { padding: 4px 10px; border-radius: 8px; background: var(--chip); border: 1px solid var(--chip-line); font-size: 12px; }
+    .meta code b { color: var(--faint); }
+    .tools a, .tools button {
+      display: inline-flex; align-items: center; height: 32px; padding: 0 12px; border-radius: 8px;
+      border: 1px solid var(--chip-line); background: var(--chip); color: var(--ink); font-size: 13px;
+      text-decoration: none; cursor: pointer;
+    }
+    .layout { display: grid; grid-template-columns: 200px minmax(0,1fr); }
+    nav { padding: 16px 12px 32px 24px; border-right: 1px solid var(--line); }
+    nav a { display: block; padding: 8px 10px; border-radius: 8px; color: var(--muted); text-decoration: none; font-size: 13px; }
+    nav a:hover { background: var(--chip); color: var(--ink); }
+    nav a small { display: block; color: var(--faint); font-size: 11px; margin-top: 2px; }
+    main { padding: 20px 24px 64px; max-width: 900px; }
+    .panel { scroll-margin-top: 96px; margin: 0 0 24px; padding: 16px; border: 1px solid var(--line); border-radius: 16px; background: var(--chip); }
+    .panel-head h2 { margin: 0; font-size: 15px; }
+    .panel-head p { margin: 6px 0 12px; color: var(--muted); font-size: 12px; line-height: 18px; }
+    .tag { display: inline-block; margin-left: 8px; height: 20px; padding: 0 8px; border-radius: 99px; background: #fff4e8; color: #ed6f21; font-size: 11px; line-height: 20px; font-weight: 600; }
+    .stage { max-width: 736px; }
+    .row { display: flex; flex-wrap: wrap; gap: 16px; align-items: flex-start; padding-top: 10px; padding-right: 10px; }
+    .lab { margin: 0 0 8px; color: var(--faint); font-size: 12px; }
+    .note { margin: 12px 0 0; padding: 10px 12px; border-radius: 10px; background: var(--page); color: var(--muted); font-size: 12px; line-height: 18px; }
+
+    .fc {
+      position: relative; display: inline-flex; align-items: center; gap: 12px;
+      width: 160px; padding: 7px 13px; border: 1px solid var(--fc-border); border-radius: 12px;
+      background: #fff; overflow: visible;
+    }
+    html.theme-dark .fc { background: #111216; }
+    .fc-ico {
+      flex: none; width: 32px; height: 32px; border-radius: 8px;
+      display: grid; place-items: center; color: var(--ico); background: var(--ico-bg);
+    }
+    .fc-copy { min-width: 0; flex: 1; }
+    .fc-copy b { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--fc-name); font-size: 14px; line-height: 22px; font-weight: 400; }
+    .fc-copy small { display: block; color: var(--fc-size); font-size: 12px; line-height: 20px; }
+
+    .fc-x {
+      position: absolute; top: -8px; right: -8px; z-index: 2;
+      width: 20px; height: 20px; border: 0; border-radius: 50%; padding: 0;
+      display: none; place-items: center; cursor: pointer; background: rgba(255,255,255,.8); color: #fff;
+    }
+    .fc-x::before { content: ""; position: absolute; inset: 0; border-radius: 50%; background: rgba(0,0,0,.6); opacity: .25; }
+    .fc-x svg { position: relative; z-index: 1; }
+    .fc:hover .fc-x, .fc.show-x .fc-x, .fi:hover .fc-x, .fi.show-x .fc-x { display: grid; }
+
+    .fc.is-loading .fc-body { filter: blur(1px); opacity: .35; pointer-events: none; }
+    .fc-load {
+      position: absolute; inset: 0; display: none; flex-direction: column; align-items: center; justify-content: center; gap: 4px;
+      border-radius: 12px; background: rgba(255,255,255,.72); color: var(--brand); font-size: 12px;
+    }
+    html.theme-dark .fc-load { background: rgba(17,18,22,.8); }
+    .fc.is-loading .fc-load { display: flex; }
+    .spin {
+      width: 16px; height: 16px; border: 2px solid color-mix(in srgb, var(--brand) 25%, transparent);
+      border-top-color: var(--brand); border-radius: 50%; animation: spin .8s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .fi { position: relative; width: 56px; height: 56px; border-radius: 12px; overflow: visible; flex: none; }
+    .fi-img {
+      display: block; width: 100%; height: 100%; border-radius: 12px;
+      background:
+        radial-gradient(circle at 30% 40%, #c4a574 0 18%, transparent 19%),
+        radial-gradient(circle at 70% 45%, #8b6914 0 12%, transparent 13%),
+        linear-gradient(160deg, #7eb6ff 0%, #3d6fb8 45%, #2a4a7a 100%);
+    }
+    .fi.is-loading .fi-img { filter: brightness(.55); }
+    .fi-load { position: absolute; inset: 0; display: none; place-items: center; border-radius: 12px; pointer-events: none; }
+    .fi.is-loading .fi-load { display: grid; }
+    .fi-load .spin { border-color: rgba(255,255,255,.35); border-top-color: #fff; width: 18px; height: 18px; }
+
+    .composer {
+      width: min(736px, 100%); border: 1px solid #f0f0f0; border-radius: 20px; background: #fff;
+      box-shadow: 0 2px 8px rgba(0,0,0,.04); padding: 12px 0; display: flex; flex-direction: column; gap: 12px; overflow: visible;
+    }
+    html.theme-dark .composer { background: #191a1d; border-color: #434448; box-shadow: none; }
+    .composer-files { display: flex; align-items: center; gap: 8px; padding: 10px 12px 0; overflow: visible; }
+    .composer-files-track {
+      display: flex; gap: 8px; align-items: center; overflow-x: auto; overflow-y: visible;
+      flex: 1; min-width: 0; padding: 8px 8px 0 0; scrollbar-width: none;
+    }
+    .composer-files-track::-webkit-scrollbar { display: none; }
+    .composer-nav {
+      flex: none; width: 28px; height: 28px; border: 1px solid #e3e4e7; border-radius: 8px;
+      background: #fff; display: grid; place-items: center; color: #5e6063; cursor: pointer; padding: 0;
+    }
+    html.theme-dark .composer-nav { background: #111216; border-color: #434448; color: #aeb2b8; }
+    .composer-foot { display: flex; align-items: center; gap: 8px; padding: 0 12px; }
+    .composer-ph { flex: 1; color: var(--faint); font-size: 14px; line-height: 22px; }
+    .composer-send {
+      width: 32px; height: 32px; border: 0; border-radius: 50%; background: #165dff; color: #fff;
+      display: grid; place-items: center; cursor: pointer;
+    }
+    @media (max-width: 800px) {
+      .layout { grid-template-columns: 1fr; }
+      nav { display: flex; gap: 4px; overflow-x: auto; border-right: 0; border-bottom: 1px solid var(--line); }
+      nav a small { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <header class="top">
+    <div>
+      <h1>形态墙 · composer_file</h1>
+      <p>输入框待发附件。悬停右上角圆形 ×（压边角）；上传中模糊 +「上传中」。与 chat 区 <code>user_file</code> 是两张卡。</p>
+      <div class="meta">
+        <code><b>card_id</b> composer_file</code>
+        <code><b>tool</b> 无 · host_only</code>
+        <code><b>aliases</b> file_chip（composer）</code>
+      </div>
+    </div>
+    <div class="tools">
+      <button type="button" id="themeBtn">深色</button>
+      <a href="../user_file/morph-wall.html">user_file</a>
+      <a href="../doc_entry/morph-wall.html">doc_entry</a>
+      <a href="../CARD_ID-NAMING.md">命名</a>
+    </div>
+  </header>
+
+  <div class="layout">
+    <nav>
+      <a href="#v-states"><b>V1</b> 默认 / 悬停 / 上传中<small>文件 + 图</small></a>
+      <a href="#v-box"><b>V2</b> 输入框内排版<small>多文件 + 左右滑</small></a>
+    </nav>
+    <main>
+      <section class="panel" id="v-states">
+        <div class="panel-head">
+          <h2>V1 · 单卡状态<span class="tag">composer_file</span></h2>
+          <p>宽 160；图 56 方。× 仅悬停出现，不被父级 overflow 裁切。</p>
+        </div>
+        <div class="stage">
+          <p class="lab">Normal</p>
+          <div class="row" data-mount="normal"></div>
+          <p class="lab" style="margin-top:16px">Hover</p>
+          <div class="row" data-mount="hover"></div>
+          <p class="lab" style="margin-top:16px">Loading</p>
+          <div class="row" data-mount="load"></div>
+        </div>
+      </section>
+      <section class="panel" id="v-box">
+        <div class="panel-head">
+          <h2>V2 · 输入框内</h2>
+          <p>多文件横排；过多左右箭头。悬停单卡出 ×。</p>
+        </div>
+        <div class="stage" data-mount="box"></div>
+        <p class="note">发送进对话后改挂 <code>user_file</code>，不再用本卡。</p>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    const DOC = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M8 13h8M8 17h5"/></svg>`;
+    const X = `<svg width="8" height="8" viewBox="0 0 8 8"><path d="M1.5 1.5l5 5M6.5 1.5l-5 5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>`;
+    const L = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 6l-6 6 6 6"/></svg>`;
+    const R = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg>`;
+    const SEND = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 19V5"/><path d="M6 11l6-6 6 6"/></svg>`;
+    const PLUS = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>`;
+
+    function fileCard({ showX = false, loading = false } = {}) {
+      return `<span class="fc${showX ? " show-x" : ""}${loading ? " is-loading" : ""}">
+        <span class="fc-body" style="display:contents"><span class="fc-ico">${DOC}</span><span class="fc-copy"><b>03 Appendix...</b><small>2.85MB</small></span></span>
+        <button class="fc-x" type="button" aria-label="移除">${X}</button>
+        <span class="fc-load"><i class="spin"></i><span>上传中</span></span>
+      </span>`;
+    }
+    function imgCard({ showX = false, loading = false } = {}) {
+      return `<span class="fi${showX ? " show-x" : ""}${loading ? " is-loading" : ""}" role="img" aria-label="图片">
+        <span class="fi-img"></span>
+        <button class="fc-x" type="button" aria-label="移除">${X}</button>
+        <span class="fi-load"><i class="spin"></i></span>
+      </span>`;
+    }
+
+    const mounts = {
+      normal: () => fileCard() + imgCard(),
+      hover: () => fileCard({ showX: true }) + imgCard({ showX: true }),
+      load: () => fileCard({ loading: true }) + imgCard({ loading: true }),
+      box: () => {
+        const files = Array.from({ length: 5 }, () => fileCard()).join("");
+        return `<div class="composer">
+          <div class="composer-files"><div class="composer-files-track">${files}</div><button class="composer-nav" type="button" aria-label="向右">${R}</button></div>
+          <div class="composer-foot"><span class="composer-ph">有什么想问的</span><button type="button" style="border:0;background:0;color:var(--faint);display:grid;place-items:center;padding:0">${PLUS}</button><button class="composer-send" type="button">${SEND}</button></div>
+        </div>
+        <div class="composer" style="margin-top:16px">
+          <div class="composer-files"><button class="composer-nav" type="button" aria-label="向左">${L}</button><div class="composer-files-track">${files}</div></div>
+          <div class="composer-foot"><span class="composer-ph">有什么想问的</span><button type="button" style="border:0;background:0;color:var(--faint);display:grid;place-items:center;padding:0">${PLUS}</button><button class="composer-send" type="button">${SEND}</button></div>
+        </div>`;
+      }
+    };
+    document.querySelectorAll("[data-mount]").forEach(el => { el.innerHTML = mounts[el.dataset.mount](); });
+    document.getElementById("themeBtn").onclick = () => {
+      const on = document.documentElement.classList.toggle("theme-dark");
+      themeBtn.textContent = on ? "浅色" : "深色";
+    };
+  </script>
+</body>
+</html>

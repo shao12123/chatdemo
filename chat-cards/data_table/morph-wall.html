@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>card_id · data_table · 形态墙</title>
+  <style>
+    :root {
+      --page: #f5f6f8; --ink: #000; --muted: rgba(0,0,0,.6); --faint: rgba(0,0,0,.4);
+      --line: #e3e4e7; --brand: #0a59f7; --chip: #fff; --chip-line: #e3e4e7;
+      --rt-text-1: #000; --rt-text-2: rgba(0,0,0,.6); --rt-text-3: rgba(0,0,0,.6); --rt-text-4: rgba(0,0,0,.4);
+      --rt-card: #eef0f3; --rt-pick-bg: #e9f5e7; --rt-pick-fg: #64bb5c;
+      --rt-line: #d8d9dd; --rt-line-soft: #e3e4e7; --rt-table: #fff; --rt-table-head: #eef0f3;
+    }
+    html.theme-dark {
+      color-scheme: dark;
+      --page: #090b0e; --ink: #fff; --muted: rgba(255,255,255,.6); --faint: rgba(255,255,255,.4);
+      --line: #292b2e; --brand: #317af7; --chip: #191a1d; --chip-line: #434448;
+      --rt-text-1: #fff; --rt-text-2: rgba(255,255,255,.6); --rt-text-3: rgba(255,255,255,.6); --rt-text-4: rgba(255,255,255,.4);
+      --rt-card: #191a1d; --rt-pick-bg: #122211; --rt-pick-fg: #5ba854;
+      --rt-line: #434448; --rt-line-soft: #292b2e; --rt-table: #111216; --rt-table-head: #191a1d;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: "PingFang SC", "Helvetica Neue", sans-serif; background: var(--page); color: var(--ink); }
+    .top {
+      position: sticky; top: 0; z-index: 20; display: flex; flex-wrap: wrap; gap: 12px; align-items: flex-start;
+      justify-content: space-between; padding: 16px 24px; border-bottom: 1px solid var(--line);
+      background: color-mix(in srgb, var(--page) 92%, transparent); backdrop-filter: blur(8px);
+    }
+    .top h1 { margin: 0; font-size: 18px; line-height: 26px; font-weight: 700; }
+    .top p { margin: 4px 0 0; color: var(--muted); font-size: 13px; line-height: 20px; max-width: 52rem; }
+    .meta { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+    .meta code {
+      display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; border-radius: 8px;
+      background: var(--chip); border: 1px solid var(--chip-line); font-size: 12px; line-height: 18px;
+    }
+    .meta code b { font-weight: 600; color: var(--faint); }
+    .tools { display: flex; gap: 8px; flex: none; }
+    .tools a, .tools button {
+      display: inline-flex; align-items: center; height: 32px; padding: 0 12px; border-radius: 8px;
+      border: 1px solid var(--chip-line); background: var(--chip); color: var(--ink); font-size: 13px;
+      text-decoration: none; cursor: pointer;
+    }
+    .tools a:hover, .tools button:hover { border-color: var(--brand); color: var(--brand); }
+    .layout { display: grid; grid-template-columns: 220px minmax(0, 1fr); min-height: calc(100vh - 88px); }
+    nav {
+      position: sticky; top: 88px; align-self: start; max-height: calc(100vh - 88px); overflow: auto;
+      padding: 16px 12px 32px 24px; border-right: 1px solid var(--line);
+    }
+    nav a {
+      display: block; padding: 8px 10px; border-radius: 8px; color: var(--muted); text-decoration: none;
+      font-size: 13px; line-height: 20px;
+    }
+    nav a:hover { background: var(--chip); color: var(--ink); }
+    nav a small { display: block; color: var(--faint); font-size: 11px; line-height: 16px; margin-top: 2px; }
+    main { padding: 20px 24px 64px; max-width: 900px; }
+    .panel {
+      scroll-margin-top: 100px; margin: 0 0 28px; padding: 16px; border: 1px solid var(--line);
+      border-radius: 16px; background: var(--chip);
+    }
+    .panel-head { display: flex; flex-wrap: wrap; gap: 8px 12px; align-items: baseline; margin-bottom: 12px; }
+    .panel-head h2 { margin: 0; font-size: 15px; line-height: 22px; font-weight: 700; }
+    .tag {
+      height: 20px; padding: 0 8px; border-radius: 99px; background: #f3f7ff; color: var(--brand);
+      font-size: 11px; line-height: 20px; font-weight: 600;
+    }
+    html.theme-dark .tag { background: #0a1831; }
+    .panel-head p { margin: 0; flex: 1 1 100%; color: var(--muted); font-size: 12px; line-height: 18px; }
+    .stage { max-width: 736px; display: flex; flex-direction: column; gap: 16px; }
+    .note {
+      margin: 12px 0 0; padding: 10px 12px; border-radius: 10px; background: var(--page);
+      color: var(--muted); font-size: 12px; line-height: 18px;
+    }
+
+    .rt-pick {
+      flex: none; display: inline-flex; align-items: center; padding: 0 6px; border-radius: 99px;
+      background: var(--rt-pick-bg); color: var(--rt-pick-fg);
+      font-family: "PingFang SC", Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-style: normal; font-size: 12px; line-height: 20px; font-weight: 400;
+    }
+    .rp-plan { width: 100%; display: flex; flex-direction: column; gap: 6px; }
+    .rp-title { display: flex; align-items: center; gap: 8px; margin: 0; color: var(--rt-text-1); font-size: 15px; line-height: 24px; font-weight: 700; }
+    .rp-sub { margin: -4px 0 0; color: var(--rt-text-2); font-size: 13px; line-height: 20px; font-weight: 500; }
+    .rp-fit, .rp-sum { margin: 0; color: var(--rt-text-2); font-size: 14px; line-height: 22px; }
+    .rp-table { position: relative; }
+    .rp-copy {
+      position: absolute; top: 4px; right: 4px; z-index: 1; width: 28px; height: 28px; padding: 0;
+      border: 0; border-radius: 8px; background: transparent; color: var(--rt-text-3); cursor: pointer;
+      display: grid; place-items: center;
+    }
+    .rp-copy:hover { color: var(--brand); background: color-mix(in srgb, var(--brand) 8%, transparent); }
+    .rd-scroll { overflow-x: auto; border: 1px solid var(--rt-line); border-radius: 12px; background: var(--rt-table); }
+    .rd-table { width: 100%; min-width: 520px; border-collapse: collapse; font-size: 13px; line-height: 20px; }
+    .rd-table th {
+      padding: 8px 10px; background: var(--rt-table-head); color: var(--rt-text-3); font-size: 12px;
+      font-weight: 500; text-align: left; border-bottom: 1px solid var(--rt-line); white-space: nowrap;
+    }
+    .rd-table th:last-child { padding-right: 40px; }
+    .rd-table td { padding: 10px; color: var(--rt-text-1); vertical-align: top; border-bottom: 1px solid var(--rt-line-soft); }
+    .rd-table tr:last-child td { border-bottom: 0; }
+    .rd-table td b { font-weight: 600; }
+    .rd-table td small { display: block; margin-top: 2px; color: var(--rt-text-3); font-size: 12px; line-height: 18px; }
+    .rd-table td:first-child { width: 112px; }
+    .rd-num { white-space: nowrap; font-variant-numeric: tabular-nums; }
+
+    @media (max-width: 860px) {
+      .layout { grid-template-columns: 1fr; }
+      nav { position: static; max-height: none; border-right: 0; border-bottom: 1px solid var(--line); display: flex; gap: 4px; overflow-x: auto; padding: 12px 16px; }
+      nav a { white-space: nowrap; }
+      nav a small { display: none; }
+      main { padding: 16px; }
+    }
+  </style>
+</head>
+<body>
+  <header class="top">
+    <div>
+      <h1>形态墙 · data_table</h1>
+      <p>通用明细表壳（标题 + 表 + 复制）。下方用行程列演示；审查等场景换 <code>columns</code> 即可。</p>
+      <div class="meta">
+        <code><b>card_id</b> data_table</code>
+        <code><b>tool</b> present_data_table</code>
+        <code><b>aliases</b> route_detail · 方案明细</code>
+      </div>
+    </div>
+    <div class="tools">
+      <button type="button" id="themeBtn" aria-pressed="false">深色</button>
+      <a href="../option_compare/morph-wall.html">对比卡</a>
+      <a href="../CARD_ID-NAMING.md">命名</a>
+    </div>
+  </header>
+
+  <div class="layout">
+    <nav aria-label="形态目录">
+      <a href="#v-same-pick"><b>V1</b> 一日通勤 · 推荐方案<small>canonical · 对齐图 1</small></a>
+      <a href="#v-same-plain"><b>V2</b> 一日通勤 · 非推荐<small>无「推荐」标签</small></a>
+      <a href="#v-stack"><b>V3</b> 首轮叠三张<small>推荐排第一</small></a>
+      <a href="#v-multi"><b>V4</b> 跨天旅行 · 列不同<small>日期 / 班次 / 价</small></a>
+      <a href="#v-follow"><b>V5</b> 跟帖只出一张<small>改方案后</small></a>
+    </nav>
+
+    <main>
+      <section class="panel" id="v-same-pick">
+        <div class="panel-head">
+          <h2>V1 · 一日通勤 · 推荐方案</h2>
+          <span class="tag">variant: same_day</span>
+          <p>列：行程 · 出发 · 方式与线路 · 预计到达 · 缓冲。右上角复制。</p>
+        </div>
+        <div class="stage" data-mount="samePick"></div>
+      </section>
+
+      <section class="panel" id="v-same-plain">
+        <div class="panel-head">
+          <h2>V2 · 一日通勤 · 非推荐方案</h2>
+          <span class="tag">no pick tag</span>
+          <p>标题同行不出现 Status Tag「推荐」。</p>
+        </div>
+        <div class="stage" data-mount="samePlain"></div>
+      </section>
+
+      <section class="panel" id="v-stack">
+        <div class="panel-head">
+          <h2>V3 · 首轮叠三张</h2>
+          <span class="tag">initial · N cards</span>
+          <p>同一 Tool 可出多实例；推荐方案排第一，其余跟后。</p>
+        </div>
+        <div class="stage" data-mount="stack"></div>
+        <p class="note">与 <code>option_compare</code> 同轮：Agent 调 <code>present_option_compare</code> + <code>present_data_table</code>。</p>
+      </section>
+
+      <section class="panel" id="v-multi">
+        <div class="panel-head">
+          <h2>V4 · 跨天旅行</h2>
+          <span class="tag">variant: multi_day</span>
+          <p>列：日期 · 行程 · 方式与班次 · 出发–到达 · 时长 · 参考价。</p>
+        </div>
+        <div class="stage" data-mount="multi"></div>
+      </section>
+
+      <section class="panel" id="v-follow">
+        <div class="panel-head">
+          <h2>V5 · 跟帖只出一张</h2>
+          <span class="tag">follow-up</span>
+          <p>「改用方案二 / 改某一程」后，通常只渲染所选方案明细。</p>
+        </div>
+        <div class="stage" data-mount="follow"></div>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    const COPY = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>`;
+
+    const SAME_HEAD = ["行程", "出发", "方式与线路", "预计到达", "缓冲"];
+    const MULTI_HEAD = ["日期", "行程", "方式与班次", "出发 – 到达", "时长", "参考价"];
+
+    const PLAN_A = {
+      title: "方案一 · 全地铁", pick: true,
+      sub: "高效准点 · 时间最可控，早高峰不堵车",
+      fit: "适合对商务守时要求极高、希望避开早高峰地面及隧道拥堵的场景。",
+      sum: "三程都走地铁，不受路况影响；每场留出 10–15 分钟缓冲。",
+      rows: [
+        ["<b>第一程</b><small>徐汇滨江 → 陆家嘴</small>", "08:25",
+          "<b>地铁</b> 步行至最近站点（如 11 号线云锦路 / 龙耀路站），乘 11 号线至江苏路站换乘 2 号线，直达陆家嘴站<small>门到门 约 50–55 分钟</small><small>或乘 7 号线 / 12 号线换乘 14 号线到陆家嘴站</small>",
+          "09:15–09:20", "10–15 分钟"],
+        ["<b>第二程</b><small>陆家嘴 → 静安寺</small>", "11:20",
+          "<b>地铁</b> 陆家嘴站乘 2 号线直达静安寺站，仅 4 站<small>门到门 约 20–25 分钟</small>",
+          "约 11:45", "约 15 分钟"],
+        ["<b>第三程</b><small>静安寺 → 人民广场公司</small>", "14:30",
+          "<b>地铁</b> 静安寺站乘 2 号线直达人民广场站，仅 2 站<small>门到门 约 15–20 分钟</small>",
+          "约 14:50", "约 10 分钟"]
+      ]
+    };
+
+    const PLAN_C = {
+      title: "方案三 · 地铁避堵 + 地面出行", pick: true,
+      sub: "弹性组合 · 平衡省心与效率",
+      fit: "第一程早高峰用地铁锁定时间；后两程距离较短且处于平峰期，打车或骑行，体感最轻松。",
+      sum: "第一程地铁保准点，后两程按天气和体力在地铁、打车、骑行之间选。",
+      rows: [
+        ["<b>第一程</b><small>早高峰保准点 · 徐汇滨江 → 陆家嘴</small>", "08:25",
+          "<b>地铁</b> 11 号线转 2 号线<small>门到门 约 50–55 分钟</small><small>或 12 / 7 号线转 14 号线</small><small>早高峰陆家嘴隧道极易缓行，首程选地铁确保准时且从容到达。</small>",
+          "约 09:20", "约 10 分钟"],
+        ["<b>第二程</b><small>中午转场 · 陆家嘴 → 静安寺</small>", "11:25",
+          "<b>地铁 / 打车</b> 地铁 2 号线 / 14 号线直达，单程仅 12–15 分钟<small>门到门 约 15–20 分钟</small><small>天气炎热或疲惫时，也可在国金 / 正大门口直接呼叫专车（约 20 分钟）</small>",
+          "约 11:40", "约 20 分钟"],
+        ["<b>第三程</b><small>下午回程 · 静安寺 → 人民广场公司</small>", "14:30 左右",
+          "<b>打车 / 骑行 / 地铁</b> 打车、共享单车骑行或地铁 2 号线<small>门到门 约 15 分钟</small><small>两地相距约 3 公里多，天气舒适可沿巨鹿路 / 富民路周边街道打车或骑行</small>",
+          "约 14:45", "约 15 分钟"]
+      ]
+    };
+
+    const PLAN_B = {
+      title: "方案二 · 全程专车 / 打车", pick: false,
+      sub: "舒适省心 · 适合随行带资料、注重私密舒适",
+      fit: "适合携带较多办公设备 / 资料、避免早高峰挤地铁，但需充分考虑早高峰路况。",
+      sum: "全程专车，最省体力；早高峰过江及延东隧道车流量大，第一程行车通常需 45–55 分钟。",
+      rows: [
+        ["<b>第一程</b><small>徐汇滨江 → 陆家嘴</small>", "08:15",
+          "<b>专车</b> 龙腾大道 → 打浦路隧道 / 延安东路隧道 → 陆家嘴环路<small>门到门 约 45–55 分钟</small><small>需提前预约专车</small>",
+          "09:10–09:20", "10–20 分钟"],
+        ["<b>第二程</b><small>陆家嘴 → 静安寺</small>", "11:20",
+          "<b>专车</b> 延安东路隧道 → 延安高架路 → 华山路 / 南京西路出口下<small>门到门 约 20–25 分钟</small><small>中午平峰期。</small>",
+          "约 11:45", "约 15 分钟"],
+        ["<b>第三程</b><small>静安寺 → 人民广场公司</small>", "14:30",
+          "<b>专车</b> 沿南京西路 / 威海路 / 延安中路直行，距离约 3.5 公里<small>门到门 约 12–18 分钟</small>",
+          "14:45–14:50", "10–15 分钟"]
+      ]
+    };
+
+    const TRIP_A = {
+      title: "方案一 · 高铁 + 飞机", pick: true,
+      sub: "省心均衡 · 市中心直达，换乘最少",
+      fit: "马德里到巴塞罗那坐高铁，市中心到市中心；去马略卡和回马德里坐飞机。",
+      sum: "第一程高铁，后两程飞机，三程在途合计约 5 小时。",
+      multi: true,
+      rows: [
+        ["11/19", "<b>第一程</b><small>马德里 → 巴塞罗那</small>",
+          "<b>高铁</b> AVE / Ouigo / Iryo，马德里阿托查站 → 巴塞罗那桑茨站<small>发车前 30 分钟到站过行李安检</small>",
+          "09:00 – 11:30", "约 2.5 小时", "€30–90 / 人"],
+        ["11/22", "<b>第二程</b><small>巴塞罗那 → 马略卡</small>",
+          "<b>飞机</b> 巴塞罗那机场 BCN → 帕尔马机场 PMI<small>提前 1.5 小时到机场</small>",
+          "10:30 – 11:25", "约 55 分钟", "€40–120 / 人"],
+        ["11/26", "<b>第三程</b><small>马略卡 → 马德里</small>",
+          "<b>飞机</b> 帕尔马机场 PMI → 马德里机场 MAD<small>帕尔马老城到机场约 20 分钟车程</small>",
+          "16:00 – 17:25", "约 1 小时 25 分钟", "€50–150 / 人"]
+      ]
+    };
+
+    function detailHtml(plan) {
+      const head = (plan.multi ? MULTI_HEAD : SAME_HEAD).map(h => `<th>${h}</th>`).join("");
+      const body = plan.rows.map(cells => {
+        const tds = cells.map((c, i) => {
+          const num = plan.multi ? (i === 0 || i >= 3) : (i === 1 || i >= 3);
+          return `<td${num ? ` class="rd-num"` : ""}>${c}</td>`;
+        }).join("");
+        return `<tr>${tds}</tr>`;
+      }).join("");
+      return `<section class="rp-plan" aria-label="行程明细">
+        <h3 class="rp-title">${plan.title}${plan.pick ? `<em class="rt-pick">推荐</em>` : ""}</h3>
+        <p class="rp-sub">${plan.sub}</p>
+        <p class="rp-fit">${plan.fit}</p>
+        <div class="rp-table">
+          <button class="rp-copy" type="button" aria-label="复制表格" title="复制表格">${COPY}</button>
+          <div class="rd-scroll"><table class="rd-table"><thead><tr>${head}</tr></thead><tbody>${body}</tbody></table></div>
+        </div>
+        <p class="rp-sum">${plan.sum}</p>
+      </section>`;
+    }
+
+    const mounts = {
+      samePick: () => detailHtml(PLAN_C),
+      samePlain: () => detailHtml({ ...PLAN_B, pick: false }),
+      stack: () => [PLAN_C, { ...PLAN_A, pick: false }, PLAN_B].map(detailHtml).join(""),
+      multi: () => detailHtml(TRIP_A),
+      follow: () => detailHtml({ ...PLAN_B, pick: true, title: "方案二 · 全程专车 / 打车", sub: "舒适省心 · 已按你的选择切换" })
+    };
+
+    document.querySelectorAll("[data-mount]").forEach(el => {
+      const key = el.getAttribute("data-mount");
+      if (mounts[key]) el.innerHTML = mounts[key]();
+    });
+
+    const themeBtn = document.getElementById("themeBtn");
+    themeBtn.addEventListener("click", () => {
+      const on = document.documentElement.classList.toggle("theme-dark");
+      themeBtn.setAttribute("aria-pressed", String(on));
+      themeBtn.textContent = on ? "浅色" : "深色";
+    });
+  </script>
+</body>
+</html>

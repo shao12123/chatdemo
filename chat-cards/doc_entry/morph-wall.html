@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>card_id · doc_entry · 形态墙</title>
+  <style>
+    :root {
+      --page: #f5f6f8; --ink: #000; --muted: rgba(0,0,0,.6); --faint: rgba(0,0,0,.4);
+      --line: #e3e4e7; --brand: #0a59f7; --chip: #fff; --chip-line: #e3e4e7;
+    }
+    html.theme-dark {
+      color-scheme: dark;
+      --page: #090b0e; --ink: #fff; --muted: rgba(255,255,255,.6); --faint: rgba(255,255,255,.4);
+      --line: #292b2e; --brand: #317af7; --chip: #191a1d; --chip-line: #434448;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: "PingFang SC", "Helvetica Neue", sans-serif; background: var(--page); color: var(--ink); }
+    .top {
+      position: sticky; top: 0; z-index: 20; display: flex; flex-wrap: wrap; gap: 12px; justify-content: space-between;
+      padding: 16px 24px; border-bottom: 1px solid var(--line);
+      background: color-mix(in srgb, var(--page) 92%, transparent); backdrop-filter: blur(8px);
+    }
+    .top h1 { margin: 0; font-size: 18px; line-height: 26px; }
+    .top p { margin: 4px 0 0; color: var(--muted); font-size: 13px; line-height: 20px; max-width: 48rem; }
+    .meta { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+    .meta code { padding: 4px 10px; border-radius: 8px; background: var(--chip); border: 1px solid var(--chip-line); font-size: 12px; }
+    .meta code b { color: var(--faint); }
+    .tools a, .tools button {
+      display: inline-flex; align-items: center; height: 32px; padding: 0 12px; border-radius: 8px;
+      border: 1px solid var(--chip-line); background: var(--chip); color: var(--ink); font-size: 13px;
+      text-decoration: none; cursor: pointer;
+    }
+    .layout { display: grid; grid-template-columns: 210px minmax(0,1fr); }
+    nav { padding: 16px 12px 32px 24px; border-right: 1px solid var(--line); }
+    nav a { display: block; padding: 8px 10px; border-radius: 8px; color: var(--muted); text-decoration: none; font-size: 13px; }
+    nav a:hover { background: var(--chip); color: var(--ink); }
+    nav a small { display: block; color: var(--faint); font-size: 11px; margin-top: 2px; }
+    main { padding: 20px 24px 64px; max-width: 780px; }
+    .panel { scroll-margin-top: 96px; margin: 0 0 24px; padding: 16px; border: 1px solid var(--line); border-radius: 16px; background: var(--chip); }
+    .panel-head h2 { margin: 0; font-size: 15px; }
+    .panel-head p { margin: 6px 0 12px; color: var(--muted); font-size: 12px; line-height: 18px; }
+    .tag { display: inline-block; margin-left: 8px; height: 20px; padding: 0 8px; border-radius: 99px; background: #f3f7ff; color: var(--brand); font-size: 11px; line-height: 20px; font-weight: 600; }
+    html.theme-dark .tag { background: #0a1831; }
+    .stage { max-width: 736px; display: flex; flex-direction: column; gap: 10px; align-items: flex-start; }
+    .note { margin: 12px 0 0; padding: 10px 12px; border-radius: 10px; background: var(--page); color: var(--muted); font-size: 12px; line-height: 18px; }
+
+    .artifact {
+      position: relative; display: flex; align-items: center; width: 300px; max-width: 100%; height: 56px;
+      border: 1px solid #eef0f3; border-radius: 12px; background: #fff;
+    }
+    html.theme-dark .artifact { border-color: #292b2e; background: #111216; }
+    .artifact-open {
+      display: flex; align-items: center; gap: 12px; min-width: 0; flex: 1; height: 100%;
+      padding: 9px; border: 0; background: transparent; color: inherit; font: inherit; text-align: left; cursor: pointer;
+    }
+    .artifact-thumb {
+      position: relative; width: 68px; height: 38px; flex: none; overflow: hidden;
+      border-radius: 6px; border: 1px solid #eef0f3; background: #fff;
+    }
+    html.theme-dark .artifact-thumb { border-color: #434448; background: #191a1d; }
+    .artifact-sheet {
+      position: absolute; left: 0; top: 0; width: 272px; padding: 10px 12px 0;
+      transform: scale(0.25); transform-origin: top left; color: #1f2329; pointer-events: none;
+    }
+    html.theme-dark .artifact-sheet { color: #e8eaed; }
+    .artifact-sheet em { display: block; color: #8f959e; font-size: 12px; line-height: 16px; font-style: normal; }
+    .artifact-sheet strong { display: block; margin: 2px 0 6px; font-size: 18px; line-height: 24px; font-weight: 650; }
+    .artifact-sheet span { display: block; margin: 0 0 4px; color: #3a3d42; font-size: 12px; line-height: 18px; }
+    html.theme-dark .artifact-sheet span { color: #aeb2b8; }
+    .artifact-copy { min-width: 0; flex: 1; overflow: hidden; }
+    .artifact-copy b {
+      display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+      color: #1e293b; font-size: 14px; line-height: 20px; font-weight: 500;
+    }
+    html.theme-dark .artifact-copy b { color: #fff; }
+    .artifact-copy small { display: block; color: rgba(0,0,0,.4); font-size: 12px; line-height: 18px; }
+    html.theme-dark .artifact-copy small { color: var(--faint); }
+    .artifact-copy small.live { color: var(--brand); }
+    .artifact-actions { display: none; align-items: center; gap: 2px; padding-right: 8px; flex: none; }
+    .artifact:hover { background: rgba(9, 11, 14, 0.04); }
+    html.theme-dark .artifact:hover { background: rgba(255,255,255,.04); }
+    .artifact:hover .artifact-actions, .artifact.show-actions .artifact-actions { display: flex; }
+    .artifact.is-active, .artifact.is-active:hover, .artifact.on, .artifact.on:hover {
+      background: #f3f7ff; border-color: #3370ff;
+    }
+    html.theme-dark .artifact.is-active, html.theme-dark .artifact.on {
+      background: #0a1831; border-color: #317af7;
+    }
+    .artifact.is-disabled { opacity: 0.3; pointer-events: none; }
+    .artifact-actions button {
+      width: 28px; height: 28px; border: 0; border-radius: 8px; background: transparent;
+      color: #5e6063; display: grid; place-items: center; padding: 0; cursor: pointer;
+    }
+    .artifact-actions button:hover { background: rgba(9, 11, 14, 0.04); }
+    html.theme-dark .artifact-actions button { color: #aeb2b8; }
+
+    .artifact.cmp { width: min(340px, 100%); height: auto; min-height: 64px; gap: 0; padding: 0; }
+    .artifact.cmp .artifact-open, .artifact.cmp.button-like {
+      display: flex; align-items: center; gap: 10px; width: 100%; padding: 8px 12px 8px 8px;
+      border: 0; background: transparent; text-align: left; cursor: pointer; font: inherit; color: inherit;
+    }
+    .cmp-thumb {
+      width: 78px; height: 54px; flex: none; display: grid; grid-template-columns: 1fr 1fr; gap: 4px;
+      padding: 6px; border-radius: 8px; background: #f3f6fb; border: 1px solid #e3e9f2;
+    }
+    html.theme-dark .cmp-thumb { background: #191a1d; border-color: #434448; }
+    .cmp-thumb .sheet {
+      min-width: 0; border-radius: 3px; background: #fff; border: 1px solid #d5deea;
+      display: flex; flex-direction: column; gap: 3px; padding: 4px 3px;
+    }
+    html.theme-dark .cmp-thumb .sheet { background: #111216; border-color: #434448; }
+    .cmp-thumb .sheet i { display: block; height: 2px; border-radius: 1px; background: #b9cbe4; }
+    .cmp-thumb .sheet i:nth-child(2) { width: 72%; }
+    .cmp-thumb .sheet i:nth-child(3) { width: 46%; }
+    .cmp-thumb .sheet.alt i { background: #8fb0e4; }
+
+    @media (max-width: 800px) {
+      .layout { grid-template-columns: 1fr; }
+      nav { display: flex; gap: 4px; overflow-x: auto; border-right: 0; border-bottom: 1px solid var(--line); }
+      nav a { white-space: nowrap; }
+      nav a small { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <header class="top">
+    <div>
+      <h1>形态墙 · doc_entry</h1>
+      <p>对话里的文档 / 产物入口条（artifact）。点整卡打开右侧文档台；悬停出预览/下载。前端挂，无独立 Agent Tool。</p>
+      <div class="meta">
+        <code><b>card_id</b> doc_entry</code>
+        <code><b>tool</b> 无 · host_only</code>
+        <code><b>aliases</b> artifact · 文档入口 · 产物卡</code>
+      </div>
+    </div>
+    <div class="tools">
+      <button type="button" id="themeBtn">深色</button>
+      <a href="../user_file/morph-wall.html">user_file</a>
+      <a href="../composer_file/morph-wall.html">composer_file</a>
+      <a href="../CARD_ID-NAMING.md">命名</a>
+    </div>
+  </header>
+
+  <div class="layout">
+    <nav>
+      <a href="#v-default"><b>V1</b> 默认入口<small>canonical</small></a>
+      <a href="#v-active"><b>V2</b> 已打开<small>.is-active</small></a>
+      <a href="#v-writing"><b>V3</b> 写入中<small>live 状态</small></a>
+      <a href="#v-cmp"><b>V4</b> 对比入口<small>双页缩略</small></a>
+      <a href="#v-disabled"><b>V5</b> 不可用<small>.is-disabled</small></a>
+    </nav>
+    <main>
+      <section class="panel" id="v-default">
+        <div class="panel-head">
+          <h2>V1 · 默认入口<span class="tag">canonical</span></h2>
+          <p>缩略预览 + 文件名 + 大小；悬停显示操作（本墙强制露出）。</p>
+        </div>
+        <div class="stage" data-mount="def"></div>
+      </section>
+      <section class="panel" id="v-active">
+        <div class="panel-head">
+          <h2>V2 · 右侧已打开</h2>
+          <p>品牌描边 + 浅蓝底，表示当前文档台正在看这份。</p>
+        </div>
+        <div class="stage" data-mount="active"></div>
+      </section>
+      <section class="panel" id="v-writing">
+        <div class="panel-head">
+          <h2>V3 · 写入 / 生成中</h2>
+          <p>副文案用品牌色 live 状态。</p>
+        </div>
+        <div class="stage" data-mount="writing"></div>
+      </section>
+      <section class="panel" id="v-cmp">
+        <div class="panel-head">
+          <h2>V4 · 对比入口</h2>
+          <p>双页缩略，用于「方案对比」类产物。</p>
+        </div>
+        <div class="stage" data-mount="cmp"></div>
+      </section>
+      <section class="panel" id="v-disabled">
+        <div class="panel-head">
+          <h2>V5 · 不可用</h2>
+          <p>生成失败 / 未就绪时降低透明度且不可点。</p>
+        </div>
+        <div class="stage" data-mount="disabled"></div>
+        <p class="note">对比：<code>composer_file</code> 输入框待发；<code>user_file</code> 用户已发送；<code>doc_entry</code> AI 产物入口（可预览/下载）。</p>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    const eye = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>`;
+    const down = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 4v11"/><path d="M7 11l5 5 5-5"/><path d="M5 20h14"/></svg>`;
+
+    function entry({ name, meta, kicker, title, lines = [], active = false, disabled = false, showActions = true, live = false }) {
+      const sheet = lines.map(t => `<span>${t}</span>`).join("");
+      const cls = `artifact${active ? " is-active" : ""}${disabled ? " is-disabled" : ""}${showActions ? " show-actions" : ""}`;
+      return `<div class="${cls}">
+        <button class="artifact-open" type="button">
+          <span class="artifact-thumb" aria-hidden="true"><span class="artifact-sheet"><em>${kicker}</em><strong>${title}</strong>${sheet}</span></span>
+          <span class="artifact-copy"><b>${name}</b><small class="${live ? "live" : ""}">${meta}</small></span>
+        </button>
+        <span class="artifact-actions">
+          <button type="button" aria-label="预览">${eye}</button>
+          <button type="button" aria-label="下载">${down}</button>
+        </span>
+      </div>`;
+    }
+
+    function cmpEntry({ name, meta, on = false, live = false }) {
+      return `<button class="artifact cmp${on ? " on" : ""}" type="button">
+        <span class="cmp-thumb" aria-hidden="true"><span class="sheet"><i></i><i></i><i></i></span><span class="sheet alt"><i></i><i></i><i></i></span></span>
+        <span class="artifact-copy"><b>${name}</b><small class="${live ? "live" : ""}">${meta}</small></span>
+      </button>`;
+    }
+
+    const mounts = {
+      def: () => entry({
+        name: "课程论文_初稿.md", meta: "2.85 MB",
+        kicker: "课程论文", title: "人工智能与教育公平",
+        lines: ["先交代问题背景与研究意义，再综述国内外相关讨论。", "第三部分写方法与案例，最后给出结论与局限。"]
+      }),
+      active: () => entry({
+        name: "周日烤羊肉计划.md", meta: "已在右侧打开",
+        kicker: "周日午餐", title: "周日烤羊肉",
+        lines: ["脆皮土豆、慢烤羊肩、时令蔬菜。"],
+        active: true
+      }),
+      writing: () => entry({
+        name: "开题报告_修订版.md", meta: "正在写入…",
+        kicker: "开题报告", title: "研究问题与框架",
+        lines: ["按标注逐段改写中。"],
+        live: true
+      }),
+      cmp: () => cmpEntry({ name: "方案对比 · 初稿 vs 修订", meta: "2 份文档 · 只列差异" }),
+      disabled: () => entry({
+        name: "标注修订_失败.md", meta: "生成失败",
+        kicker: "标注修订", title: "未能写出新版",
+        lines: ["可点错误卡重试。"],
+        disabled: true, showActions: false
+      })
+    };
+
+    document.querySelectorAll("[data-mount]").forEach(el => { el.innerHTML = mounts[el.dataset.mount](); });
+    document.getElementById("themeBtn").onclick = () => {
+      const on = document.documentElement.classList.toggle("theme-dark");
+      themeBtn.textContent = on ? "浅色" : "深色";
+    };
+  </script>
+</body>
+</html>

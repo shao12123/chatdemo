@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>card_id · option_compare · 形态墙</title>
+  <style>
+    :root {
+      --page: #f5f6f8; --ink: #000; --muted: rgba(0,0,0,.6); --faint: rgba(0,0,0,.4);
+      --line: #e3e4e7; --brand: #0a59f7; --chip: #fff; --chip-line: #e3e4e7;
+      --rt-text-1: #000; --rt-text-2: rgba(0,0,0,.6); --rt-text-3: rgba(0,0,0,.6); --rt-text-4: rgba(0,0,0,.4);
+      --rt-card: #eef0f3; --rt-block: #fff; --rt-dot: #fff;
+      --rt-pick-bg: #e9f5e7; --rt-pick-fg: #64bb5c; --rt-tip-icon: #ed6f21; --rt-brand: #0a59f7;
+      --rt-plan-1: #0a59f7; --rt-plan-2: #8c3bfe; --rt-plan-3: #00a7ad;
+      --rt-line: #d8d9dd; --rt-line-soft: #e3e4e7; --rt-table: #fff; --rt-table-head: #eef0f3;
+    }
+    html.theme-dark {
+      color-scheme: dark;
+      --page: #090b0e; --ink: #fff; --muted: rgba(255,255,255,.6); --faint: rgba(255,255,255,.4);
+      --line: #292b2e; --brand: #317af7; --chip: #191a1d; --chip-line: #434448;
+      --rt-text-1: #fff; --rt-text-2: rgba(255,255,255,.6); --rt-text-3: rgba(255,255,255,.6); --rt-text-4: rgba(255,255,255,.4);
+      --rt-card: #191a1d; --rt-block: #111216; --rt-dot: #111216;
+      --rt-pick-bg: #122211; --rt-pick-fg: #5ba854; --rt-tip-icon: #db6b42; --rt-brand: #317af7;
+      --rt-plan-1: #317af7; --rt-plan-2: #7f45e2; --rt-plan-3: #00afaf;
+      --rt-line: #434448; --rt-line-soft: #292b2e; --rt-table: #111216; --rt-table-head: #191a1d;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: "PingFang SC", "Helvetica Neue", sans-serif; background: var(--page); color: var(--ink); }
+    .top {
+      position: sticky; top: 0; z-index: 20; display: flex; flex-wrap: wrap; gap: 12px; align-items: flex-start;
+      justify-content: space-between; padding: 16px 24px; border-bottom: 1px solid var(--line);
+      background: color-mix(in srgb, var(--page) 92%, transparent); backdrop-filter: blur(8px);
+    }
+    .top h1 { margin: 0; font-size: 18px; line-height: 26px; font-weight: 700; }
+    .top p { margin: 4px 0 0; color: var(--muted); font-size: 13px; line-height: 20px; max-width: 52rem; }
+    .meta { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+    .meta code {
+      display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; border-radius: 8px;
+      background: var(--chip); border: 1px solid var(--chip-line); font-size: 12px; line-height: 18px;
+    }
+    .meta code b { font-weight: 600; color: var(--faint); }
+    .tools { display: flex; gap: 8px; flex: none; }
+    .tools button {
+      height: 32px; padding: 0 12px; border-radius: 8px; border: 1px solid var(--chip-line);
+      background: var(--chip); color: var(--ink); font-size: 13px; cursor: pointer;
+    }
+    .tools button:hover { border-color: var(--brand); color: var(--brand); }
+    .layout { display: grid; grid-template-columns: 220px minmax(0, 1fr); min-height: calc(100vh - 88px); }
+    nav {
+      position: sticky; top: 88px; align-self: start; max-height: calc(100vh - 88px); overflow: auto;
+      padding: 16px 12px 32px 24px; border-right: 1px solid var(--line);
+    }
+    nav a {
+      display: block; padding: 8px 10px; border-radius: 8px; color: var(--muted); text-decoration: none;
+      font-size: 13px; line-height: 20px;
+    }
+    nav a:hover, nav a:focus-visible { background: var(--chip); color: var(--ink); outline: none; }
+    nav a small { display: block; color: var(--faint); font-size: 11px; line-height: 16px; margin-top: 2px; }
+    main { padding: 20px 24px 64px; max-width: 780px; }
+    .panel {
+      scroll-margin-top: 100px; margin: 0 0 28px; padding: 16px; border: 1px solid var(--line);
+      border-radius: 16px; background: var(--chip);
+    }
+    .panel-head { display: flex; flex-wrap: wrap; gap: 8px 12px; align-items: baseline; margin-bottom: 12px; }
+    .panel-head h2 { margin: 0; font-size: 15px; line-height: 22px; font-weight: 700; }
+    .tag {
+      height: 20px; padding: 0 8px; border-radius: 99px; background: #f3f7ff; color: var(--brand);
+      font-size: 11px; line-height: 20px; font-weight: 600;
+    }
+    html.theme-dark .tag { background: #0a1831; }
+    .panel-head p { margin: 0; flex: 1 1 100%; color: var(--muted); font-size: 12px; line-height: 18px; }
+    .stage { max-width: 736px; }
+    .gate {
+      padding: 28px 16px; border-radius: 16px; background: var(--rt-card); color: var(--rt-text-3);
+      text-align: center; font-size: 13px; line-height: 20px;
+    }
+    .gate b { color: var(--rt-text-1); }
+    .note {
+      margin: 12px 0 0; padding: 10px 12px; border-radius: 10px; background: var(--page);
+      color: var(--muted); font-size: 12px; line-height: 18px;
+    }
+    .note code { font-size: 11px; }
+
+    /* —— 抄自三个路线方案：对比卡 —— */
+    .rc-card { width: 100%; border-radius: 16px; background: var(--rt-card); padding: 14px 16px; display: flex; flex-direction: column; gap: 8px; }
+    .rc-head { padding: 0 2px 4px; }
+    .rc-kicker { margin: 0 0 2px; color: var(--rt-text-3); font-size: 12px; line-height: 18px; }
+    .rc-trip { margin: 0; color: var(--rt-text-1); font-size: 14px; line-height: 22px; font-weight: 500; }
+    .rc-trip b { font-weight: 700; font-variant-numeric: tabular-nums; }
+    .rc-trip i { color: var(--rt-text-4); font-style: normal; margin: 0 2px; }
+    .rc-plan { border-radius: 14px; background: var(--rt-block); padding: 12px 16px; }
+    .rc-plan-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+    .rc-title { margin: 0; min-width: 0; color: var(--rt-text-1); font-size: 15px; line-height: 22px; font-weight: 700; }
+    .rc-sub { margin: 2px 0 0; color: var(--rt-text-2); font-size: 13px; line-height: 20px; font-weight: 500; }
+    .rc-fit { margin: 2px 0 0; color: var(--rt-text-3); font-size: 12px; line-height: 18px; }
+    /* 对齐三个路线方案：Status Tag（无圆点，12/20 Regular） */
+    .rt-pick {
+      flex: none;
+      display: inline-flex;
+      align-items: center;
+      padding: 0 6px;
+      border-radius: 99px;
+      background: var(--rt-pick-bg);
+      color: var(--rt-pick-fg);
+      font-family: "PingFang SC", Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-style: normal;
+      font-size: 12px;
+      line-height: 20px;
+      font-weight: 400;
+    }
+    .rc-legs { position: relative; list-style: none; margin: 10px 0 0; padding: 0 0 0 18px; display: flex; flex-direction: column; gap: 6px; }
+    .rc-legs::before { content: ""; position: absolute; left: 4px; top: 8px; bottom: 8px; width: 2px; border-radius: 1px; background: var(--plan); opacity: .35; }
+    .rc-plan.is-pick .rc-legs::before { opacity: 1; }
+    .rc-legs li { position: relative; display: grid; grid-template-columns: var(--time-col, 68px) minmax(0, 1fr); column-gap: 8px; font-size: 13px; line-height: 20px; }
+    .rc-dot { position: absolute; left: -18px; top: 6px; width: 10px; height: 10px; border-radius: 50%; background: var(--rt-dot); border: 2px solid var(--plan); box-sizing: border-box; }
+    .rc-time { color: var(--rt-text-1); font-weight: 700; white-space: nowrap; font-variant-numeric: tabular-nums; }
+    .rc-seg { color: var(--rt-text-1); }
+    .rc-legs .rc-sub { grid-column: 2; color: var(--rt-text-3); font-size: 12px; line-height: 18px; font-weight: 400; }
+    .rc-foot { margin: 2px 2px 0; color: var(--rt-text-3); font-size: 12px; line-height: 18px; }
+
+    /* tip_block 对照（非本卡，仅示意相邻） */
+    .rt-tips { width: 100%; margin-top: 12px; padding: 12px 16px 14px; border-radius: 14px; background: var(--rt-card); }
+    .rt-tips-h { display: flex; align-items: center; gap: 6px; margin: 0 0 8px; color: var(--rt-text-1); font-size: 14px; line-height: 22px; font-weight: 700; }
+    .rt-tips-h svg { flex: none; color: var(--rt-tip-icon); }
+    .rt-tips ul { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 6px; }
+    .rt-tips li { position: relative; padding-left: 12px; color: var(--rt-text-2); font-size: 13px; line-height: 21px; }
+    .rt-tips li::before { content: ""; position: absolute; left: 1px; top: 9px; width: 4px; height: 4px; border-radius: 50%; background: var(--rt-text-4); }
+    .rt-tips li b { color: var(--rt-text-1); font-weight: 600; }
+
+    @media (max-width: 860px) {
+      .layout { grid-template-columns: 1fr; }
+      nav { position: static; max-height: none; border-right: 0; border-bottom: 1px solid var(--line); display: flex; gap: 4px; overflow-x: auto; padding: 12px 16px; }
+      nav a { white-space: nowrap; }
+      nav a small { display: none; }
+      main { padding: 16px; }
+    }
+  </style>
+</head>
+<body>
+  <header class="top">
+    <div>
+      <h1>形态墙 · option_compare</h1>
+      <p>通用「多方案对比」壳。下方用行程数据演示；时间对比等场景换 payload 即可。明细表见 <code>data_table</code>；提示见 <code>tip_block</code>。</p>
+      <div class="meta">
+        <code><b>card_id</b> option_compare</code>
+        <code><b>tool</b> present_option_compare</code>
+        <code><b>aliases</b> route_compare · 三个路线方案</code>
+      </div>
+    </div>
+    <div class="tools">
+      <button type="button" id="themeBtn" aria-pressed="false">深色</button>
+      <a href="../data_table/morph-wall.html" style="display:inline-flex;align-items:center;height:32px;padding:0 12px;border-radius:8px;border:1px solid var(--chip-line);background:var(--chip);color:var(--ink);font-size:13px;text-decoration:none">明细表</a>
+      <a href="../CARD_ID-NAMING.md" style="display:inline-flex;align-items:center;height:32px;padding:0 12px;border-radius:8px;border:1px solid var(--chip-line);background:var(--chip);color:var(--ink);font-size:13px;text-decoration:none">命名</a>
+    </div>
+  </header>
+
+  <div class="layout">
+    <nav aria-label="形态目录">
+      <a href="#v-same-3"><b>V1</b> 一日通勤 · 3 方案<small>canonical · same_day</small></a>
+      <a href="#v-same-2"><b>V2</b> 一日通勤 · 2 方案<small>仍出对比卡</small></a>
+      <a href="#v-gate-1"><b>V3</b> 单方案闸门<small>plans &lt; 2 → 不渲染本卡</small></a>
+      <a href="#v-multi-3"><b>V4</b> 跨天旅行 · 3 方案<small>multi_day · 行程骨架</small></a>
+      <a href="#v-foot"><b>V5</b> 带卡底脚注<small>compareFoot</small></a>
+      <a href="#v-pick-b"><b>V6</b> 推荐方案二<small>is-pick 换位</small></a>
+      <a href="#v-with-tip"><b>V7</b> 同条 + tip_block<small>相邻卡对照，非本卡</small></a>
+    </nav>
+
+    <main>
+      <section class="panel" id="v-same-3">
+        <div class="panel-head">
+          <h2>V1 · 一日通勤 · 3 方案</h2>
+          <span class="tag">variant: same_day</span>
+          <p>默认标杆。kicker「今日行程」；推荐方案时间线实色，其余 35% 透明。</p>
+        </div>
+        <div class="stage" data-mount="same3"></div>
+      </section>
+
+      <section class="panel" id="v-same-2">
+        <div class="panel-head">
+          <h2>V2 · 一日通勤 · 2 方案</h2>
+          <span class="tag">plans.length = 2</span>
+          <p>≥2 仍出对比卡；第三色方案不出现。</p>
+        </div>
+        <div class="stage" data-mount="same2"></div>
+      </section>
+
+      <section class="panel" id="v-gate-1">
+        <div class="panel-head">
+          <h2>V3 · 单方案闸门</h2>
+          <span class="tag">gate</span>
+          <p>仍可调用 Tool；对比卡不渲染。明细表可在同条消息另出（本墙不画表）。</p>
+        </div>
+        <div class="stage">
+          <div class="gate">本形态 <b>不渲染</b> <code>option_compare</code><br/>条件：<code>plans.length &lt; 2</code></div>
+        </div>
+        <p class="note">调用规则：单方案也可调 <code>present_option_compare</code>；前端按闸门跳过对比卡。</p>
+      </section>
+
+      <section class="panel" id="v-multi-3">
+        <div class="panel-head">
+          <h2>V4 · 跨天旅行 · 3 方案</h2>
+          <span class="tag">variant: multi_day</span>
+          <p>kicker「行程骨架」；节点带「晚数」标签；时间列更宽（日期 + 时刻）。</p>
+        </div>
+        <div class="stage" data-mount="multi3"></div>
+      </section>
+
+      <section class="panel" id="v-foot">
+        <div class="panel-head">
+          <h2>V5 · 带卡底脚注</h2>
+          <span class="tag">compareFoot</span>
+          <p>有 <code>compareFoot</code> 才出 <code>.rc-foot</code>。</p>
+        </div>
+        <div class="stage" data-mount="foot"></div>
+      </section>
+
+      <section class="panel" id="v-pick-b">
+        <div class="panel-head">
+          <h2>V6 · 推荐落在方案二</h2>
+          <span class="tag">pick ≠ plan[0]</span>
+          <p>推荐标记与实色时间线跟所选方案走，不固定第一块。</p>
+        </div>
+        <div class="stage" data-mount="pickB"></div>
+      </section>
+
+      <section class="panel" id="v-with-tip">
+        <div class="panel-head">
+          <h2>V7 · 同条消息相邻：tip_block</h2>
+          <span class="tag">card_id: tip_block</span>
+          <p>出行提示是全局提示块，不是第二张业务 Tool。此处仅对照视觉关系。</p>
+        </div>
+        <div class="stage" data-mount="withTip"></div>
+        <p class="note">Agent 调 <code>present_option_compare</code>；tips 由前端挂 <code>tip_block</code>（无 Tool）。</p>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    const bulb = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18h6M10 22h4"/><path d="M12 2a7 7 0 0 0-4 12.7c.6.5 1 1.3 1 2.1V18h6v-1.2c0-.8.4-1.6 1-2.1A7 7 0 0 0 12 2z"/></svg>`;
+
+    const SAME = {
+      kicker: "今日行程",
+      timeCol: 68,
+      trip: `徐汇滨江 <i aria-hidden="true">→</i> 陆家嘴 <b>9:30</b> <i aria-hidden="true">→</i> 静安寺 <b>12:00</b> <i aria-hidden="true">→</i> 人民广场 <b>15:00</b>`,
+      plans: [
+        {
+          name: "方案一", way: "全地铁", pos: "高效准点", reason: "时间最可控，早高峰不堵车",
+          legs: [
+            ["08:25", "徐汇滨江 → 陆家嘴", "地铁 · 09:15–09:20 到"],
+            ["11:20", "陆家嘴 → 静安寺", "地铁 · 约 11:45 到"],
+            ["14:30", "静安寺 → 人民广场", "地铁 · 约 14:50 到"]
+          ]
+        },
+        {
+          name: "方案二", way: "全程专车 / 打车", pos: "舒适省心", reason: "适合随行带资料、注重私密舒适",
+          risk: "早高峰过江及延东隧道车流量大，行车通常需 45–55 分钟。",
+          legs: [
+            ["08:15", "徐汇滨江 → 陆家嘴", "专车 · 09:10–09:20 到"],
+            ["11:20", "陆家嘴 → 静安寺", "专车 · 约 11:45 到"],
+            ["14:30", "静安寺 → 人民广场", "专车 · 14:45–14:50 到"]
+          ]
+        },
+        {
+          name: "方案三", way: "地铁避堵 + 地面出行", pos: "弹性组合", reason: "平衡省心与效率",
+          legs: [
+            ["08:25", "徐汇滨江 → 陆家嘴", "地铁 · 约 09:20 到"],
+            ["11:25", "陆家嘴 → 静安寺", "地铁 / 打车 · 约 11:40 到"],
+            ["14:30", "静安寺 → 人民广场", "打车 / 骑行 / 地铁 · 约 14:45 到"]
+          ]
+        }
+      ],
+      tips: [
+        ["陆家嘴站步行时间", "站内出闸到写字楼前台通常需预留 8–10 分钟。"],
+        ["静安寺午餐时间", "12:00 面谈后约有 1 小时富余，可在附近处理邮件。"]
+      ],
+      foot: "以上为示例班次与路况假设，出门前请再确认地铁运营与路况。"
+    };
+
+    const MULTI = {
+      kicker: "行程骨架",
+      timeCol: 92,
+      trip: `马德里 <i aria-hidden="true">→</i> 巴塞罗那 <b>3 晚</b> <i aria-hidden="true">→</i> 马略卡 <b>4 晚</b> <i aria-hidden="true">→</i> 马德里`,
+      plans: [
+        {
+          name: "方案一", way: "高铁 + 飞机", pos: "换乘最少", reason: "市中心直达，三程在途合计约 5 小时",
+          legs: [
+            ["11/19 09:00", "马德里 → 巴塞罗那", "高铁 · 11:30 到"],
+            ["11/22 10:30", "巴塞罗那 → 马略卡", "飞机 · 11:25 到"],
+            ["11/26 16:00", "马略卡 → 马德里", "飞机 · 17:25 到"]
+          ]
+        },
+        {
+          name: "方案二", way: "全程飞机", pos: "班次灵活", reason: "三程都飞，改签空间大",
+          risk: "第一程门到门约 3.5 小时，并不比高铁快。",
+          legs: [
+            ["11/19 09:30", "马德里 → 巴塞罗那", "飞机 · 10:45 到"],
+            ["11/22 10:30", "巴塞罗那 → 马略卡", "飞机 · 11:25 到"],
+            ["11/26 16:00", "马略卡 → 马德里", "飞机 · 17:25 到"]
+          ]
+        },
+        {
+          name: "方案三", way: "高铁 + 夜渡轮 + 飞机", pos: "省一晚住宿", reason: "第二程船上过夜",
+          legs: [
+            ["11/19 09:00", "马德里 → 巴塞罗那", "高铁 · 11:30 到"],
+            ["11/21 23:00", "巴塞罗那 → 马略卡", "夜间渡轮 · 次日 07:00 到"],
+            ["11/26 16:00", "马略卡 → 马德里", "飞机 · 17:25 到"]
+          ]
+        }
+      ]
+    };
+
+    function planHtml(plan, index, pickIndex, timeCol) {
+      const picked = index === pickIndex;
+      const legs = plan.legs.map(([t, seg, sub]) =>
+        `<li><i class="rc-dot" aria-hidden="true"></i><b class="rc-time">${t}</b><span class="rc-seg">${seg}</span><span class="rc-sub">${sub}</span></li>`
+      ).join("");
+      return `<section class="rc-plan${picked ? " is-pick" : ""}" style="--plan:var(--rt-plan-${index + 1})">
+        <div class="rc-plan-head"><h4 class="rc-title">${plan.name} · ${plan.way}</h4>${picked ? `<em class="rt-pick">推荐</em>` : ""}</div>
+        <p class="rc-sub">${plan.pos} · ${plan.reason}</p>
+        ${plan.risk ? `<p class="rc-fit">${plan.risk}</p>` : ""}
+        <ol class="rc-legs" style="--time-col:${timeCol}px">${legs}</ol>
+      </section>`;
+    }
+
+    function cardHtml(data, { pickIndex = 0, planCount = 3, foot = false } = {}) {
+      const plans = data.plans.slice(0, planCount).map((p, i) => planHtml(p, i, pickIndex, data.timeCol)).join("");
+      return `<article class="rc-card" aria-label="行程对比">
+        <header class="rc-head"><p class="rc-kicker">${data.kicker}</p><p class="rc-trip">${data.trip}</p></header>
+        ${plans}
+        ${foot && data.foot ? `<p class="rc-foot">${data.foot}</p>` : ""}
+      </article>`;
+    }
+
+    function tipHtml(tips) {
+      return `<aside class="rt-tips" aria-label="出行提示"><p class="rt-tips-h">${bulb}出行提示</p><ul>${
+        tips.map(([h, b]) => `<li><b>${h}：</b>${b}</li>`).join("")
+      }</ul></aside>`;
+    }
+
+    const mounts = {
+      same3: () => cardHtml(SAME),
+      same2: () => cardHtml(SAME, { planCount: 2 }),
+      multi3: () => cardHtml(MULTI),
+      foot: () => cardHtml(SAME, { foot: true }),
+      pickB: () => cardHtml(SAME, { pickIndex: 1 }),
+      withTip: () => cardHtml(SAME) + tipHtml(SAME.tips)
+    };
+
+    document.querySelectorAll("[data-mount]").forEach(el => {
+      const key = el.getAttribute("data-mount");
+      if (mounts[key]) el.innerHTML = mounts[key]();
+    });
+
+    const themeBtn = document.getElementById("themeBtn");
+    themeBtn.addEventListener("click", () => {
+      const on = document.documentElement.classList.toggle("theme-dark");
+      themeBtn.setAttribute("aria-pressed", String(on));
+      themeBtn.textContent = on ? "浅色" : "深色";
+    });
+  </script>
+</body>
+</html>

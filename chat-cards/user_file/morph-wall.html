@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>card_id · user_file · 形态墙</title>
+  <style>
+    :root {
+      --page: #f5f6f8; --ink: #171717; --muted: rgba(0,0,0,.6); --faint: rgba(0,0,0,.4);
+      --line: #e3e4e7; --brand: #0a59f7; --chip: #fff; --chip-line: #e3e4e7;
+      --fc-border: #eef0f3;
+      --ico-docx-bg: #e6eefe; --ico-docx: #3370ff;
+      --ico-md-bg: #e5f6f7; --ico-md: #12b5c7;
+      --ico-xlsx-bg: #eff8ef; --ico-xlsx: #2da641;
+      --ico-pdf-bg: #fdece9; --ico-pdf: #f54a45;
+      --ico-html-bg: #f3ebff; --ico-html: #8b5cf6;
+      --ico-pptx-bg: #fdece9; --ico-pptx: #f54a45;
+    }
+    html.theme-dark {
+      color-scheme: dark;
+      --page: #090b0e; --ink: #fff; --muted: rgba(255,255,255,.6); --faint: rgba(255,255,255,.4);
+      --line: #292b2e; --brand: #317af7; --chip: #191a1d; --chip-line: #434448;
+      --fc-border: #292b2e;
+      --ico-docx-bg: #0a1831; --ico-md-bg: #0f2426; --ico-xlsx-bg: #122211;
+      --ico-pdf-bg: #2a1412; --ico-html-bg: #1a1230; --ico-pptx-bg: #2a1412;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: "PingFang SC", "HarmonyOS Sans SC", "Helvetica Neue", sans-serif; background: var(--page); color: var(--ink); }
+    .top {
+      position: sticky; top: 0; z-index: 20; display: flex; flex-wrap: wrap; gap: 12px; justify-content: space-between;
+      padding: 16px 24px; border-bottom: 1px solid var(--line);
+      background: color-mix(in srgb, var(--page) 92%, transparent); backdrop-filter: blur(8px);
+    }
+    .top h1 { margin: 0; font-size: 18px; line-height: 26px; }
+    .top p { margin: 4px 0 0; color: var(--muted); font-size: 13px; line-height: 20px; max-width: 48rem; }
+    .meta { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+    .meta code { padding: 4px 10px; border-radius: 8px; background: var(--chip); border: 1px solid var(--chip-line); font-size: 12px; }
+    .meta code b { color: var(--faint); }
+    .tools a, .tools button {
+      display: inline-flex; align-items: center; height: 32px; padding: 0 12px; border-radius: 8px;
+      border: 1px solid var(--chip-line); background: var(--chip); color: var(--ink); font-size: 13px;
+      text-decoration: none; cursor: pointer;
+    }
+    .layout { display: grid; grid-template-columns: 200px minmax(0,1fr); }
+    nav { padding: 16px 12px 32px 24px; border-right: 1px solid var(--line); }
+    nav a { display: block; padding: 8px 10px; border-radius: 8px; color: var(--muted); text-decoration: none; font-size: 13px; }
+    nav a:hover { background: var(--chip); color: var(--ink); }
+    nav a small { display: block; color: var(--faint); font-size: 11px; margin-top: 2px; }
+    main { padding: 20px 24px 64px; max-width: 900px; }
+    .panel { scroll-margin-top: 96px; margin: 0 0 24px; padding: 16px; border: 1px solid var(--line); border-radius: 16px; background: var(--chip); }
+    .panel-head h2 { margin: 0; font-size: 15px; }
+    .panel-head p { margin: 6px 0 12px; color: var(--muted); font-size: 12px; line-height: 18px; }
+    .tag { display: inline-block; margin-left: 8px; height: 20px; padding: 0 8px; border-radius: 99px; background: #e9f5e7; color: #64bb5c; font-size: 11px; line-height: 20px; font-weight: 600; }
+    .stage { max-width: 736px; }
+    .note { margin: 12px 0 0; padding: 10px 12px; border-radius: 10px; background: var(--page); color: var(--muted); font-size: 12px; line-height: 18px; }
+    .chat-grid { display: flex; flex-wrap: wrap; gap: 12px 16px; justify-content: flex-end; }
+    .col.end { display: flex; flex-direction: column; align-items: flex-end; }
+
+    .fc {
+      position: relative; display: inline-flex; align-items: center; gap: 12px;
+      width: 200px; padding: 7px 13px; border: 1px solid var(--fc-border); border-radius: 12px;
+      background: #fff; cursor: pointer;
+    }
+    html.theme-dark .fc { background: #111216; }
+    .fc-ico {
+      flex: none; width: 32px; height: 32px; border-radius: 8px;
+      display: grid; place-items: center; color: var(--ico-docx); background: var(--ico-docx-bg);
+    }
+    .fc.kind-md .fc-ico { background: var(--ico-md-bg); color: var(--ico-md); }
+    .fc.kind-docx .fc-ico { background: var(--ico-docx-bg); color: var(--ico-docx); }
+    .fc.kind-xlsx .fc-ico { background: var(--ico-xlsx-bg); color: var(--ico-xlsx); }
+    .fc.kind-pdf .fc-ico { background: var(--ico-pdf-bg); color: var(--ico-pdf); }
+    .fc.kind-html .fc-ico { background: var(--ico-html-bg); color: var(--ico-html); }
+    .fc.kind-pptx .fc-ico { background: var(--ico-pptx-bg); color: var(--ico-pptx); }
+    .fc-copy { min-width: 0; flex: 1; }
+    .fc-copy b {
+      display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+      color: #1e293b; font-size: 14px; line-height: 20px; font-weight: 500;
+    }
+    html.theme-dark .fc-copy b { color: #fff; }
+    .fc-copy small { display: block; color: rgba(0,0,0,.4); font-size: 12px; line-height: 20px; }
+    html.theme-dark .fc-copy small { color: var(--faint); }
+
+    .fi { width: 56px; height: 56px; border-radius: 12px; overflow: hidden; flex: none; }
+    .fi-img {
+      display: block; width: 100%; height: 100%;
+      background:
+        radial-gradient(circle at 30% 40%, #c4a574 0 18%, transparent 19%),
+        radial-gradient(circle at 70% 45%, #8b6914 0 12%, transparent 13%),
+        linear-gradient(160deg, #7eb6ff 0%, #3d6fb8 45%, #2a4a7a 100%);
+    }
+    @media (max-width: 800px) {
+      .layout { grid-template-columns: 1fr; }
+      nav { display: flex; gap: 4px; overflow-x: auto; border-right: 0; border-bottom: 1px solid var(--line); }
+      nav a small { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <header class="top">
+    <div>
+      <h1>形态墙 · user_file</h1>
+      <p>Chat 区用户已发送的文件。宽 200、类型色图标；<b>无移除、无下载</b>。与输入框 <code>composer_file</code> 是两张卡。</p>
+      <div class="meta">
+        <code><b>card_id</b> user_file</code>
+        <code><b>tool</b> 无 · host_only</code>
+        <code><b>aliases</b> file_chip（chat）</code>
+      </div>
+    </div>
+    <div class="tools">
+      <button type="button" id="themeBtn">深色</button>
+      <a href="../composer_file/morph-wall.html">composer_file</a>
+      <a href="../doc_entry/morph-wall.html">doc_entry</a>
+      <a href="../CARD_ID-NAMING.md">命名</a>
+    </div>
+  </header>
+
+  <div class="layout">
+    <nav>
+      <a href="#v-types"><b>V1</b> 类型色板<small>md/docx/pdf…</small></a>
+      <a href="#v-msg"><b>V2</b> 用户消息内<small>右对齐</small></a>
+    </nav>
+    <main>
+      <section class="panel" id="v-types">
+        <div class="panel-head">
+          <h2>V1 · 类型色<span class="tag">user_file</span></h2>
+          <p>图标底色随扩展名；点卡打开预览由宿主接。</p>
+        </div>
+        <div class="stage">
+          <div class="chat-grid" data-mount="types" style="justify-content:flex-start"></div>
+        </div>
+      </section>
+      <section class="panel" id="v-msg">
+        <div class="panel-head">
+          <h2>V2 · 用户消息内</h2>
+          <p>跟在用户气泡侧，右对齐；仍无 ×。</p>
+        </div>
+        <div class="stage col end">
+          <div class="chat-grid" data-mount="msg"></div>
+        </div>
+        <p class="note">对比：<code>composer_file</code> = 待发可删；<code>user_file</code> = 已发送展示；<code>doc_entry</code> = AI 产物入口（可预览/下载）。</p>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    const DOC = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M8 13h8M8 17h5"/></svg>`;
+
+    function fileCard(name, kind, size = "2.85MB") {
+      return `<span class="fc kind-${kind}" title="${name}"><span class="fc-ico">${DOC}</span><span class="fc-copy"><b>${name}</b><small>${size}</small></span></span>`;
+    }
+    function imgCard() {
+      return `<span class="fi" role="img" aria-label="图片"><span class="fi-img"></span></span>`;
+    }
+
+    const mounts = {
+      types: () => [
+        fileCard("设计文档.md", "md"),
+        fileCard("设计文档.docx", "docx"),
+        fileCard("设计文档.xlsx", "xlsx"),
+        fileCard("设计文档.pdf", "pdf"),
+        fileCard("设计文档.html", "html"),
+        fileCard("设计文档.pptx", "pptx"),
+        imgCard()
+      ].join(""),
+      msg: () => [
+        fileCard("开题报告_v2.docx", "docx", "1.1MB"),
+        fileCard("参考文献.pdf", "pdf", "3.2MB"),
+        imgCard()
+      ].join("")
+    };
+    document.querySelectorAll("[data-mount]").forEach(el => { el.innerHTML = mounts[el.dataset.mount](); });
+    document.getElementById("themeBtn").onclick = () => {
+      const on = document.documentElement.classList.toggle("theme-dark");
+      themeBtn.textContent = on ? "浅色" : "深色";
+    };
+  </script>
+</body>
+</html>

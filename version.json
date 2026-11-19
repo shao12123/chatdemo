@@ -1,5 +1,5 @@
 {
-  "version": "2026.11.19-12",
-  "updatedAt": "2026-11-19 15:51",
-  "note": "生成计划清单入口改为打开计划清单 PRD"
+  "version": "2026.11.19-13",
+  "updatedAt": "2026-11-19 16:42",
+  "note": "附件拆卡：composer_file + user_file；卡片库形态墙入 demos；命名文档 v1.3"
 }

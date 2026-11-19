@@ -37,6 +37,55 @@
       "summary": "PRD + Agent TOOL（可下载 Demo.html / TOOL.md / PRD.md）：行程规划触发判定与边界清单；前端职责、数据契约、验收；可打开交互 Demo"
     },
     {
+      "id": "card-option-compare-wall",
+      "title": "卡片库 · option_compare 形态墙",
+      "file": "chat-cards/option_compare/morph-wall.html",
+      "owner": "共同维护",
+      "summary": "通用多方案对比壳；旧名 route_compare；命名见 chat-cards/CARD_ID-NAMING.md"
+    },
+    {
+      "id": "card-data-table-wall",
+      "title": "卡片库 · data_table 形态墙",
+      "file": "chat-cards/data_table/morph-wall.html",
+      "owner": "共同维护",
+      "summary": "通用明细表壳；旧名 route_detail；行程/审查等同用 present_data_table"
+    },
+    {
+      "id": "card-tip-block-wall",
+      "title": "卡片库 · tip_block 形态墙",
+      "file": "chat-cards/tip_block/morph-wall.html",
+      "owner": "共同维护",
+      "summary": "全站提示块；host_only，无 Agent Tool"
+    },
+    {
+      "id": "card-error-card-wall",
+      "title": "卡片库 · error_card 形态墙",
+      "file": "chat-cards/error_card/morph-wall.html",
+      "owner": "共同维护",
+      "summary": "全站错误卡片（.net-card + 重试）；host_only，无 Agent Tool"
+    },
+    {
+      "id": "card-composer-file-wall",
+      "title": "卡片库 · composer_file 形态墙",
+      "file": "chat-cards/composer_file/morph-wall.html",
+      "owner": "共同维护",
+      "summary": "输入框附件：悬停角标×/上传中/多文件滑动；host_only；旧名 file_chip composer"
+    },
+    {
+      "id": "card-user-file-wall",
+      "title": "卡片库 · user_file 形态墙",
+      "file": "chat-cards/user_file/morph-wall.html",
+      "owner": "共同维护",
+      "summary": "对话用户文件：类型色/无移除；host_only；旧名 file_chip chat"
+    },
+    {
+      "id": "card-doc-entry-wall",
+      "title": "卡片库 · doc_entry 形态墙",
+      "file": "chat-cards/doc_entry/morph-wall.html",
+      "owner": "共同维护",
+      "summary": "文档/产物入口条（artifact）：默认/已打开/写入中/对比入口；host_only"
+    },
+    {
       "id": "gen-fault",
       "title": "生成异常与恢复",
       "file": "生成异常与恢复-PRD.html",
