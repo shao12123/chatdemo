@@ -1,5 +1,5 @@
 {
-  "version": "2026.11.19-18",
-  "updatedAt": "2026-11-19 18:00",
-  "note": "Chat 卡：map_align / app_link / schedule_preview（agenda 为别名）；命名 v1.8"
+  "version": "2026.11.19-19",
+  "updatedAt": "2026-11-19 18:35",
+  "note": "日程 Chat 只留 doc_entry 日历入口；撤 schedule_preview；命名 v1.9"
 }

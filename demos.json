@@ -83,7 +83,7 @@
       "title": "卡片库 · doc_entry 形态墙",
       "file": "chat-cards/doc_entry/morph-wall.html",
       "owner": "共同维护",
-      "summary": "文档/产物入口条（artifact）：默认/已打开/写入中/对比入口；host_only"
+      "summary": "文档/产物入口（含日历 mark）：日程 Chat 只挂本卡；host_only"
     },
     {
       "id": "card-ask-form-wall",
@@ -126,13 +126,6 @@
       "file": "chat-cards/app_link/morph-wall.html",
       "owner": "共同维护",
       "summary": "连接外部应用卡 present_app_link：待授权 / 已连接 / 失败 / 已取消；授权弹层为 host 浮层不入卡"
-    },
-    {
-      "id": "card-schedule-preview-wall",
-      "title": "卡片库 · schedule_preview 形态墙",
-      "file": "chat-cards/schedule_preview/morph-wall.html",
-      "owner": "共同维护",
-      "summary": "日程预览卡 present_schedule_preview（agenda_list 为别名）：timeline / agenda、待确认→安排中→已确认、选项与日期闸门归 ask_form、失败与部分失败"
     },
     {
       "id": "gen-fault",

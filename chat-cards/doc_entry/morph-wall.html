@@ -95,6 +95,17 @@
     .artifact-actions button:hover { background: rgba(9, 11, 14, 0.04); }
     html.theme-dark .artifact-actions button { color: #aeb2b8; }
 
+    /* 时间场景：日历 mark 头图（无缩略预览） */
+    .artifact.cal { width: 300px; height: auto; min-height: 54px; padding: 7px 13px; }
+    .artifact.cal .artifact-open { padding: 0; height: auto; min-height: 40px; }
+    .artifact-mark {
+      display: grid; place-items: center; flex: none; width: 32px; height: 32px;
+      border-radius: 8px; background: #e6eefe; color: #0a59f7;
+    }
+    html.theme-dark .artifact-mark { background: #0a1831; color: #317af7; }
+    .artifact-mark svg { display: block; width: 16px; height: 16px; }
+    .artifact.cal .artifact-copy small { line-height: 20px; }
+
     .artifact.cmp { width: min(340px, 100%); height: auto; min-height: 64px; gap: 0; padding: 0; }
     .artifact.cmp .artifact-open, .artifact.cmp.button-like {
       display: flex; align-items: center; gap: 10px; width: 100%; padding: 8px 12px 8px 8px;
@@ -127,11 +138,11 @@
   <header class="top">
     <div>
       <h1>形态墙 · doc_entry</h1>
-      <p>对话里的文档 / 产物入口条（artifact）。点整卡打开右侧文档台；悬停出预览/下载。前端挂，无独立 Agent Tool。</p>
+      <p>对话里的文档 / 产物入口条（artifact）。含<strong>文档缩略</strong>与<strong>日历 mark</strong>两种头图。日程管理 Chat <b>只挂本卡</b>，点开右侧日历台（非卡）。host_only。</p>
       <div class="meta">
         <code><b>card_id</b> doc_entry</code>
         <code><b>tool</b> 无 · host_only</code>
-        <code><b>aliases</b> artifact · 文档入口 · 产物卡</code>
+        <code><b>aliases</b> artifact · 文档入口 · 产物卡 · 日历入口</code>
       </div>
     </div>
     <div class="tools">
@@ -149,6 +160,9 @@
       <a href="#v-writing"><b>V3</b> 写入中<small>live 状态</small></a>
       <a href="#v-cmp"><b>V4</b> 对比入口<small>双页缩略</small></a>
       <a href="#v-disabled"><b>V5</b> 不可用<small>.is-disabled</small></a>
+      <a href="#v-cal"><b>V6</b> 日历入口<small>mark · 日程</small></a>
+      <a href="#v-cal-on"><b>V7</b> 日历已打开<small>.on</small></a>
+      <a href="#v-cal-partial"><b>V8</b> 部分成功<small>已创建/失败</small></a>
     </nav>
     <main>
       <section class="panel" id="v-default">
@@ -185,7 +199,29 @@
           <p>生成失败 / 未就绪时降低透明度且不可点。</p>
         </div>
         <div class="stage" data-mount="disabled"></div>
-        <p class="note">对比：<code>composer_file</code> 输入框待发；<code>user_file</code> 用户已发送；<code>doc_entry</code> AI 产物入口（可预览/下载）。</p>
+        <p class="note">对比：<code>composer_file</code> 输入框待发；<code>user_file</code> 用户已发送；<code>doc_entry</code> AI 产物入口。</p>
+      </section>
+      <section class="panel" id="v-cal">
+        <div class="panel-head">
+          <h2>V6 · 日历入口<span class="tag">日程</span></h2>
+          <p>时间场景产物：左侧日历 mark + 标题 +「日历 · …」副文案。日程管理 Chat <b>只出本卡</b>；timeline / agenda 预览板不进卡片库。</p>
+        </div>
+        <div class="stage" data-mount="cal"></div>
+      </section>
+      <section class="panel" id="v-cal-on">
+        <div class="panel-head">
+          <h2>V7 · 日历已打开</h2>
+          <p>右侧日历台打开时：<code>.artifact.on</code> 品牌描边 + 浅蓝底（与截图一致）。</p>
+        </div>
+        <div class="stage" data-mount="calOn"></div>
+      </section>
+      <section class="panel" id="v-cal-partial">
+        <div class="panel-head">
+          <h2>V8 · 部分成功</h2>
+          <p>副文案反馈写入结果，例如「已创建 7 项，失败 2 项」；点开仍看右侧台（仅成功项）。</p>
+        </div>
+        <div class="stage" data-mount="calPartial"></div>
+        <p class="note">全部失败可不挂入口（或挂 disabled）；失败重试条走 <code>error_card</code> / 场景自带 chrome，不另开日程卡。</p>
       </section>
     </main>
   </div>
@@ -216,6 +252,11 @@
       </button>`;
     }
 
+    const calGlyph = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15" rx="2"/><path d="M8 3v4M16 3v4M3.5 10h17"/></svg>`;
+    function calEntry({ name, meta, on = false }) {
+      return `<div class="artifact cal${on ? " on" : ""}"><button class="artifact-open" type="button"><span class="artifact-mark">${calGlyph}</span><span class="artifact-copy"><b>${name}</b><small>${meta}</small></span></button></div>`;
+    }
+
     const mounts = {
       def: () => entry({
         name: "课程论文_初稿.md", meta: "2.85 MB",
@@ -240,7 +281,10 @@
         kicker: "标注修订", title: "未能写出新版",
         lines: ["可点错误卡重试。"],
         disabled: true, showActions: false
-      })
+      }),
+      cal: () => calEntry({ name: "周四面试日程", meta: "日历 · 9 项模拟安排" }),
+      calOn: () => calEntry({ name: "周四面试日程", meta: "日历 · 已按建议写入", on: true }),
+      calPartial: () => calEntry({ name: "周四面试日程", meta: "日历 · 已创建 7 项，失败 2 项", on: true })
     };
 
     document.querySelectorAll("[data-mount]").forEach(el => { el.innerHTML = mounts[el.dataset.mount](); });
