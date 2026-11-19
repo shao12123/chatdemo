@@ -1,5 +1,5 @@
 {
-  "version": "2026.11.19-13",
-  "updatedAt": "2026-11-19 16:42",
-  "note": "附件拆卡：composer_file + user_file；卡片库形态墙入 demos；命名文档 v1.3"
+  "version": "2026.11.19-14",
+  "updatedAt": "2026-11-19 16:55",
+  "note": "卡片库：ask_form（host_only 全量）+ weather_card（present_ 全量）形态墙；命名 v1.4"
 }

@@ -1,0 +1,728 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>card_id · weather_card · 形态墙</title>
+  <style>
+
+    :root {
+      --page: #f5f6f8; --ink: #171717; --muted: rgba(0,0,0,.6); --faint: rgba(0,0,0,.4);
+      --line: #e3e4e7; --brand: #0a59f7; --chip: #fff; --chip-line: #e3e4e7;
+      --card: #ffffff; --font: Inter, "PingFang SC", sans-serif;
+    }
+    html.theme-dark {
+      color-scheme: dark;
+      --page: #090b0e; --ink: #fff; --muted: rgba(255,255,255,.6); --faint: rgba(255,255,255,.4);
+      --line: #292b2e; --brand: #317af7; --chip: #191a1d; --chip-line: #434448;
+      --card: #111216;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: "PingFang SC", "HarmonyOS Sans SC", "Helvetica Neue", sans-serif; background: var(--page); color: var(--ink); }
+    .top {
+      position: sticky; top: 0; z-index: 20; display: flex; flex-wrap: wrap; gap: 12px; justify-content: space-between;
+      padding: 16px 24px; border-bottom: 1px solid var(--line);
+      background: color-mix(in srgb, var(--page) 92%, transparent); backdrop-filter: blur(8px);
+    }
+    .top h1 { margin: 0; font-size: 18px; line-height: 26px; }
+    .top p { margin: 4px 0 0; color: var(--muted); font-size: 13px; line-height: 20px; max-width: 48rem; }
+    .meta { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+    .meta code { padding: 4px 10px; border-radius: 8px; background: var(--chip); border: 1px solid var(--chip-line); font-size: 12px; }
+    .meta code b { color: var(--faint); }
+    .tools { display: flex; flex-wrap: wrap; gap: 8px; align-items: flex-start; }
+    .tools a, .tools button, .mini {
+      display: inline-flex; align-items: center; height: 32px; padding: 0 12px; border-radius: 8px;
+      border: 1px solid var(--chip-line); background: var(--chip); color: var(--ink); font-size: 13px;
+      text-decoration: none; cursor: pointer; font-family: inherit;
+    }
+    .mini { height: 26px; padding: 0 10px; font-size: 12px; color: var(--muted); }
+    .layout { display: grid; grid-template-columns: 200px minmax(0,1fr); }
+    nav { padding: 16px 12px 32px 24px; border-right: 1px solid var(--line); position: sticky; top: 0; align-self: start; max-height: 100vh; overflow-y: auto; }
+    nav a { display: block; padding: 8px 10px; border-radius: 8px; color: var(--muted); text-decoration: none; font-size: 13px; }
+    nav a:hover { background: var(--chip); color: var(--ink); }
+    nav a small { display: block; color: var(--faint); font-size: 11px; margin-top: 2px; }
+    main { padding: 20px 24px 64px; max-width: 900px; }
+    .panel { scroll-margin-top: 96px; margin: 0 0 24px; padding: 16px; border: 1px solid var(--line); border-radius: 16px; background: var(--chip); }
+    .panel-head { display: flex; justify-content: space-between; gap: 12px; align-items: flex-start; }
+    .panel-head h2 { margin: 0; font-size: 15px; }
+    .panel-head p { margin: 6px 0 12px; color: var(--muted); font-size: 12px; line-height: 18px; }
+    .tag { display: inline-block; margin-left: 8px; height: 20px; padding: 0 8px; border-radius: 99px; background: #fff4e8; color: #ed6f21; font-size: 11px; line-height: 20px; font-weight: 600; }
+    .stage { max-width: 736px; }
+    .row { display: flex; flex-wrap: wrap; gap: 16px; align-items: flex-start; }
+    .lab { margin: 0 0 8px; color: var(--faint); font-size: 12px; }
+    .lab:not(:first-child) { margin-top: 16px; }
+    .note { margin: 12px 0 0; padding: 10px 12px; border-radius: 10px; background: var(--page); color: var(--muted); font-size: 12px; line-height: 18px; }
+    .note code { font-size: 11px; }
+    .gate { width: 436px; max-width: 100%; padding: 10px 12px; border: 1px dashed var(--chip-line); border-radius: 12px; color: var(--faint); font-size: 12px; line-height: 18px; }
+    /* 墙内：日历改为文档流（产品为 fixed 浮层，由 placeAskCal 定位） */
+    .stage .ask-cal { position: static; margin: 4px 8px 8px 38px; }
+    .stage .ask { margin-top: 0; }
+    .stage .ask.is-done + .ask-note { margin: 8px 0 0; }
+    .stage .ask-note + .wx { width: 436px; max-width: 100%; margin-top: 16px; }
+    .stage .ask.is-w-sm { width: 300px; }
+    @media (max-width: 800px) {
+      .layout { grid-template-columns: 1fr; }
+      nav { position: static; max-height: none; display: flex; gap: 4px; overflow-x: auto; border-right: 0; border-bottom: 1px solid var(--line); }
+      nav a small { display: none; }
+    }
+
+    /* ===== 以下 .lead / .wx* / .ask* 抄自 天气场景.html（唯一来源）===== */
+    .lead { margin: 0 0 12px; font-size: 14px; line-height: 24px; font-weight: 400; }
+    #stage .msg.assistant .lead { margin: 0 0 12px; }
+    .wx {
+      align-self: flex-start;
+      width: 436px;
+      max-width: 100%;
+      --day: 40px;
+      border-radius: 12px;
+      padding: 18px 18px 14px;
+      color: #fff;
+      background: #0b6fe0;
+      font-family: var(--font);
+      -webkit-font-smoothing: antialiased;
+    }
+    .wx:has(.wx-scroll) { padding-bottom: 12px; }
+    .wx-sun {
+      background:
+        radial-gradient(130% 70% at 50% -24%, rgba(255,255,255,.5), transparent 56%),
+        radial-gradient(80% 46% at 78% -8%, rgba(255, 232, 160, .42), transparent 62%),
+        linear-gradient(180deg, #62c8ff 0%, #2f95f6 40%, #0b6fe0 100%);
+    }
+    .wx-cloud { background: #7b93a8; }
+    .wx-rain {
+      background:
+        radial-gradient(120% 52% at 50% -18%, rgba(255,255,255,.18), transparent 60%),
+        linear-gradient(180deg, #5b7d9a 0%, #3a5a76 50%, #223648 100%);
+    }
+    .wx-storm {
+      background:
+        radial-gradient(70% 38% at 74% -6%, rgba(255, 206, 130, .2), transparent 64%),
+        radial-gradient(80% 46% at 16% -12%, rgba(150, 130, 230, .18), transparent 62%),
+        linear-gradient(180deg, #3a2d68 0%, #211743 44%, #100c1c 100%);
+    }
+    .wx-snow {
+      color: #1d1d1f;
+      background:
+        radial-gradient(100% 46% at 50% -12%, rgba(255,255,255,.85), transparent 62%),
+        linear-gradient(180deg, #f3f8fc 0%, #e1eef7 46%, #cfe0ee 100%);
+    }
+    .wx-fog {
+      color: #1d1d1f;
+      background: linear-gradient(180deg, #e4e8ed 0%, #cfd6de 52%, #bcc5ce 100%);
+    }
+    .wx-night {
+      background:
+        radial-gradient(1.2px 1.2px at 18% 16%, rgba(255,255,255,.9), transparent 70%),
+        radial-gradient(1px 1px at 34% 26%, rgba(255,255,255,.7), transparent 70%),
+        radial-gradient(1px 1px at 62% 12%, rgba(255,255,255,.65), transparent 70%),
+        radial-gradient(1.3px 1.3px at 78% 22%, rgba(255,255,255,.5), transparent 70%),
+        radial-gradient(64px 64px at 88% 4%, rgba(214, 226, 255, .26), transparent 72%),
+        linear-gradient(180deg, #1a2748 0%, #0e1730 50%, #070b16 100%);
+    }
+    .wx-top { display: flex; flex-direction: column; }
+    .wx-place { font-size: 14px; line-height: 24px; font-weight: 500; }
+    .wx-hero { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 8px; }
+    .wx-temp { font-size: 48px; line-height: 56px; font-weight: 500; font-variant-numeric: tabular-nums; }
+    .wx-temp sup { font-size: .4em; font-weight: 500; line-height: 0; position: relative; top: -.55em; margin-left: 1px; }
+    .wx-cond { display: block; margin-top: 10px; font-size: 14px; line-height: 24px; font-weight: 400; }
+    .wx-range { display: flex; gap: 14px; margin-top: 6px; font-size: 14px; line-height: 24px; font-weight: 400; }
+    .wx-ico { width: 40px; height: 40px; flex: none; }
+    .wx-ico img, .wx-day-ico img { display: block; width: 100%; height: 100%; filter: drop-shadow(0 4px 8px rgba(0, 0, 0, .16)); }
+    .wx.is-light .wx-ico img, .wx.is-light .wx-day-ico img { filter: drop-shadow(0 1px 0 rgba(255,255,255,.7)) drop-shadow(0 2px 4px rgba(30, 50, 70, .28)); }
+    .wx-days { margin-top: 20px; padding-top: 12px; border-top: 1px solid rgba(255,255,255,.2); }
+    .wx.is-light .wx-days { border-top-color: rgba(0, 0, 0, .1); }
+    .wx-days-label { margin: 0 0 8px; font-size: 14px; line-height: 24px; font-weight: 500; opacity: .6; }
+    .wx-day { display: grid; grid-template-columns: 40px 20px 72px 48px minmax(28px, 1fr) 48px; align-items: center; column-gap: 4px; height: var(--day, 40px); }
+    .wx-day-label { font-size: 14px; line-height: 24px; font-weight: 400; }
+    .wx-day.is-today .wx-day-label { font-weight: 500; }
+    .wx-day-ico { width: 18px; height: 18px; }
+    .wx-day-pop { font-size: 14px; line-height: 24px; font-style: normal; font-weight: 500; color: #8ecfff; font-variant-numeric: tabular-nums; white-space: nowrap; }
+    .wx-day-pop.is-zero { opacity: .42; font-weight: 400; }
+    .wx.is-light .wx-day-pop { color: #007aff; }
+    .wx-bar { position: relative; height: 4px; border-radius: 4px; background: rgba(255,255,255,.22); }
+    .wx.is-light .wx-bar { background: rgba(0, 0, 0, .1); }
+    .wx-bar i { position: absolute; top: 0; bottom: 0; left: var(--lo); width: var(--span); border-radius: 4px; background: linear-gradient(90deg, var(--c1), var(--c2)); }
+    .wx-lo, .wx-hi { font-size: 14px; line-height: 24px; font-variant-numeric: tabular-nums; white-space: nowrap; }
+    .wx-lo { font-weight: 400; opacity: .6; text-align: right; }
+    .wx-hi { font-weight: 500; text-align: left; }
+    .wx-scroll { position: relative; width: 100%; }
+    .wx-scroll-body { width: 100%; max-height: calc(var(--day, 40px) * var(--preview, 8)); overflow-y: auto; scrollbar-width: none; }
+    .wx-scroll-body::-webkit-scrollbar { width: 0; height: 0; }
+    .wx-scroll.is-more .wx-scroll-body {
+      -webkit-mask-image: linear-gradient(to bottom, #000 0, #000 calc(100% - var(--day, 40px)), transparent calc(100% - var(--day, 40px) * .45));
+      mask-image: linear-gradient(to bottom, #000 0, #000 calc(100% - var(--day, 40px)), transparent calc(100% - var(--day, 40px) * .45));
+    }
+    .wx-more {
+      display: none;
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      height: var(--day, 40px);
+      align-items: flex-end;
+      justify-content: center;
+      padding-bottom: 0;
+      color: #fff;
+      font-size: 12px;
+      line-height: 22px;
+      font-weight: 500;
+      pointer-events: none;
+      background: linear-gradient(to bottom, rgba(123, 147, 168, 0) 0%, #7b93a8 48%);
+    }
+    .wx-sun .wx-more { background: linear-gradient(to bottom, rgba(11, 111, 224, 0) 0%, #0b6fe0 48%); }
+    .wx-rain .wx-more { background: linear-gradient(to bottom, rgba(34, 54, 72, 0) 0%, #223648 48%); }
+    .wx-storm .wx-more { background: linear-gradient(to bottom, rgba(16, 12, 28, 0) 0%, #100c1c 48%); }
+    .wx-night .wx-more { background: linear-gradient(to bottom, rgba(7, 11, 22, 0) 0%, #070b16 48%); }
+    .wx-snow .wx-more { color: #1d1d1f; background: linear-gradient(to bottom, rgba(207, 224, 238, 0) 0%, #cfe0ee 48%); }
+    .wx-fog .wx-more { color: #1d1d1f; background: linear-gradient(to bottom, rgba(188, 197, 206, 0) 0%, #bcc5ce 48%); }
+    .wx-scroll.is-more .wx-more { display: flex; }
+    .ask {
+      width: 436px;
+      max-width: 100%;
+      margin-top: 12px;
+      padding: 16px 8px;
+      border: 1px solid #eef0f3;
+      border-radius: 12px;
+      background: #fff;
+      color: #0c121a;
+    }
+    .ask-head { display: flex; align-items: center; justify-content: space-between; padding: 0 8px; }
+    .ask-title { margin: 0; font-size: 14px; line-height: 24px; font-weight: 500; color: #000; }
+    .ask-list { display: flex; flex-direction: column; gap: 4px; margin-top: 12px; }
+    .ask-opt {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      width: 100%;
+      height: 38px;
+      margin: 0;
+      padding: 8px;
+      border: 0;
+      border-radius: 12px;
+      background: transparent;
+      color: #0c121a;
+      font: inherit;
+      font-size: 14px;
+      line-height: 24px;
+      text-align: left;
+      cursor: pointer;
+    }
+    .ask-opt:hover { background: rgba(9, 11, 14, .04); }
+    .ask-num {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 22px;
+      height: 22px;
+      flex: none;
+      border-radius: 6px;
+      background: rgba(9, 11, 14, .04);
+      color: rgba(0, 0, 0, .6);
+      font-size: 14px;
+      line-height: 24px;
+    }
+    .ask-num svg { display: none; width: 22px; height: 22px; }
+    .ask-opt.is-on .ask-num { background: #0a59f7; color: #fff; }
+    .ask-opt.is-on .ask-num svg { display: block; }
+    .ask-label { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .ask-custom { height: 38px; padding-top: 3px; padding-bottom: 3px; cursor: text; }
+    .ask-input {
+      flex: 1;
+      min-width: 0;
+      height: 22px;
+      margin: 0;
+      padding: 0 12px;
+      border: 1px solid #e3e4e7;
+      border-radius: 8px;
+      background: #fff;
+      color: #0c121a;
+      font: inherit;
+      font-size: 14px;
+      line-height: 24px;
+      outline: none;
+    }
+    .ask-input::placeholder { color: rgba(0, 0, 0, .4); }
+    .ask-input:focus { border-color: #84acfb; }
+    .ask-trigger {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      flex: 1;
+      min-width: 0;
+      height: 32px;
+      margin: 0;
+      padding: 0 10px 0 12px;
+      border: 1px solid #dee0e3;
+      border-radius: 8px;
+      background: #fff;
+      color: var(--ink);
+      font: inherit;
+      font-size: 14px;
+      line-height: 24px;
+      text-align: left;
+      cursor: pointer;
+    }
+    .ask-trigger b { display: flex; align-items: center; gap: 8px; min-width: 0; overflow: hidden; font-weight: 400; }
+    .ask-trigger b span { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .ask-trigger b .is-placeholder,
+    .ask-range-sep { color: #bbbfc4; }
+    .ask-range-sep { flex: none; }
+    .ask-trigger svg { flex: none; color: #8f959e; }
+    .ask-trigger:hover { border-color: #c3c6cb; }
+    .ask-trigger.is-open { border-color: var(--brand); }
+    .ask-trigger.is-open svg { color: var(--brand); }
+    .ask-cal {
+      position: fixed;
+      z-index: 40;
+      width: 280px;
+      padding: 12px 12px 8px;
+      border: 1px solid #dee0e3;
+      border-radius: 8px;
+      background: #fff;
+      box-shadow: 0 8px 24px rgba(31, 35, 41, .12);
+    }
+    .ask-cal-head { display: flex; align-items: center; justify-content: space-between; height: 32px; margin-bottom: 4px; }
+    .ask-cal-head strong { font-size: 14px; line-height: 24px; font-weight: 500; color: var(--ink); }
+    .ask-cal-nav {
+      width: 28px;
+      height: 28px;
+      margin: 0;
+      padding: 0;
+      border: 0;
+      border-radius: 6px;
+      background: transparent;
+      color: #646a73;
+      display: grid;
+      place-items: center;
+      cursor: pointer;
+    }
+    .ask-cal-nav:hover:not(:disabled) { background: #f2f3f5; color: var(--ink); }
+    .ask-cal-nav:disabled { opacity: .35; cursor: default; }
+    .ask-week, .ask-days { display: grid; grid-template-columns: repeat(7, 1fr); }
+    .ask-week span { height: 32px; display: grid; place-items: center; color: #8f959e; font-size: 12px; line-height: 22px; font-weight: 400; }
+    .ask-day {
+      width: 28px;
+      height: 28px;
+      margin: 1px auto;
+      padding: 0;
+      border: 0;
+      border-radius: 6px;
+      background: transparent;
+      color: var(--ink);
+      font: inherit;
+      font-size: 14px;
+      line-height: 24px;
+      cursor: pointer;
+    }
+    .ask-cell { position: relative; display: flex; align-items: center; justify-content: center; height: 30px; }
+    .ask-cell.is-in::before {
+      content: "";
+      position: absolute;
+      z-index: 0;
+      top: 1px;
+      height: 28px;
+      left: 0;
+      right: 0;
+      background: rgba(10, 89, 247, .12);
+    }
+    .ask-cell.is-cap-start::before { left: 50%; }
+    .ask-cell.is-cap-end::before { right: 50%; }
+    .ask-cell.is-row-start::before { border-radius: 6px 0 0 6px; }
+    .ask-cell.is-row-end::before { border-radius: 0 6px 6px 0; }
+    .ask-cell.is-row-start.is-row-end::before { border-radius: 6px; }
+    .ask-day { position: relative; z-index: 1; }
+    .ask-cell:not(.is-in) .ask-day:hover:not(:disabled):not(.is-on) { background: #f2f3f5; }
+    .ask-day.is-off, .ask-day.out, .ask-day:disabled { color: #c4c8d0; background: transparent; cursor: default; }
+    .ask-day.is-today:not(.is-on) { color: var(--brand); font-weight: 400; }
+    .ask-day.is-on, .ask-day.is-on:hover { background: var(--brand); color: #fff; font-weight: 400; }
+    .ask.is-done { display: flex; flex-direction: column; gap: 16px; padding: 16px; }
+    .ask-picked { display: flex; align-items: flex-start; gap: 8px; min-height: 22px; }
+    .ask-picked .ask-label { font-size: 14px; line-height: 24px; font-weight: 400; color: #0c121a; }
+    #stage .ask.is-done + .ask-note { margin: 8px 0 0; }
+    #stage .ask-note + .wx { width: 436px; max-width: 100%; margin-top: 16px; }
+    .ask-foot { display: flex; justify-content: flex-end; align-items: center; gap: 8px; margin-top: 12px; padding: 0 8px; }
+    .ask-skip, .ask-next {
+      height: 28px;
+      margin: 0;
+      padding: 0 16px;
+      border-radius: 8px;
+      font: inherit;
+      font-size: 14px;
+      line-height: 24px;
+      font-weight: 400;
+      cursor: pointer;
+    }
+    .ask-skip { border: 0; background: transparent; color: rgba(0, 0, 0, .9); }
+    .ask-skip:hover { background: rgba(9, 11, 14, .04); }
+    .ask-next {
+      border: 1px solid #84acfb;
+      background: linear-gradient(180deg, #4a85ff 0%, #3370ff 100%);
+      color: #fff;
+    }
+    .ask-next:disabled { opacity: .3; cursor: default; }
+    .ask.is-locked .ask-opt,
+    .ask.is-locked .ask-input,
+    .ask.is-locked .ask-trigger,
+    .ask.is-locked .ask-skip,
+    .ask.is-locked .ask-next { pointer-events: none; }
+    .ask-note { margin: 12px 0; font-size: 14px; line-height: 24px; font-weight: 400; color: var(--ink); }
+    html.theme-dark .ask {
+      background: var(--card);
+      border-color: #292b2e;
+      color: var(--ink);
+    }
+    html.theme-dark .ask-title,
+    html.theme-dark .ask-opt,
+    html.theme-dark .ask-picked .ask-label,
+    html.theme-dark .ask-skip { color: var(--ink); }
+    html.theme-dark .ask-opt:hover,
+    html.theme-dark .ask-skip:hover { background: rgba(255, 255, 255, .06); }
+    html.theme-dark .ask-num { background: rgba(255, 255, 255, .06); color: rgba(255, 255, 255, .6); }
+    html.theme-dark .ask-opt.is-on .ask-num { background: var(--brand); color: #fff; }
+    html.theme-dark .ask-input,
+    html.theme-dark .ask-trigger,
+    html.theme-dark .ask-cal { background: #191a1d; border-color: #434448; color: var(--ink); }
+    html.theme-dark .ask-input::placeholder,
+    html.theme-dark .ask-trigger b .is-placeholder,
+    html.theme-dark .ask-range-sep,
+    html.theme-dark .ask-week span { color: rgba(255, 255, 255, .4); }
+    html.theme-dark .ask-cal-nav { color: rgba(255, 255, 255, .6); }
+    html.theme-dark .ask-cal-nav:hover:not(:disabled),
+    html.theme-dark .ask-cell:not(.is-in) .ask-day:hover:not(:disabled):not(.is-on) { background: #292b2e; color: var(--ink); }
+    html.theme-dark .ask-day.is-off,
+    html.theme-dark .ask-day:disabled { color: rgba(255, 255, 255, .2); }
+    html.theme-dark .ask-next { border-color: #2762c6; background: var(--brand); }
+    html.theme-dark .lead,
+    html.theme-dark .ask-note { color: var(--ink); }
+  </style>
+</head>
+<body>
+  <header class="top">
+    <div>
+      <h1>形态墙 · weather_card</h1>
+      <p>天气卡 <code>.wx</code>（Agent Tool：<code>present_weather_card</code>）。样式与图标抄自「天气场景」；含 7/3/15 日、单日、Gate、七种 tone、is-light、深色与补问后合成。补问卡见 ask_form。</p>
+      <div class="meta"><code><b>card_id</b> weather_card</code>
+        <code><b>tool</b> present_weather_card</code>
+        <code><b>aliases</b> 天气场景 · wx</code></div>
+    </div>
+    <div class="tools">
+      <button type="button" id="themeBtn">深色</button>
+      <a href="../ask_form/morph-wall.html">ask_form</a>
+      <a href="../../天气场景.html">天气场景</a>
+      <a href="../CARD_ID-NAMING.md">命名</a>
+    </div>
+  </header>
+  <div class="layout">
+    <nav>
+      <a href="#v1"><b>V1</b> 7 日 · 云<small>canonical</small></a>
+      <a href="#v2"><b>V2</b> 3 日 · d3<small>短卡</small></a>
+      <a href="#v3"><b>V3</b> 15 日滚动<small>window:8 + wx-more</small></a>
+      <a href="#v4"><b>V4</b> 单日 · sat<small>指定日期</small></a>
+      <a href="#v5"><b>V5</b> Gate · card:false<small>不出卡</small></a>
+      <a href="#v6"><b>V6</b> sun 晴<small>.wx-sun</small></a>
+      <a href="#v7"><b>V7</b> cloud 多云<small>.wx-cloud</small></a>
+      <a href="#v8"><b>V8</b> rain 雨<small>.wx-rain</small></a>
+      <a href="#v9"><b>V9</b> storm 雷暴<small>.wx-storm</small></a>
+      <a href="#v10"><b>V10</b> snow 雪<small>.wx-snow</small></a>
+      <a href="#v11"><b>V11</b> fog 雾<small>.wx-fog</small></a>
+      <a href="#v12"><b>V12</b> night 夜<small>.wx-night</small></a>
+      <a href="#v13"><b>V13</b> is-light<small>snow / fog</small></a>
+      <a href="#v14"><b>V14</b> 深色 app 主题<small>wx 渐变不变</small></a>
+      <a href="#v15"><b>V15</b> 补问后合成<small>10月25日-10月31日</small></a>
+    </nav>
+    <main>
+      <section class="panel" id="v1">
+        <div class="panel-head">
+          <div>
+            <h2>V1 · 7 日预报（canonical）<span class="tag">weather_card</span></h2>
+            <p>scene <code>cloud</code>：listLabel 缺省「七日预报」，7 行，无 window。</p>
+          </div>
+        </div>
+        <div class="stage">
+          <div data-mount="cloud7"></div>
+        </div>        <p class="note"><code>tone:cloud</code> · 7 days · 最高/最低取今天；温度条按整卡 min/max 归一。</p>
+      </section>
+      <section class="panel" id="v2">
+        <div class="panel-head">
+          <div>
+            <h2>V2 · 3 日预报<span class="tag">weather_card</span></h2>
+            <p>scene <code>d3</code>：listLabel「三日预报」。</p>
+          </div>
+        </div>
+        <div class="stage">
+          <div data-mount="d3"></div>
+        </div>
+      </section>
+      <section class="panel" id="v3">
+        <div class="panel-head">
+          <div>
+            <h2>V3 · 15 日预报（可滚动）<span class="tag">weather_card</span></h2>
+            <p>scene <code>d20</code>：<code>window:8</code>，仅露 8 行高度；向下滚动到底时 <code>is-more</code> 被移除，「向下查看」渐隐。</p>
+          </div>
+        </div>
+        <div class="stage">
+          <div data-mount="d15"></div>
+        </div>        <p class="note"><code>.wx-scroll.is-more</code> 由 <code>.wx-scroll-body</code> 的 scroll 事件切换（阈值 6px）。</p>
+      </section>
+      <section class="panel" id="v4">
+        <div class="panel-head">
+          <div>
+            <h2>V4 · 单日卡<span class="tag">weather_card</span></h2>
+            <p>scene <code>sat</code>：<code>when:"10月31日"</code>，listLabel 为日期，1 行。</p>
+          </div>
+        </div>
+        <div class="stage">
+          <div data-mount="sat"></div>
+        </div>
+      </section>
+      <section class="panel" id="v5">
+        <div class="panel-head">
+          <div>
+            <h2>V5 · Gate（card:false）<span class="tag">weather_card</span></h2>
+            <p>scene <code>far</code>：查询范围外的指定日期 → 只出 lead 文案，不调用 present_weather_card。</p>
+          </div>
+        </div>
+        <div class="stage">
+          <div data-mount="gate"></div>
+        </div>        <p class="note">Host 在这之后挂 <a href="../ask_form/morph-wall.html" style="color:var(--brand)">ask_form</a>（无 Tool）。</p>
+      </section>
+      <section class="panel" id="v6">
+        <div class="panel-head">
+          <div>
+            <h2>V6 · sun · 晴空<span class="tag">weather_card</span></h2>
+            <p>蓝天渐变 + 高光；晴 / 晴间多云 / 晴。</p>
+          </div>
+        </div>
+        <div class="stage">
+          <div data-mount="sun"></div>
+        </div>        <p class="note"><code>tone:"sun"</code> · 3 days（样例数据）。</p>
+      </section>
+      <section class="panel" id="v7">
+        <div class="panel-head">
+          <div>
+            <h2>V7 · cloud · 多云<span class="tag">weather_card</span></h2>
+            <p>纯色灰蓝 #7b93a8；与 V1–V4 同色。</p>
+          </div>
+        </div>
+        <div class="stage">
+          <div data-mount="cloud"></div>
+        </div>        <p class="note"><code>tone:"cloud"</code> · 3 days（样例数据）。</p>
+      </section>
+      <section class="panel" id="v8">
+        <div class="panel-head">
+          <div>
+            <h2>V8 · rain · 雨<span class="tag">weather_card</span></h2>
+            <p>阵雨 / 毛毛雨 / 小雨；降水量取代概率时显示 mm。</p>
+          </div>
+        </div>
+        <div class="stage">
+          <div data-mount="rain"></div>
+        </div>        <p class="note"><code>tone:"rain"</code> · 3 days（样例数据）。</p>
+      </section>
+      <section class="panel" id="v9">
+        <div class="panel-head">
+          <div>
+            <h2>V9 · storm · 雷暴<span class="tag">weather_card</span></h2>
+            <p>深紫渐变；storm 图标带闪电。</p>
+          </div>
+        </div>
+        <div class="stage">
+          <div data-mount="storm"></div>
+        </div>        <p class="note"><code>tone:"storm"</code> · 3 days（样例数据）。</p>
+      </section>
+      <section class="panel" id="v10">
+        <div class="panel-head">
+          <div>
+            <h2>V10 · snow · 雪<span class="tag">weather_card</span></h2>
+            <p>浅底深字；此处<b>未加</b> is-light，对照见 V13。</p>
+          </div>
+        </div>
+        <div class="stage">
+          <div data-mount="snow"></div>
+        </div>        <p class="note"><code>tone:"snow"</code> · 3 days（样例数据）。</p>
+      </section>
+      <section class="panel" id="v11">
+        <div class="panel-head">
+          <div>
+            <h2>V11 · fog · 雾<span class="tag">weather_card</span></h2>
+            <p>浅灰底深字；此处<b>未加</b> is-light，对照见 V13。</p>
+          </div>
+        </div>
+        <div class="stage">
+          <div data-mount="fog"></div>
+        </div>        <p class="note"><code>tone:"fog"</code> · 3 days（样例数据）。</p>
+      </section>
+      <section class="panel" id="v12">
+        <div class="panel-head">
+          <div>
+            <h2>V12 · night · 夜<span class="tag">weather_card</span></h2>
+            <p>星点 + 深蓝渐变；晴夜用 night 图标。</p>
+          </div>
+        </div>
+        <div class="stage">
+          <div data-mount="night"></div>
+        </div>        <p class="note"><code>tone:"night"</code> · 3 days（样例数据）。</p>
+      </section>
+      <section class="panel" id="v13">
+        <div class="panel-head">
+          <div>
+            <h2>V13 · is-light（浅底）<span class="tag">weather_card</span></h2>
+            <p><code>.wx.is-light</code>：图标阴影、分隔线、降水概率色、温度条底改深色系。snow、fog 需加。</p>
+          </div>
+        </div>
+        <div class="stage">
+          <div data-mount="lightCmp"></div>
+        </div>        <p class="note">天气场景中由 <code>scene.light</code> 控制 → 渲染 <code>is-light</code>。</p>
+      </section>
+      <section class="panel" id="v14">
+        <div class="panel-head">
+          <div>
+            <h2>V14 · 深色 App 主题<span class="tag">weather_card</span></h2>
+            <p><code>html.theme-dark</code> 下天气卡渐变保持不变（无 <code>.wx</code> 深色覆盖），只有周边容器与文字换色。点右侧按钮或顶栏切换对照。</p>
+          </div><button type="button" class="mini" id="darkJump">切换深浅</button>
+        </div>
+        <div class="stage">
+          <div data-mount="dark"></div>
+        </div>        <p class="note">切换深色后，本墙面板与其它 V 保持同一套 wx 样式。</p>
+      </section>
+      <section class="panel" id="v15">
+        <div class="panel-head">
+          <div>
+            <h2>V15 · Post-ask 合成区间<span class="tag">weather_card</span></h2>
+            <p>ask_form 选定日期区间后由 host 拼 scene：<code>listLabel = "起 - 止"</code>，天数 &gt; 8 时 <code>window:8</code>。</p>
+          </div>
+        </div>
+        <div class="stage">
+          <div data-mount="post"></div>
+        </div>
+      </section>
+    </main>
+  </div>
+  <script>
+
+    /* Icons: Meteocons fill SVGs, MIT. Copyright (c) 2020-present Bas Milius. */
+    const sky = {"sun":"<svg viewBox=\"0 0 128 128\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\"> <g id=\"clear-day\"> <g id=\"Sun\"> <circle id=\"Core\" cx=\"64\" cy=\"63.9999\" r=\"19.5\" fill=\"url(#paint0_linear_1802_5186)\" stroke=\"#F8AF18\"/> <g id=\"Rays\"> <path d=\"M61 19C61 17.3431 62.3431 16 64 16C65.6568 16 67 17.3431 67 19V33C67 34.6569 65.6568 36 64 36C62.3431 36 61 34.6569 61 33V19Z\" fill=\"#F8AF18\"/> <path d=\"M93.6985 30.0589C94.87 28.8873 96.7696 28.8873 97.9411 30.0589C99.1127 31.2304 99.1127 33.1299 97.9411 34.3015L88.0416 44.201C86.8701 45.3726 84.9706 45.3726 83.799 44.201C82.6274 43.0294 82.6274 41.1299 83.799 39.9584L93.6985 30.0589Z\" fill=\"#F8AF18\"/> <path d=\"M109 61C110.657 61 112 62.3432 112 64C112 65.6569 110.657 67 109 67H95C93.3431 67 92 65.6569 92 64C92 62.3432 93.3431 61 95 61H109Z\" fill=\"#F8AF18\"/> <path d=\"M97.9411 93.6985C99.1127 94.8701 99.1127 96.7696 97.9411 97.9411C96.7696 99.1127 94.8701 99.1127 93.6985 97.9411L83.799 88.0416C82.6274 86.8701 82.6274 84.9706 83.799 83.799C84.9706 82.6274 86.8701 82.6274 88.0416 83.799L97.9411 93.6985Z\" fill=\"#F8AF18\"/> <path d=\"M61 95C61 93.3431 62.3431 92 64 92C65.6568 92 67 93.3431 67 95V109C67 110.657 65.6568 112 64 112C62.3431 112 61 110.657 61 109V95Z\" fill=\"#F8AF18\"/> <path d=\"M39.9584 83.799C41.1299 82.6274 43.0294 82.6274 44.201 83.799C45.3726 84.9706 45.3726 86.8701 44.201 88.0416L34.3015 97.9411C33.1299 99.1127 31.2304 99.1127 30.0589 97.9411C28.8873 96.7696 28.8873 94.87 30.0589 93.6985L39.9584 83.799Z\" fill=\"#F8AF18\"/> <path d=\"M33 61C34.6569 61 36 62.3431 36 64C36 65.6568 34.6569 67 33 67H19C17.3431 67 16 65.6568 16 64C16 62.3431 17.3431 61 19 61H33Z\" fill=\"#F8AF18\"/> <path d=\"M44.201 39.9584C45.3726 41.1299 45.3726 43.0294 44.201 44.201C43.0294 45.3726 41.1299 45.3726 39.9584 44.201L30.0589 34.3015C28.8873 33.1299 28.8873 31.2305 30.0589 30.0589C31.2305 28.8873 33.1299 28.8873 34.3015 30.0589L44.201 39.9584Z\" fill=\"#F8AF18\"/> </g> </g> </g> <defs> <linearGradient id=\"paint0_linear_1802_5186\" x1=\"64\" y1=\"43.9999\" x2=\"64\" y2=\"83.9999\" gradientUnits=\"userSpaceOnUse\"> <stop stop-color=\"#FBBF24\"/> <stop offset=\"1\" stop-color=\"#F8AF18\"/> </linearGradient> </defs> </svg>","cloud":"<svg viewBox=\"0 0 128 128\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\"> <g id=\"cloudy\" clip-path=\"url(#clip0_1858_8144)\"> <g id=\"Sky\"> <g id=\"Clouds\"> <g id=\"Cloud\"> <path id=\"Cloud_2\" d=\"M55.2623 48.4746C60.1227 40.6111 70.2975 37.38 78.8151 40.9434C87.3214 44.5023 92.138 54.0026 89.903 62.9648L89.7418 63.6143L90.4108 63.585C97.4203 63.2791 103.5 68.9917 103.5 76.0283C103.5 82.8395 97.7717 88.4997 90.9772 88.5H37.9537C31.1275 88.5018 25.2029 83.1709 24.5592 76.3604C23.9158 69.5518 28.7369 63.2124 35.443 61.9453L35.9264 61.8535L35.8424 61.3691C35.0256 56.6239 37.1258 51.7168 41.1051 49.0127C45.0951 46.3014 50.4459 46.1537 54.5797 48.6396L55.0026 48.8945L55.2623 48.4746Z\" fill=\"url(#paint0_linear_1858_8144)\" stroke=\"#E6EFFC\" stroke-miterlimit=\"10\"/> </g> </g> </g> </g> <defs> <linearGradient id=\"paint0_linear_1858_8144\" x1=\"64.0008\" y1=\"39\" x2=\"64.0008\" y2=\"89\" gradientUnits=\"userSpaceOnUse\"> <stop stop-color=\"#F3F7FE\"/> <stop offset=\"1\" stop-color=\"#E6EFFC\"/> </linearGradient> <clipPath id=\"clip0_1858_8144\"> <rect width=\"128\" height=\"128\" fill=\"white\"/> </clipPath> </defs> </svg>","part":"<svg viewBox=\"0 0 128 128\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\"> <g id=\"partly-cloudy-day\" clip-path=\"url(#clip0_1858_8241)\"> <g id=\"Sky\"> <g id=\"Sun\"> <circle id=\"Core\" cx=\"39\" cy=\"51\" r=\"8.5\" fill=\"url(#paint0_linear_1858_8241)\" stroke=\"#F8AF18\"/> <g id=\"Rays\"> <path d=\"M37.6875 31.3125C37.6875 30.5876 38.2751 30 39 30C39.7249 30 40.3125 30.5876 40.3125 31.3125V37.4375C40.3125 38.1624 39.7249 38.75 39 38.75C38.2751 38.75 37.6875 38.1624 37.6875 37.4375V31.3125Z\" fill=\"#F8AF18\"/> <path d=\"M51.9931 36.1508C52.5056 35.6382 53.3367 35.6382 53.8492 36.1508C54.3618 36.6633 54.3618 37.4943 53.8492 38.0069L49.5182 42.3379C49.0056 42.8505 48.1746 42.8505 47.6621 42.3379C47.1495 41.8254 47.1495 40.9944 47.6621 40.4818L51.9931 36.1508Z\" fill=\"#F8AF18\"/> <path d=\"M58.6875 49.6875C59.4124 49.6875 60 50.2751 60 51C60 51.7249 59.4124 52.3125 58.6875 52.3125H52.5625C51.8376 52.3125 51.25 51.7249 51.25 51C51.25 50.2751 51.8376 49.6875 52.5625 49.6875H58.6875Z\" fill=\"#F8AF18\"/> <path d=\"M53.8492 63.9931C54.3618 64.5057 54.3618 65.3367 53.8492 65.8492C53.3367 66.3618 52.5056 66.3618 51.9931 65.8492L47.6621 61.5182C47.1495 61.0057 47.1495 60.1746 47.6621 59.6621C48.1746 59.1495 49.0057 59.1495 49.5182 59.6621L53.8492 63.9931Z\" fill=\"#F8AF18\"/> <path d=\"M37.6875 64.5625C37.6875 63.8376 38.2751 63.25 39 63.25C39.7249 63.25 40.3125 63.8376 40.3125 64.5625V70.6875C40.3125 71.4124 39.7249 72 39 72C38.2751 72 37.6875 71.4124 37.6875 70.6875V64.5625Z\" fill=\"#F8AF18\"/> <path d=\"M28.4818 59.6621C28.9943 59.1495 29.8254 59.1495 30.3379 59.6621C30.8505 60.1746 30.8505 61.0056 30.3379 61.5182L26.0069 65.8492C25.4943 66.3618 24.6633 66.3618 24.1508 65.8492C23.6382 65.3367 23.6382 64.5056 24.1508 63.9931L28.4818 59.6621Z\" fill=\"#F8AF18\"/> <path d=\"M25.4375 49.6875C26.1624 49.6875 26.75 50.2751 26.75 51C26.75 51.7249 26.1624 52.3125 25.4375 52.3125H19.3125C18.5876 52.3125 18 51.7249 18 51C18 50.2751 18.5876 49.6875 19.3125 49.6875H25.4375Z\" fill=\"#F8AF18\"/> <path d=\"M30.3379 40.4818C30.8505 40.9944 30.8505 41.8254 30.3379 42.3379C29.8254 42.8505 28.9944 42.8505 28.4818 42.3379L24.1508 38.0069C23.6382 37.4944 23.6382 36.6633 24.1508 36.1508C24.6633 35.6382 25.4944 35.6382 26.0069 36.1508L30.3379 40.4818Z\" fill=\"#F8AF18\"/> </g> </g> <g id=\"Clouds\"> <g id=\"Cloud\"> <path id=\"Cloud_2\" d=\"M55.2623 48.4746C60.1227 40.6111 70.2975 37.38 78.8151 40.9434C87.3214 44.5023 92.138 54.0026 89.903 62.9648L89.7418 63.6143L90.4108 63.585C97.4203 63.2791 103.5 68.9917 103.5 76.0283C103.5 82.8395 97.7717 88.4997 90.9772 88.5H37.9537C31.1275 88.5018 25.2029 83.1709 24.5592 76.3604C23.9158 69.5518 28.7369 63.2124 35.443 61.9453L35.9264 61.8535L35.8424 61.3691C35.0256 56.6239 37.1258 51.7168 41.1051 49.0127C45.0951 46.3014 50.4459 46.1537 54.5797 48.6396L55.0026 48.8945L55.2623 48.4746Z\" fill=\"url(#paint1_linear_1858_8241)\" stroke=\"#E6EFFC\" stroke-miterlimit=\"10\"/> </g> </g> </g> </g> <defs> <linearGradient id=\"paint0_linear_1858_8241\" x1=\"39\" y1=\"42\" x2=\"39\" y2=\"60\" gradientUnits=\"userSpaceOnUse\"> <stop stop-color=\"#FBBF24\"/> <stop offset=\"1\" stop-color=\"#F8AF18\"/> </linearGradient> <linearGradient id=\"paint1_linear_1858_8241\" x1=\"64.0008\" y1=\"39\" x2=\"64.0008\" y2=\"89\" gradientUnits=\"userSpaceOnUse\"> <stop stop-color=\"#F3F7FE\"/> <stop offset=\"1\" stop-color=\"#E6EFFC\"/> </linearGradient> <clipPath id=\"clip0_1858_8241\"> <rect width=\"128\" height=\"128\" fill=\"white\"/> </clipPath> </defs> </svg>","rain":"<svg viewBox=\"0 0 128 128\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\"> <g id=\"rain\" clip-path=\"url(#clip0_1858_8370)\"> <g id=\"Sky\"> <g id=\"Clouds\"> <g id=\"Cloud\"> <path id=\"Cloud_2\" d=\"M55.2623 48.4746C60.1227 40.6111 70.2975 37.38 78.8151 40.9434C87.3214 44.5023 92.138 54.0026 89.903 62.9648L89.7418 63.6143L90.4108 63.585C97.4203 63.2791 103.5 68.9917 103.5 76.0283C103.5 82.8395 97.7717 88.4997 90.9772 88.5H37.9537C31.1275 88.5018 25.2029 83.1709 24.5592 76.3604C23.9158 69.5518 28.7369 63.2124 35.443 61.9453L35.9264 61.8535L35.8424 61.3691C35.0256 56.6239 37.1258 51.7168 41.1051 49.0127C45.0951 46.3014 50.4459 46.1537 54.5797 48.6396L55.0026 48.8945L55.2623 48.4746Z\" fill=\"url(#paint0_linear_1858_8370)\" stroke=\"#E6EFFC\" stroke-miterlimit=\"10\"/> </g> </g> </g> <g id=\"Precipitation\"> <g id=\"Raindrops\"> <path id=\"Raindrop 1\" d=\"M52 83V95\" stroke=\"#0A5AD4\" stroke-width=\"4\" stroke-linecap=\"round\" transform=\"translate(0, 8)\"/> <path id=\"Raindrop 2\" d=\"M64 83V95\" stroke=\"#0A5AD4\" stroke-width=\"4\" stroke-linecap=\"round\" transform=\"translate(0, 0)\"/> <path id=\"Raindrop 3\" d=\"M76 83V95\" stroke=\"#0A5AD4\" stroke-width=\"4\" stroke-linecap=\"round\" transform=\"translate(0, 8)\"/> </g> </g> </g> <defs> <linearGradient id=\"paint0_linear_1858_8370\" x1=\"64.0008\" y1=\"39\" x2=\"64.0008\" y2=\"89\" gradientUnits=\"userSpaceOnUse\"> <stop stop-color=\"#F3F7FE\"/> <stop offset=\"1\" stop-color=\"#E6EFFC\"/> </linearGradient> <clipPath id=\"clip0_1858_8370\"> <rect width=\"128\" height=\"128\" fill=\"white\"/> </clipPath> </defs> </svg>","drizzle":"<svg viewBox=\"0 0 128 128\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\"> <g id=\"drizzle\" clip-path=\"url(#clip0_1858_8512)\"> <g id=\"Sky\"> <g id=\"Clouds\"> <g id=\"Cloud\"> <path id=\"Cloud_2\" d=\"M55.2623 48.4746C60.1227 40.6111 70.2975 37.38 78.8151 40.9434C87.3214 44.5023 92.138 54.0026 89.903 62.9648L89.7418 63.6143L90.4108 63.585C97.4203 63.2791 103.5 68.9917 103.5 76.0283C103.5 82.8395 97.7717 88.4997 90.9772 88.5H37.9537C31.1275 88.5018 25.2029 83.1709 24.5592 76.3604C23.9158 69.5518 28.7369 63.2124 35.443 61.9453L35.9264 61.8535L35.8424 61.3691C35.0256 56.6239 37.1258 51.7168 41.1051 49.0127C45.0951 46.3014 50.4459 46.1537 54.5797 48.6396L55.0026 48.8945L55.2623 48.4746Z\" fill=\"url(#paint0_linear_1858_8512)\" stroke=\"#E6EFFC\" stroke-miterlimit=\"10\"/> </g> </g> </g> <g id=\"Precipitation\"> <g id=\"Raindrops\"> <path id=\"Raindrop 1\" d=\"M52 87V90\" stroke=\"#0A5AD4\" stroke-width=\"4\" stroke-linecap=\"round\" transform=\"translate(0, 8)\"/> <path id=\"Raindrop 2\" d=\"M64 87V90\" stroke=\"#0A5AD4\" stroke-width=\"4\" stroke-linecap=\"round\" transform=\"translate(0, 0)\"/> <path id=\"Raindrop 3\" d=\"M76 87V90\" stroke=\"#0A5AD4\" stroke-width=\"4\" stroke-linecap=\"round\" transform=\"translate(0, 8)\"/> </g> </g> </g> <defs> <linearGradient id=\"paint0_linear_1858_8512\" x1=\"64.0008\" y1=\"39\" x2=\"64.0008\" y2=\"89\" gradientUnits=\"userSpaceOnUse\"> <stop stop-color=\"#F3F7FE\"/> <stop offset=\"1\" stop-color=\"#E6EFFC\"/> </linearGradient> <clipPath id=\"clip0_1858_8512\"> <rect width=\"128\" height=\"128\" fill=\"white\"/> </clipPath> </defs> </svg>","storm":"<svg viewBox=\"0 0 128 128\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\"> <g id=\"thunderstorms-rain\" clip-path=\"url(#clip0_1858_9933)\"> <g id=\"Sky\"> <g id=\"Clouds\"> <g id=\"Cloud\"> <path id=\"Cloud_2\" d=\"M55.2625 48.4746C60.1228 40.6111 70.2976 37.38 78.8152 40.9434C87.3215 44.5023 92.1381 54.0026 89.9031 62.9648L89.7419 63.6143L90.4109 63.585C97.4205 63.2791 103.5 68.9917 103.5 76.0283C103.5 82.8395 97.7719 88.4997 90.9773 88.5H37.9539C31.1276 88.5018 25.203 83.1709 24.5593 76.3604C23.9159 69.5518 28.7371 63.2124 35.4431 61.9453L35.9265 61.8535L35.8425 61.3691C35.0258 56.6239 37.1259 51.7168 41.1052 49.0127C45.0952 46.3014 50.4461 46.1537 54.5798 48.6396L55.0027 48.8945L55.2625 48.4746Z\" fill=\"url(#paint0_linear_1858_9933)\" stroke=\"#E6EFFC\" stroke-miterlimit=\"10\"/> </g> </g> </g> <g id=\"Precipitation\"> <g id=\"Raindrops\"> <path id=\"Raindrop 1\" d=\"M52 83V95\" stroke=\"#0A5AD4\" stroke-width=\"4\" stroke-linecap=\"round\" transform=\"translate(0, 8)\"/> <path id=\"Raindrop 2\" d=\"M64 83V95\" stroke=\"#0A5AD4\" stroke-width=\"4\" stroke-linecap=\"round\" transform=\"translate(0, 0)\"/> <path id=\"Raindrop 3\" d=\"M76 83V95\" stroke=\"#0A5AD4\" stroke-width=\"4\" stroke-linecap=\"round\" transform=\"translate(0, 8)\"/> </g> </g> <g id=\"Lightning\"> <path id=\"Lightning Bolt\" d=\"M71.1729 68.5L63.5566 83.041L63.1729 83.7725H75.002L56.9521 107.892L60.4893 91.0117L60.6162 90.4092H52.7041L60.3555 68.5H71.1729Z\" fill=\"url(#paint1_linear_1858_9933)\" stroke=\"#F6A823\" stroke-miterlimit=\"10\"/> </g> </g> <defs> <linearGradient id=\"paint0_linear_1858_9933\" x1=\"64.0009\" y1=\"39\" x2=\"64.0009\" y2=\"89\" gradientUnits=\"userSpaceOnUse\"> <stop stop-color=\"#F3F7FE\"/> <stop offset=\"1\" stop-color=\"#E6EFFC\"/> </linearGradient> <linearGradient id=\"paint1_linear_1858_9933\" x1=\"64.528\" y1=\"66.0377\" x2=\"84.4144\" y2=\"77.4572\" gradientUnits=\"userSpaceOnUse\"> <stop stop-color=\"#F7B23B\"/> <stop offset=\"1\" stop-color=\"#F6A823\"/> </linearGradient> <clipPath id=\"clip0_1858_9933\"> <rect width=\"128\" height=\"128\" fill=\"white\"/> </clipPath> </defs> </svg>","snow":"<svg viewBox=\"0 0 128 128\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\"> <g id=\"snow\" clip-path=\"url(#clip0_1858_8860)\"> <g id=\"Sky\"> <g id=\"Clouds\"> <g id=\"Cloud\"> <path id=\"Cloud_2\" d=\"M55.2623 48.4746C60.1227 40.6111 70.2975 37.38 78.8151 40.9434C87.3214 44.5023 92.138 54.0026 89.903 62.9648L89.7418 63.6143L90.4108 63.585C97.4203 63.2791 103.5 68.9917 103.5 76.0283C103.5 82.8395 97.7717 88.4997 90.9772 88.5H37.9537C31.1275 88.5018 25.2029 83.1709 24.5592 76.3604C23.9158 69.5518 28.7369 63.2124 35.443 61.9453L35.9264 61.8535L35.8424 61.3691C35.0256 56.6239 37.1258 51.7168 41.1051 49.0127C45.0951 46.3014 50.4459 46.1537 54.5797 48.6396L55.0026 48.8945L55.2623 48.4746Z\" fill=\"url(#paint0_linear_1858_8860)\" stroke=\"#E6EFFC\" stroke-miterlimit=\"10\"/> </g> </g> </g> <g id=\"Precipitation\"> <g id=\"Snowflakes\"> <path id=\"Snowflake 1\" d=\"M52.5781 90.366L51.3735 89.6775C51.4794 89.2326 51.4786 88.7687 51.3708 88.3241L52.5781 87.6345C52.6738 87.5805 52.7577 87.5079 52.8252 87.421C52.8926 87.3342 52.9423 87.2347 52.9711 87.1284C52.9998 87.0221 53.0071 86.9112 52.9926 86.802C52.9782 86.6928 52.9422 86.5876 52.8868 86.4926C52.7732 86.2998 52.5886 86.1597 52.3728 86.1025C52.157 86.0452 51.9276 86.0754 51.7339 86.1866L50.5278 86.8763C50.1931 86.5586 49.7868 86.3264 49.3437 86.1995V84.8202C49.3368 84.6003 49.245 84.3918 49.0875 84.2387C48.93 84.0856 48.7192 84 48.4998 84C48.2805 84 48.0699 84.0856 47.9124 84.2387C47.7548 84.3918 47.6628 84.6003 47.656 84.8202V86.1995C47.214 86.3289 46.8081 86.5598 46.4706 86.874L45.2662 86.1853C45.0724 86.0742 44.8428 86.044 44.627 86.1013C44.4113 86.1585 44.2267 86.2986 44.113 86.4913C44.0576 86.5864 44.0217 86.6916 44.0072 86.8007C43.9928 86.9099 44 87.0209 44.0288 87.1271C44.0575 87.2334 44.1072 87.3329 44.1747 87.4198C44.2421 87.5067 44.326 87.5792 44.4217 87.6332L45.6264 88.3216C45.5204 88.7666 45.5213 89.2305 45.629 89.675L44.4217 90.3647C44.326 90.4187 44.2421 90.4912 44.1747 90.5781C44.1072 90.665 44.0575 90.7645 44.0288 90.8708C44 90.9771 43.9928 91.088 44.0072 91.1972C44.0217 91.3063 44.0576 91.4115 44.113 91.5066C44.2267 91.6992 44.4113 91.8392 44.627 91.8965C44.8428 91.9537 45.0724 91.9236 45.2662 91.8126L46.4721 91.1229C46.8063 91.4409 47.2128 91.6726 47.6562 91.7979V93.1798C47.6631 93.3997 47.755 93.6082 47.9126 93.7613C48.0701 93.9144 48.2807 94 48.5 94C48.7194 94 48.9302 93.9144 49.0877 93.7613C49.2452 93.6082 49.337 93.3997 49.3439 93.1798V91.7975C49.7853 91.6683 50.1907 91.4378 50.5278 91.1242L51.7341 91.8138C51.9278 91.9248 52.1573 91.955 52.373 91.8977C52.5888 91.8405 52.7733 91.7005 52.887 91.5079C52.9424 91.4128 52.9784 91.3076 52.9928 91.1984C53.0073 91.0892 52.9998 90.9783 52.9711 90.872C52.9423 90.7657 52.8929 90.6662 52.8254 90.5793C52.7579 90.4925 52.6738 90.4199 52.5781 90.366ZM47.8664 90.0861C47.7229 90.005 47.5968 89.8961 47.4956 89.7657C47.3944 89.6353 47.3202 89.486 47.2771 89.3266C47.2339 89.1671 47.2228 89.0007 47.2443 88.8369C47.2658 88.6731 47.3197 88.5152 47.4026 88.3724C47.5735 88.084 47.8503 87.8743 48.1736 87.7883C48.497 87.7023 48.8411 87.747 49.1321 87.9126C49.2756 87.9938 49.4016 88.1027 49.5028 88.2331C49.604 88.3635 49.6782 88.5127 49.7214 88.6722C49.7645 88.8316 49.7757 88.9981 49.7541 89.1619C49.7326 89.3257 49.6787 89.4836 49.5958 89.6263C49.425 89.9149 49.1482 90.1247 48.8248 90.2108C48.5014 90.2969 48.1574 90.2523 47.8664 90.0867V90.0861Z\" fill=\"#86C3DB\" transform=\"translate(0, 8)\"/> <path id=\"Snowflake 2\" d=\"M67.5781 90.366L66.3735 89.6775C66.4794 89.2326 66.4786 88.7687 66.3708 88.3241L67.5781 87.6345C67.6738 87.5805 67.7577 87.5079 67.8252 87.421C67.8926 87.3342 67.9423 87.2347 67.9711 87.1284C67.9998 87.0221 68.0071 86.9112 67.9926 86.802C67.9782 86.6928 67.9422 86.5876 67.8868 86.4926C67.7732 86.2998 67.5886 86.1597 67.3728 86.1025C67.157 86.0452 66.9276 86.0754 66.7339 86.1866L65.5278 86.8763C65.1931 86.5586 64.7868 86.3264 64.3437 86.1995V84.8202C64.3368 84.6003 64.245 84.3918 64.0875 84.2387C63.93 84.0856 63.7192 84 63.4998 84C63.2805 84 63.0699 84.0856 62.9124 84.2387C62.7548 84.3918 62.6628 84.6003 62.656 84.8202V86.1995C62.214 86.3289 61.8081 86.5598 61.4706 86.874L60.2662 86.1853C60.0724 86.0742 59.8428 86.044 59.627 86.1013C59.4113 86.1585 59.2267 86.2986 59.113 86.4913C59.0576 86.5864 59.0217 86.6916 59.0072 86.8007C58.9928 86.9099 59 87.0209 59.0288 87.1271C59.0575 87.2334 59.1072 87.3329 59.1747 87.4198C59.2421 87.5067 59.326 87.5792 59.4217 87.6332L60.6264 88.3216C60.5204 88.7666 60.5213 89.2305 60.629 89.675L59.4217 90.3647C59.326 90.4187 59.2421 90.4912 59.1747 90.5781C59.1072 90.665 59.0575 90.7645 59.0288 90.8708C59 90.9771 58.9928 91.088 59.0072 91.1972C59.0217 91.3063 59.0576 91.4115 59.113 91.5066C59.2267 91.6992 59.4113 91.8392 59.627 91.8965C59.8428 91.9537 60.0724 91.9236 60.2662 91.8126L61.4721 91.1229C61.8063 91.4409 62.2128 91.6726 62.6562 91.7979V93.1798C62.6631 93.3997 62.755 93.6082 62.9126 93.7613C63.0701 93.9144 63.2807 94 63.5 94C63.7194 94 63.9302 93.9144 64.0877 93.7613C64.2452 93.6082 64.337 93.3997 64.3439 93.1798V91.7975C64.7853 91.6683 65.1907 91.4378 65.5278 91.1242L66.7341 91.8138C66.9278 91.9248 67.1573 91.955 67.373 91.8977C67.5888 91.8405 67.7733 91.7005 67.887 91.5079C67.9424 91.4128 67.9784 91.3076 67.9928 91.1984C68.0073 91.0892 67.9998 90.9783 67.9711 90.872C67.9423 90.7657 67.8929 90.6662 67.8254 90.5793C67.7579 90.4925 67.6738 90.4199 67.5781 90.366ZM62.8664 90.0861C62.7229 90.005 62.5968 89.8961 62.4956 89.7657C62.3944 89.6353 62.3202 89.486 62.2771 89.3266C62.2339 89.1671 62.2228 89.0007 62.2443 88.8369C62.2658 88.6731 62.3197 88.5152 62.4026 88.3724C62.5735 88.084 62.8503 87.8743 63.1736 87.7883C63.497 87.7023 63.8411 87.747 64.1321 87.9126C64.2756 87.9938 64.4016 88.1027 64.5028 88.2331C64.604 88.3635 64.6782 88.5127 64.7214 88.6722C64.7645 88.8316 64.7757 88.9981 64.7541 89.1619C64.7326 89.3257 64.6787 89.4836 64.5958 89.6263C64.425 89.9149 64.1482 90.1247 63.8248 90.2108C63.5014 90.2969 63.1574 90.2523 62.8664 90.0867V90.0861Z\" fill=\"#86C3DB\" transform=\"translate(0, 0)\"/> <path id=\"Snowflake 3\" d=\"M82.5781 90.366L81.3735 89.6775C81.4794 89.2326 81.4786 88.7687 81.3708 88.3241L82.5781 87.6345C82.6738 87.5805 82.7577 87.5079 82.8252 87.421C82.8926 87.3342 82.9423 87.2347 82.9711 87.1284C82.9998 87.0221 83.0071 86.9112 82.9926 86.802C82.9782 86.6928 82.9422 86.5876 82.8868 86.4926C82.7732 86.2998 82.5886 86.1597 82.3728 86.1025C82.157 86.0452 81.9276 86.0754 81.7339 86.1866L80.5278 86.8763C80.1931 86.5586 79.7868 86.3264 79.3437 86.1995V84.8202C79.3368 84.6003 79.245 84.3918 79.0875 84.2387C78.93 84.0856 78.7192 84 78.4998 84C78.2805 84 78.0699 84.0856 77.9124 84.2387C77.7548 84.3918 77.6628 84.6003 77.656 84.8202V86.1995C77.214 86.3289 76.8081 86.5598 76.4706 86.874L75.2662 86.1853C75.0724 86.0742 74.8428 86.044 74.627 86.1013C74.4113 86.1585 74.2267 86.2986 74.113 86.4913C74.0576 86.5864 74.0217 86.6916 74.0072 86.8007C73.9928 86.9099 74 87.0209 74.0288 87.1271C74.0575 87.2334 74.1072 87.3329 74.1747 87.4198C74.2421 87.5067 74.326 87.5792 74.4217 87.6332L75.6264 88.3216C75.5204 88.7666 75.5213 89.2305 75.629 89.675L74.4217 90.3647C74.326 90.4187 74.2421 90.4912 74.1747 90.5781C74.1072 90.665 74.0575 90.7645 74.0288 90.8708C74 90.9771 73.9928 91.088 74.0072 91.1972C74.0217 91.3063 74.0576 91.4115 74.113 91.5066C74.2267 91.6992 74.4113 91.8392 74.627 91.8965C74.8428 91.9537 75.0724 91.9236 75.2662 91.8126L76.4721 91.1229C76.8063 91.4409 77.2128 91.6726 77.6562 91.7979V93.1798C77.6631 93.3997 77.755 93.6082 77.9126 93.7613C78.0701 93.9144 78.2807 94 78.5 94C78.7194 94 78.9302 93.9144 79.0877 93.7613C79.2452 93.6082 79.337 93.3997 79.3439 93.1798V91.7975C79.7853 91.6683 80.1907 91.4378 80.5278 91.1242L81.7341 91.8138C81.9278 91.9248 82.1573 91.955 82.373 91.8977C82.5888 91.8405 82.7733 91.7005 82.887 91.5079C82.9424 91.4128 82.9784 91.3076 82.9928 91.1984C83.0073 91.0892 82.9998 90.9783 82.9711 90.872C82.9423 90.7657 82.8929 90.6662 82.8254 90.5793C82.7579 90.4925 82.6738 90.4199 82.5781 90.366ZM77.8664 90.0861C77.7229 90.005 77.5968 89.8961 77.4956 89.7657C77.3944 89.6353 77.3202 89.486 77.2771 89.3266C77.2339 89.1671 77.2228 89.0007 77.2443 88.8369C77.2658 88.6731 77.3197 88.5152 77.4026 88.3724C77.5735 88.084 77.8503 87.8743 78.1736 87.7883C78.497 87.7023 78.8411 87.747 79.1321 87.9126C79.2756 87.9938 79.4016 88.1027 79.5028 88.2331C79.604 88.3635 79.6782 88.5127 79.7214 88.6722C79.7645 88.8316 79.7757 88.9981 79.7541 89.1619C79.7326 89.3257 79.6787 89.4836 79.5958 89.6263C79.425 89.9149 79.1482 90.1247 78.8248 90.2108C78.5014 90.2969 78.1574 90.2523 77.8664 90.0867V90.0861Z\" fill=\"#86C3DB\" transform=\"translate(0, 8)\"/> </g> </g> </g> <defs> <linearGradient id=\"paint0_linear_1858_8860\" x1=\"64.0008\" y1=\"39\" x2=\"64.0008\" y2=\"89\" gradientUnits=\"userSpaceOnUse\"> <stop stop-color=\"#F3F7FE\"/> <stop offset=\"1\" stop-color=\"#E6EFFC\"/> </linearGradient> <clipPath id=\"clip0_1858_8860\"> <rect width=\"128\" height=\"128\" fill=\"white\"/> </clipPath> </defs> </svg>","fog":"<svg viewBox=\"0 0 128 128\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\"> <g id=\"fog\" clip-path=\"url(#clip0_1858_9374)\"> <g id=\"Sky\"> <g id=\"Clouds\"> <g id=\"Cloud\"> <path id=\"Cloud_2\" d=\"M55.2623 48.4746C60.1227 40.6111 70.2975 37.38 78.8151 40.9434C87.3214 44.5023 92.138 54.0026 89.903 62.9648L89.7418 63.6143L90.4108 63.585C97.4203 63.2791 103.5 68.9917 103.5 76.0283C103.5 82.8395 97.7717 88.4997 90.9772 88.5H37.9537C31.1275 88.5018 25.2029 83.1709 24.5592 76.3604C23.9158 69.5518 28.7369 63.2124 35.443 61.9453L35.9264 61.8535L35.8424 61.3691C35.0256 56.6239 37.1258 51.7168 41.1051 49.0127C45.0951 46.3014 50.4459 46.1537 54.5797 48.6396L55.0026 48.8945L55.2623 48.4746Z\" fill=\"url(#paint0_linear_1858_9374)\" stroke=\"#E6EFFC\" stroke-miterlimit=\"10\"/> </g> </g> </g> <g id=\"Precipitation\"> <path id=\"Line 2\" d=\"M40 95H88\" stroke=\"#E2E8F0\" stroke-width=\"3\" stroke-miterlimit=\"10\" stroke-linecap=\"round\"/> <path id=\"Line 1\" d=\"M40 103H88\" stroke=\"#E2E8F0\" stroke-width=\"3\" stroke-miterlimit=\"10\" stroke-linecap=\"round\"/> </g> </g> <defs> <linearGradient id=\"paint0_linear_1858_9374\" x1=\"64.0008\" y1=\"39\" x2=\"64.0008\" y2=\"89\" gradientUnits=\"userSpaceOnUse\"> <stop stop-color=\"#F3F7FE\"/> <stop offset=\"1\" stop-color=\"#E6EFFC\"/> </linearGradient> <clipPath id=\"clip0_1858_9374\"> <rect width=\"128\" height=\"128\" fill=\"white\"/> </clipPath> </defs> </svg>","night":"<svg viewBox=\"0 0 128 128\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\"> <g id=\"clear-night\"> <g id=\"Moon\"> <path id=\"Moon_2\" d=\"M60.3018 32.582C55.2817 53.6999 73.6001 74.3477 95.3252 72.5146C91.5193 85.7702 79.1986 95.4998 64.5361 95.5C46.8375 95.5 32.5001 81.3444 32.5 63.8984C32.5 47.8688 44.6066 34.6278 60.3018 32.582Z\" fill=\"url(#paint0_linear_1837_5080)\" stroke=\"#72B9D5\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/> </g> </g> <defs> <linearGradient id=\"paint0_linear_1837_5080\" x1=\"64\" y1=\"32\" x2=\"64\" y2=\"96\" gradientUnits=\"userSpaceOnUse\"> <stop stop-color=\"#86C3DB\"/> <stop offset=\"1\" stop-color=\"#72B9D5\"/> </linearGradient> </defs> </svg>"};
+    function skyIcon(kind) {
+      const svg = sky[kind] || sky.cloud;
+      return `<img alt="" draggable="false" src="data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}">`;
+    }
+    function esc(value) {
+      return String(value).replace(/[&<>"']/g, char => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[char]));
+    }
+    function tempRgb(t) {
+      const stops = [[-15, [88, 176, 255]], [0, [110, 206, 255]], [8, [120, 214, 168]], [16, [255, 214, 90]], [24, [255, 159, 48]], [34, [255, 96, 48]]];
+      if (t <= stops[0][0]) return stops[0][1];
+      const last = stops[stops.length - 1];
+      if (t >= last[0]) return last[1];
+      for (let i = 0; i < stops.length - 1; i++) {
+        const [a, ca] = stops[i];
+        const [b, cb] = stops[i + 1];
+        if (t >= a && t <= b) {
+          const p = (t - a) / (b - a);
+          return ca.map((c, k) => Math.round(c + (cb[k] - c) * p));
+        }
+      }
+      return last[1];
+    }
+    function weatherCardHtml(scene) {
+      const today = scene.days[0];
+      const temps = scene.days.flatMap(day => [parseFloat(day.low), parseFloat(day.high)]);
+      const minT = Math.min(...temps);
+      const span = Math.max(Math.max(...temps) - minT, 1);
+      const days = scene.days.map((day, index) => {
+        const detail = `${day.date} ${day.cond}，${day.high} / ${day.low}°C，降水概率 ${day.pop}${day.rain ? "，" + day.rain : ""}`;
+        const lo = parseFloat(day.low);
+        const hi = parseFloat(day.high);
+        const left = ((lo - minT) / span) * 100;
+        const width = Math.min(Math.max(((hi - lo) / span) * 100, 8), 100 - left);
+        const pop = day.rain || day.pop;
+        const c1 = tempRgb(lo).join(",");
+        const c2 = tempRgb(hi).join(",");
+        return `<div class="wx-day${day.label === "今天" ? " is-today" : ""}" title="${esc(detail)}"><span class="wx-day-label">${esc(day.label)}</span><span class="wx-day-ico">${skyIcon(day.kind)}</span><em class="wx-day-pop${pop === "0%" ? " is-zero" : ""}">${esc(pop)}</em><span class="wx-lo">${esc(day.low)}°</span><span class="wx-bar" style="--lo:${left.toFixed(1)}%;--span:${width.toFixed(1)}%;--c1:rgb(${c1});--c2:rgb(${c2})"><i></i></span><span class="wx-hi">${esc(day.high)}°</span></div>`;
+      }).join("");
+      const light = scene.light ? " is-light" : "";
+      const cond = scene.when === "今天" ? today.cond : `${scene.when} · ${today.cond}`;
+      const preview = scene.window || 0;
+      const forecast = preview > 0 && scene.days.length > preview
+        ? `<div class="wx-scroll is-more"><div class="wx-scroll-body" style="--preview:${preview}">${days}</div><div class="wx-more" aria-hidden="true">向下查看</div></div>`
+        : days;
+      return `<article class="wx wx-${esc(scene.tone)}${light}" aria-label="${esc(scene.place)}${esc(scene.when)}天气"><div class="wx-top"><div class="wx-place">${esc(scene.place)}</div><div class="wx-hero"><div class="wx-temp">${esc(today.high)}<sup>°</sup></div><div class="wx-ico">${skyIcon(today.kind)}</div></div><span class="wx-cond">${esc(cond)}</span><div class="wx-range"><span>最高 ${esc(today.high)}°</span><span>最低 ${esc(today.low)}°</span></div></div><div class="wx-days"><div class="wx-days-label">${esc(scene.listLabel || "七日预报")}</div>${forecast}</div></article>`;
+    }
+    function bindWxScroll(root) {
+      root.querySelectorAll(".wx-scroll-body").forEach(body => {
+        const sync = () => {
+          const more = body.scrollHeight - body.clientHeight - body.scrollTop > 6;
+          body.parentElement.classList.toggle("is-more", more);
+        };
+        body.addEventListener("scroll", sync, { passive: true });
+        sync();
+      });
+    }
+    /* 与 天气场景.html scene d20 同源（15 日） */
+    const D20 = [
+      { label: "今天", date: "10月22日", cond: "多云", kind: "cloud", high: "15.5", low: "4.0", pop: "0%" },
+      { label: "周五", date: "10月23日", cond: "晴间多云", kind: "part", high: "15.9", low: "6.6", pop: "2%" },
+      { label: "周六", date: "10月24日", cond: "多云", kind: "cloud", high: "17.7", low: "8.7", pop: "4%" },
+      { label: "周日", date: "10月25日", cond: "阵雨", kind: "rain", high: "14.9", low: "10.9", pop: "78%", rain: "12.6 mm" },
+      { label: "周一", date: "10月26日", cond: "毛毛雨", kind: "drizzle", high: "16.4", low: "9.1", pop: "59%" },
+      { label: "周二", date: "10月27日", cond: "晴", kind: "sun", high: "12.4", low: "4.3", pop: "0%" },
+      { label: "周三", date: "10月28日", cond: "多云", kind: "cloud", high: "12.0", low: "2.5", pop: "0%" },
+      { label: "周四", date: "10月29日", cond: "晴间多云", kind: "part", high: "13.2", low: "3.1", pop: "6%" },
+      { label: "周五", date: "10月30日", cond: "多云", kind: "cloud", high: "11.6", low: "2.8", pop: "10%" },
+      { label: "周六", date: "10月31日", cond: "小雨", kind: "drizzle", high: "10.4", low: "4.6", pop: "62%" },
+      { label: "周日", date: "11月1日", cond: "阴", kind: "cloud", high: "9.8", low: "3.2", pop: "18%" },
+      { label: "周一", date: "11月2日", cond: "晴", kind: "sun", high: "12.6", low: "1.4", pop: "0%" },
+      { label: "周二", date: "11月3日", cond: "多云", kind: "cloud", high: "11.2", low: "2.2", pop: "8%" },
+      { label: "周三", date: "11月4日", cond: "晴间多云", kind: "part", high: "13.4", low: "2.6", pop: "4%" },
+      { label: "周四", date: "11月5日", cond: "多云", kind: "cloud", high: "10.8", low: "1.6", pop: "12%" }
+    ];
+    function dayCard(day) {
+      return { place: "北京", when: day.date, tone: "cloud", listLabel: day.date, days: [day] };
+    }
+    document.getElementById("themeBtn").onclick = () => {
+      const on = document.documentElement.classList.toggle("theme-dark");
+      document.getElementById("themeBtn").textContent = on ? "浅色" : "深色";
+    };
+
+    const mk = (label, date, cond, kind, high, low, pop, rain) => ({ label, date, cond, kind, high, low, pop, ...(rain ? { rain } : {}) });
+    const base = { place: "北京", when: "今天", tone: "cloud" };
+    const S = {
+      cloud7: { ...base, days: D20.slice(0, 7) },
+      d3: { ...base, listLabel: "三日预报", days: D20.slice(0, 3) },
+      d15: { ...base, listLabel: "15日预报", window: 8, days: D20 },
+      sat: { ...base, when: "10月31日", listLabel: "10月31日", days: [D20[9]] },
+      sun: { ...base, tone: "sun", listLabel: "三日预报", days: [mk("今天", "10月22日", "晴", "sun", "24.0", "12.0", "0%"), mk("明天", "10月23日", "晴间多云", "part", "23.2", "11.4", "2%"), mk("后天", "10月24日", "晴", "sun", "25.1", "13.0", "0%")] },
+      cloud: { ...base, tone: "cloud", listLabel: "三日预报", days: D20.slice(0, 3) },
+      rain: { ...base, tone: "rain", listLabel: "三日预报", days: [mk("今天", "10月22日", "阵雨", "rain", "14.9", "10.9", "78%", "12.6 mm"), mk("明天", "10月23日", "毛毛雨", "drizzle", "16.4", "9.1", "59%"), mk("后天", "10月24日", "小雨", "drizzle", "13.8", "8.6", "66%")] },
+      storm: { ...base, tone: "storm", listLabel: "三日预报", days: [mk("今天", "10月22日", "雷阵雨", "storm", "26.4", "19.2", "88%", "24.0 mm"), mk("明天", "10月23日", "阵雨", "rain", "24.1", "18.0", "72%"), mk("后天", "10月24日", "多云", "cloud", "25.3", "17.6", "20%")] },
+      snow: { ...base, tone: "snow", listLabel: "三日预报", days: [mk("今天", "10月22日", "小雪", "snow", "-1.2", "-6.4", "70%"), mk("明天", "10月23日", "雪", "snow", "-2.8", "-8.1", "82%"), mk("后天", "10月24日", "多云", "cloud", "0.6", "-6.0", "10%")] },
+      fog: { ...base, tone: "fog", listLabel: "三日预报", days: [mk("今天", "10月22日", "雾", "fog", "9.4", "3.2", "5%"), mk("明天", "10月23日", "多云", "cloud", "12.2", "4.0", "6%"), mk("后天", "10月24日", "晴间多云", "part", "14.0", "4.8", "2%")] },
+      night: { ...base, tone: "night", listLabel: "三日预报", days: [mk("今天", "10月22日", "晴夜", "night", "11.0", "4.0", "0%"), mk("明天", "10月23日", "多云", "cloud", "13.5", "5.2", "4%"), mk("后天", "10月24日", "晴夜", "night", "12.8", "4.6", "0%")] }
+    };
+    const FAR_LEAD = "下个月 5 号还太远，逐日预报现在只到 11 月 5 日。<br>临近那天再问我，就可以看准确的天气了。";
+    const rangeScene = (days, window) => ({ place: "北京", when: days[0].label === "今天" ? "今天" : days[0].date, tone: "cloud", listLabel: `${days[0].date} - ${days[days.length - 1].date}`, window: window || 0, days });
+    const mounts = {
+      cloud7: () => weatherCardHtml(S.cloud7),
+      d3: () => weatherCardHtml(S.d3),
+      d15: () => weatherCardHtml(S.d15),
+      sat: () => weatherCardHtml(S.sat),
+      gate: () => `<p class="lead">${FAR_LEAD}</p><div class="gate">card: false · 本轮不调用 present_weather_card，不出 .wx 卡。后续由 ask_form（host_only）补问日期区间。</div>`,
+      sun: () => weatherCardHtml(S.sun),
+      cloud: () => weatherCardHtml(S.cloud),
+      rain: () => weatherCardHtml(S.rain),
+      storm: () => weatherCardHtml(S.storm),
+      snow: () => weatherCardHtml(S.snow),
+      fog: () => weatherCardHtml(S.fog),
+      night: () => weatherCardHtml(S.night),
+      lightCmp: () => `<p class="lab">snow · 无 is-light（对照：图标阴影/降水色偏深色系）</p>${weatherCardHtml(S.snow)}<p class="lab">snow · is-light</p>${weatherCardHtml({ ...S.snow, light: true })}<p class="lab">fog · is-light</p>${weatherCardHtml({ ...S.fog, light: true })}`,
+      dark: () => `<div class="row">${weatherCardHtml(S.rain)}${weatherCardHtml(S.sun)}</div>`,
+      post: () => `<p class="lab">10月25日 - 10月31日 · 7 天（≤8，不挂 window）</p>${weatherCardHtml(rangeScene(D20.slice(3, 10)))}<p class="lab">10月25日 - 11月5日 · 12 天（window: 8 + wx-more）</p>${weatherCardHtml(rangeScene(D20.slice(3), 8))}`
+    };
+    document.querySelectorAll("[data-mount]").forEach(el => { el.innerHTML = mounts[el.dataset.mount](); bindWxScroll(el); });
+    const darkBtn = document.getElementById("darkJump");
+    if (darkBtn) darkBtn.onclick = () => document.getElementById("themeBtn").click();
+
+  </script>
+</body>
+</html>

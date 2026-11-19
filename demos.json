@@ -86,6 +86,20 @@
       "summary": "文档/产物入口条（artifact）：默认/已打开/写入中/对比入口；host_only"
     },
     {
+      "id": "card-ask-form-wall",
+      "title": "卡片库 · ask_form 形态墙",
+      "file": "chat-cards/ask_form/morph-wall.html",
+      "owner": "共同维护",
+      "summary": "补充信息卡（天气补问）：选项/日期区间日历/完成/跳过/提交后合成；host_only 无 Tool"
+    },
+    {
+      "id": "card-weather-card-wall",
+      "title": "卡片库 · weather_card 形态墙",
+      "file": "chat-cards/weather_card/morph-wall.html",
+      "owner": "共同维护",
+      "summary": "天气卡 present_weather_card：7/3/15 日、单日、Gate、七种 tone、is-light、深色与补问后合成"
+    },
+    {
       "id": "gen-fault",
       "title": "生成异常与恢复",
       "file": "生成异常与恢复-PRD.html",

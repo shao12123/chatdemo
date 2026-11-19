@@ -1,4 +1,4 @@
-# card_id 命名（v1.3 · 通用壳）
+# card_id 命名（v1.4 · 通用壳）
 
 > 卡按 **UI 壳 / 模式** 命名，不按业务故事。场景差异在触发规则与 payload。  
 > 形态墙见各子目录 `morph-wall.html`。
@@ -15,6 +15,7 @@
 | 4 | 全站件 **前端挂，无 Tool**（含附件两卡） |
 | 5 | **思考过程不算卡** |
 | 6 | **输入框附件 ≠ chat 用户文件**：拆成 `composer_file` + `user_file`（2026-11-19） |
+| 7 | **`ask_form` = host_only**：无 `present_` Tool，归全站件（2026-11-19 定）；天气补问后的结果卡仍走 `weather_card` |
 
 ---
 
@@ -41,7 +42,7 @@
 | `course_paper` | 长文文档台 | `present_course_paper` | |
 | `paper_compare_pick` | 对比选择卡 | `present_paper_compare_pick` | |
 | `annotation_edit` | 标注修改卡 | `present_annotation_edit` | |
-| `weather_card` | 天气卡 | `present_weather_card` | |
+| `weather_card` | 天气卡 | `present_weather_card` | `天气场景` · `wx` |
 | `map_align` | 映射对照卡 | `present_map_align` | |
 | `push_digest` | 推送汇总卡 | `present_push_digest` | 暂缓 |
 
@@ -54,13 +55,14 @@
 | `composer_file` | 输入框附件 | [有](composer_file/morph-wall.html) | 悬停角标 × / 上传中 |
 | `user_file` | 对话用户文件 | [有](user_file/morph-wall.html) | 类型色；无移除 |
 | `doc_entry` | 文档/产物入口 | [有](doc_entry/morph-wall.html) | artifact |
+| `ask_form` | 补充信息卡 | [有](ask_form/morph-wall.html) | host_only；别名 天气补问 · 补充信息卡；选项 + 日期区间 |
 | `map_entry` | 地图入口卡 | 本期不做 | |
 
 > 旧 `file_chip` → aliases，分别映射到 `composer_file` / `user_file`。
 
 ### C. 候选尚未收名（下批）
 
-`ask_form` · `group_form` · `group_result` · `app_link` · `schedule_preview` · `agenda_list` · `analysis_card`
+`group_form` · `group_result` · `app_link` · `schedule_preview` · `agenda_list` · `analysis_card`
 
 ### D. 已有形态墙
 
@@ -73,6 +75,8 @@
 | `composer_file` | [composer_file/morph-wall.html](composer_file/morph-wall.html) |
 | `user_file` | [user_file/morph-wall.html](user_file/morph-wall.html) |
 | `doc_entry` | [doc_entry/morph-wall.html](doc_entry/morph-wall.html) |
+| `ask_form` | [ask_form/morph-wall.html](ask_form/morph-wall.html) |
+| `weather_card` | [weather_card/morph-wall.html](weather_card/morph-wall.html) |
 
 ---
 
