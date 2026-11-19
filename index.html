@@ -35,6 +35,13 @@
       border-radius: 999px; background: rgba(255,255,255,.8); color: var(--muted); font-size: 12px;
     }
     .meta b { color: var(--brand); font-weight: 600; }
+    .section { margin-top: 32px; }
+    .section:first-of-type { margin-top: 8px; }
+    .section-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-bottom: 12px; }
+    .section-head h2 { margin: 0; font-size: 15px; font-weight: 650; letter-spacing: -.01em; }
+    .section-head p { margin: 0; color: var(--muted); font-size: 12px; }
+    .section-head a { color: var(--brand); text-decoration: none; font-weight: 600; }
+    .section-head a:hover { text-decoration: underline; }
     .list { display: flex; flex-direction: column; gap: 12px; margin: 0; padding: 0; list-style: none; }
     .card {
       display: block; padding: 18px 20px; border: 1px solid var(--line); border-radius: 16px;
@@ -43,7 +50,7 @@
       transition: border-color .15s, transform .15s, box-shadow .15s;
     }
     .card:hover { border-color: #b9cdfb; transform: translateY(-1px); box-shadow: 0 12px 28px rgba(28, 35, 48, .08); }
-    .card h2 { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin: 0 0 6px; font-size: 17px; }
+    .card h3 { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin: 0 0 6px; font-size: 17px; font-weight: 650; }
     .card .tag { padding: 1px 8px; border-radius: 999px; background: #fff4e5; color: #b54708; font-size: 12px; font-weight: 600; line-height: 20px; }
     .card p { margin: 0; color: var(--muted); font-size: 13px; }
     .card .row { display: flex; justify-content: space-between; gap: 12px; align-items: baseline; margin-top: 10px; font-size: 12px; color: var(--muted); }
@@ -62,8 +69,8 @@
       <p>团队唯一入口。改完推送后，打开这里刷新即可看到最新版；不要再用本地附件当分发渠道。</p>
       <div class="meta" id="versionMeta">正在读取版本…</div>
     </header>
-    <ul class="list" id="demoList" aria-live="polite"></ul>
-    <p class="hint">多人协作：各做各的 HTML，在 <code>demos.json</code> 登记一条（可选 <code>status</code> 字段标注状态，如「本期暂不开发」）；同一文件请先拉再改。正式说明以仓库默认内容为准。</p>
+    <div id="catalog" aria-live="polite"></div>
+    <p class="hint">多人协作：各做各的 HTML，在 <code>demos.json</code> 登记一条并标 <code>kind</code>（<code>demo</code> 业务场景 / <code>card</code> 卡片形态墙）；可选 <code>status</code>（如「本期暂不开发」）。同一文件请先拉再改。正式说明以仓库默认内容为准。</p>
     <p class="err" id="loadErr" hidden></p>
   </main>
   <script>
@@ -75,26 +82,58 @@
     function esc(s) {
       return String(s ?? "").replace(/[&<>"']/g, ch => ({ "&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;" }[ch]));
     }
+    function resolveKind(demo) {
+      if (demo.kind === "demo" || demo.kind === "card") return demo.kind;
+      const id = String(demo.id || "");
+      const file = String(demo.file || "");
+      if (id.startsWith("card-") || file.startsWith("chat-cards/")) return "card";
+      return "demo";
+    }
+    function cardHtml(demo) {
+      return `
+        <li>
+          <a class="card" href="${esc(demo.file)}" target="_blank" rel="noopener noreferrer">
+            <h3>${esc(demo.title || demo.id)}${demo.status ? `<span class="tag">${esc(demo.status)}</span>` : ""}</h3>
+            <p>${esc(demo.summary || "")}</p>
+            <div class="row"><span>打开 →</span><em>${esc(demo.owner || "未署名")}</em></div>
+          </a>
+        </li>`;
+    }
+    function sectionHtml(title, desc, items, emptyText) {
+      const body = items.length
+        ? `<ul class="list">${items.map(cardHtml).join("")}</ul>`
+        : `<p class="empty">${esc(emptyText)}</p>`;
+      return `
+        <section class="section">
+          <div class="section-head">
+            <h2>${esc(title)}</h2>
+            <p>${desc}</p>
+          </div>
+          ${body}
+        </section>`;
+    }
     (async () => {
       const meta = document.getElementById("versionMeta");
-      const list = document.getElementById("demoList");
+      const catalog = document.getElementById("catalog");
       const err = document.getElementById("loadErr");
       try {
-        const [version, catalog] = await Promise.all([loadJson("version.json"), loadJson("demos.json")]);
+        const [version, data] = await Promise.all([loadJson("version.json"), loadJson("demos.json")]);
         meta.innerHTML = `当前版本 <b>${esc(version.version)}</b> · 更新于 ${esc(version.updatedAt)}${version.note ? " · " + esc(version.note) : ""}`;
-        const demos = Array.isArray(catalog.demos) ? catalog.demos : [];
-        if (!demos.length) {
-          list.innerHTML = `<li class="empty">还没有登记 demo。在 demos.json 里加一条即可。</li>`;
+        const all = Array.isArray(data.demos) ? data.demos : [];
+        const demos = all.filter(d => resolveKind(d) === "demo");
+        const cards = all.filter(d => resolveKind(d) === "card");
+        if (!all.length) {
+          catalog.innerHTML = `<p class="empty">还没有登记条目。在 demos.json 里加一条即可。</p>`;
           return;
         }
-        list.innerHTML = demos.map(demo => `
-          <li>
-            <a class="card" href="${esc(demo.file)}" target="_blank" rel="noopener noreferrer">
-              <h2>${esc(demo.title || demo.id)}${demo.status ? `<span class="tag">${esc(demo.status)}</span>` : ""}</h2>
-              <p>${esc(demo.summary || "")}</p>
-              <div class="row"><span>打开 →</span><em>${esc(demo.owner || "未署名")}</em></div>
-            </a>
-          </li>`).join("");
+        catalog.innerHTML =
+          sectionHtml("业务 Demo", "场景故事 · PRD · 交互验收", demos, "暂无业务 Demo") +
+          sectionHtml(
+            "卡片库",
+            `Chat 区 UI 壳形态墙 · <a href="chat-cards/CARD_ID-NAMING.md" target="_blank" rel="noopener noreferrer">命名规范</a>`,
+            cards,
+            "暂无卡片形态墙"
+          );
       } catch (e) {
         meta.textContent = "版本读取失败";
         err.hidden = false;

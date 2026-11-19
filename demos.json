@@ -5,14 +5,16 @@
       "title": "课程论文对话",
       "file": "课程论文-PRD.html",
       "owner": "共同维护",
-      "summary": "PRD：课程论文首稿/停止续写/异常/修订/对比/标注；顶部可打开 conversations.html Demo，可复制 Markdown 给 AGENT"
+      "summary": "PRD：课程论文首稿/停止续写/异常/修订/对比/标注；顶部可打开 conversations.html Demo，可复制 Markdown 给 AGENT",
+      "kind": "demo"
     },
     {
       "id": "chat-outline",
       "title": "对话目录",
       "file": "对话目录-PRD.html",
       "owner": "共同维护",
-      "summary": "PRD：提问/消息/文档目录同一控件；很多条边缘平移+鱼眼、展开 peek、右侧互斥；顶部可打开 Demo"
+      "summary": "PRD：提问/消息/文档目录同一控件；很多条边缘平移+鱼眼、展开 peek、右侧互斥；顶部可打开 Demo",
+      "kind": "demo"
     },
     {
       "id": "hot-topics",
@@ -20,196 +22,224 @@
       "status": "本期暂不开发",
       "file": "高频主题汇总.html",
       "owner": "共同维护",
-      "summary": "MoreAI 推送卡片统一规范 · 高频主题汇总等 7 条推送 · 消息目录 · 说明模式"
+      "summary": "MoreAI 推送卡片统一规范 · 高频主题汇总等 7 条推送 · 消息目录 · 说明模式",
+      "kind": "demo"
     },
     {
       "id": "chat-info-card",
       "title": "标注修改",
       "file": "标注修改-PRD.html",
       "owner": "张宏尧",
-      "summary": "PRD：PPT 标注入队、一次发送、成功另存新版、失败与暂停不留预览标注；顶部可打开交互 Demo，可复制 Markdown 给 AGENT"
+      "summary": "PRD：PPT 标注入队、一次发送、成功另存新版、失败与暂停不留预览标注；顶部可打开交互 Demo，可复制 Markdown 给 AGENT",
+      "kind": "demo"
     },
     {
       "id": "route-plan-prd",
       "title": "行程对比方案",
       "file": "三个路线方案-PRD.html",
       "owner": "共同维护",
-      "summary": "PRD + Agent TOOL（可下载 Demo.html / TOOL.md / PRD.md）：行程规划触发判定与边界清单；前端职责、数据契约、验收；可打开交互 Demo"
-    },
-    {
-      "id": "card-option-compare-wall",
-      "title": "卡片库 · option_compare 形态墙",
-      "file": "chat-cards/option_compare/morph-wall.html",
-      "owner": "共同维护",
-      "summary": "通用多方案对比壳；旧名 route_compare；命名见 chat-cards/CARD_ID-NAMING.md"
-    },
-    {
-      "id": "card-data-table-wall",
-      "title": "卡片库 · data_table 形态墙",
-      "file": "chat-cards/data_table/morph-wall.html",
-      "owner": "共同维护",
-      "summary": "通用明细表壳；旧名 route_detail；行程/审查等同用 present_data_table"
-    },
-    {
-      "id": "card-tip-block-wall",
-      "title": "卡片库 · tip_block 形态墙",
-      "file": "chat-cards/tip_block/morph-wall.html",
-      "owner": "共同维护",
-      "summary": "全站提示块；host_only，无 Agent Tool"
-    },
-    {
-      "id": "card-error-card-wall",
-      "title": "卡片库 · error_card 形态墙",
-      "file": "chat-cards/error_card/morph-wall.html",
-      "owner": "共同维护",
-      "summary": "全站错误卡片（.net-card + 重试）；host_only，无 Agent Tool"
-    },
-    {
-      "id": "card-composer-file-wall",
-      "title": "卡片库 · composer_file 形态墙",
-      "file": "chat-cards/composer_file/morph-wall.html",
-      "owner": "共同维护",
-      "summary": "输入框附件：悬停角标×/上传中/多文件滑动；host_only；旧名 file_chip composer"
-    },
-    {
-      "id": "card-user-file-wall",
-      "title": "卡片库 · user_file 形态墙",
-      "file": "chat-cards/user_file/morph-wall.html",
-      "owner": "共同维护",
-      "summary": "对话用户文件：类型色/无移除；host_only；旧名 file_chip chat"
-    },
-    {
-      "id": "card-doc-entry-wall",
-      "title": "卡片库 · doc_entry 形态墙",
-      "file": "chat-cards/doc_entry/morph-wall.html",
-      "owner": "共同维护",
-      "summary": "文档/产物入口（含日历 mark）：日程 Chat 只挂本卡；host_only"
-    },
-    {
-      "id": "card-ask-form-wall",
-      "title": "卡片库 · ask_form 形态墙",
-      "file": "chat-cards/ask_form/morph-wall.html",
-      "owner": "共同维护",
-      "summary": "唯一补输入壳 ask_form（host_only）：天气 canonical + 多选/多题；V17 对哪里不满意 / V18 多题步进 .pick-card；路线旧 .ask 不另开卡"
-    },
-    {
-      "id": "card-weather-card-wall",
-      "title": "卡片库 · weather_card 形态墙",
-      "file": "chat-cards/weather_card/morph-wall.html",
-      "owner": "共同维护",
-      "summary": "天气卡 present_weather_card：7/3/15 日、单日、Gate、七种 tone、is-light、深色与补问后合成"
-    },
-    {
-      "id": "card-doc-summary-wall",
-      "title": "卡片库 · doc_summary 形态墙",
-      "file": "chat-cards/doc_summary/morph-wall.html",
-      "owner": "共同维护",
-      "summary": "总结报告卡 present_doc_summary：七壳 metric/points/material/spec/ledger/catalog/notes、多文件多外框、模块闸门、深色；tip 见 tip_block"
-    },
-    {
-      "id": "card-paper-compare-pick-wall",
-      "title": "卡片库 · paper_compare_pick 形态墙",
-      "file": "chat-cards/paper_compare_pick/morph-wall.html",
-      "owner": "共同维护",
-      "summary": "Chat 内对比选择卡 present_paper_compare_pick；确认后右侧文档台对比（非卡）"
-    },
-    {
-      "id": "card-map-align-wall",
-      "title": "卡片库 · map_align 形态墙",
-      "file": "chat-cards/map_align/morph-wall.html",
-      "owner": "共同维护",
-      "summary": "映射对照卡 present_map_align：中英双栏、窄屏叠放、复制成功、复制失败 toast；仅 chat"
-    },
-    {
-      "id": "card-app-link-wall",
-      "title": "卡片库 · app_link 形态墙",
-      "file": "chat-cards/app_link/morph-wall.html",
-      "owner": "共同维护",
-      "summary": "连接外部应用卡 present_app_link：待授权 / 已连接 / 失败 / 已取消；授权弹层为 host 浮层不入卡"
-    },
-    {
-      "id": "card-group-form-wall",
-      "title": "卡片库 · group_form 形态墙",
-      "file": "chat-cards/group_form/morph-wall.html",
-      "owner": "共同维护",
-      "summary": "建群表单卡 present_group_form（非 ask_form）：空白禁用 / 有群名 / 无群名 / 搜索未命中 / 照片·色块·默认头像 / 创建中卡隐藏"
-    },
-    {
-      "id": "card-group-result-wall",
-      "title": "卡片库 · group_result 形态墙",
-      "file": "chat-cards/group_result/morph-wall.html",
-      "owner": "共同维护",
-      "summary": "建群结果卡 present_group_result：默认 / 照片 / 色块头像、长名省略、展开成员（is-open）"
-    },
-    {
-      "id": "card-analysis-card-wall",
-      "title": "卡片库 · analysis_card 形态墙",
-      "file": "chat-cards/analysis_card/morph-wall.html",
-      "owner": "共同维护",
-      "summary": "结构化分析卡 present_analysis_card（.revise-card；aliases revise_card）：诊断+方案 / 方案型 / 边界型 / 无改动 chips / 过程方案展开 / 深色；不并入 doc_summary"
+      "summary": "PRD + Agent TOOL（可下载 Demo.html / TOOL.md / PRD.md）：行程规划触发判定与边界清单；前端职责、数据契约、验收；可打开交互 Demo",
+      "kind": "demo"
     },
     {
       "id": "gen-fault",
       "title": "生成异常与恢复",
       "file": "生成异常与恢复-PRD.html",
       "owner": "共同维护",
-      "summary": "PRD：异常分级与恢复规则、全站错误卡片、断线续传事件与接口、前后端职责与验收；顶部可打开交互 Demo（12 个场景 + 故障模拟面板），可复制 Markdown 给 AGENT"
+      "summary": "PRD：异常分级与恢复规则、全站错误卡片、断线续传事件与接口、前后端职责与验收；顶部可打开交互 Demo（12 个场景 + 故障模拟面板），可复制 Markdown 给 AGENT",
+      "kind": "demo"
     },
     {
       "id": "doc-summary",
       "title": "文档分析与总结",
       "file": "文档分析与总结-PRD.html",
       "owner": "共同维护",
-      "summary": "PRD：总结壳族与模块闸门、信号映射、数据契约与验收；顶部可打开交互 Demo（8 个 case），可复制 Markdown 给 AGENT"
+      "summary": "PRD：总结壳族与模块闸门、信号映射、数据契约与验收；顶部可打开交互 Demo（8 个 case），可复制 Markdown 给 AGENT",
+      "kind": "demo"
     },
     {
       "id": "ai-face",
       "title": "AI形象优化",
       "file": "AI形象优化.html",
       "owner": "张宏尧",
-      "summary": "对话形象、生成失败短线眼、右下角可拖拽且眼睛跟随鼠标的悬浮形象"
+      "summary": "对话形象、生成失败短线眼、右下角可拖拽且眼睛跟随鼠标的悬浮形象",
+      "kind": "demo"
     },
     {
       "id": "map-align",
       "title": "映射对照场景",
       "file": "映射对照场景.html",
       "owner": "张宏尧",
-      "summary": "中英词句对照：悬停两边一起高亮，复制成功变对勾、失败有提示；对话区间距和 MoreAI 形象与天气场景一致"
+      "summary": "中英词句对照：悬停两边一起高亮，复制成功变对勾、失败有提示；对话区间距和 MoreAI 形象与天气场景一致",
+      "kind": "demo"
     },
     {
       "id": "weather",
       "title": "天气场景",
       "file": "天气场景.html",
       "owner": "张宏尧",
-      "summary": "北京天气卡片：可查询区间内外、指定日期、日期区间；确认后卡片只留选中项"
+      "summary": "北京天气卡片：可查询区间内外、指定日期、日期区间；确认后卡片只留选中项",
+      "kind": "demo"
     },
     {
       "id": "create-group",
       "title": "建群场景",
       "file": "建群场景.html",
       "owner": "张宏尧",
-      "summary": "建群卡片：选人、搜索、群名与头像、指定头像、找不到人、群已创建；浅色深色与标注"
+      "summary": "建群卡片：选人、搜索、群名与头像、指定头像、找不到人、群已创建；浅色深色与标注",
+      "kind": "demo"
     },
     {
       "id": "link-app",
       "title": "连接外部应用场景",
       "file": "连接外部应用场景.html",
       "owner": "张宏尧",
-      "summary": "连接 GitHub：授权确认、已连接、关掉授权窗口、连接失败后再授权；浅色深色与标注"
+      "summary": "连接 GitHub：授权确认、已连接、关掉授权窗口、连接失败后再授权；浅色深色与标注",
+      "kind": "demo"
     },
     {
       "id": "time-scene",
       "title": "时间场景",
       "file": "时间场景.html",
       "owner": "张宏尧",
-      "summary": "周四面试安排：正常完成、冲突自动解决、冲突需要确认、全部失败和部分失败；对话里是日程卡片，完整日程在右侧日历"
+      "summary": "周四面试安排：正常完成、冲突自动解决、冲突需要确认、全部失败和部分失败；对话里是日程卡片，完整日程在右侧日历",
+      "kind": "demo"
     },
     {
       "id": "plan-list",
       "title": "生成计划清单",
       "file": "计划清单-PRD.html",
       "owner": "张宏尧",
-      "summary": "PRD + Agent TOOL：计划清单触发判定；顶部可打开交互 Demo，可下载 Demo.html / TOOL.md，可复制 TOOL"
+      "summary": "PRD + Agent TOOL：计划清单触发判定；顶部可打开交互 Demo，可下载 Demo.html / TOOL.md，可复制 TOOL",
+      "kind": "demo"
+    },
+    {
+      "id": "card-option-compare-wall",
+      "title": "option_compare 形态墙",
+      "file": "chat-cards/option_compare/morph-wall.html",
+      "owner": "共同维护",
+      "summary": "通用多方案对比壳；旧名 route_compare；命名见 chat-cards/CARD_ID-NAMING.md",
+      "kind": "card"
+    },
+    {
+      "id": "card-data-table-wall",
+      "title": "data_table 形态墙",
+      "file": "chat-cards/data_table/morph-wall.html",
+      "owner": "共同维护",
+      "summary": "通用明细表壳；旧名 route_detail；行程/审查等同用 present_data_table",
+      "kind": "card"
+    },
+    {
+      "id": "card-tip-block-wall",
+      "title": "tip_block 形态墙",
+      "file": "chat-cards/tip_block/morph-wall.html",
+      "owner": "共同维护",
+      "summary": "全站提示块；host_only，无 Agent Tool",
+      "kind": "card"
+    },
+    {
+      "id": "card-error-card-wall",
+      "title": "error_card 形态墙",
+      "file": "chat-cards/error_card/morph-wall.html",
+      "owner": "共同维护",
+      "summary": "全站错误卡片（.net-card + 重试）；host_only，无 Agent Tool",
+      "kind": "card"
+    },
+    {
+      "id": "card-composer-file-wall",
+      "title": "composer_file 形态墙",
+      "file": "chat-cards/composer_file/morph-wall.html",
+      "owner": "共同维护",
+      "summary": "输入框附件：悬停角标×/上传中/多文件滑动；host_only；旧名 file_chip composer",
+      "kind": "card"
+    },
+    {
+      "id": "card-user-file-wall",
+      "title": "user_file 形态墙",
+      "file": "chat-cards/user_file/morph-wall.html",
+      "owner": "共同维护",
+      "summary": "对话用户文件：类型色/无移除；host_only；旧名 file_chip chat",
+      "kind": "card"
+    },
+    {
+      "id": "card-doc-entry-wall",
+      "title": "doc_entry 形态墙",
+      "file": "chat-cards/doc_entry/morph-wall.html",
+      "owner": "共同维护",
+      "summary": "文档/产物入口（含日历 mark）：日程 Chat 只挂本卡；host_only",
+      "kind": "card"
+    },
+    {
+      "id": "card-ask-form-wall",
+      "title": "ask_form 形态墙",
+      "file": "chat-cards/ask_form/morph-wall.html",
+      "owner": "共同维护",
+      "summary": "唯一补输入壳 ask_form（host_only）：天气 canonical + 多选/多题；V17 对哪里不满意 / V18 多题步进 .pick-card；路线旧 .ask 不另开卡",
+      "kind": "card"
+    },
+    {
+      "id": "card-weather-card-wall",
+      "title": "weather_card 形态墙",
+      "file": "chat-cards/weather_card/morph-wall.html",
+      "owner": "共同维护",
+      "summary": "天气卡 present_weather_card：7/3/15 日、单日、Gate、七种 tone、is-light、深色与补问后合成",
+      "kind": "card"
+    },
+    {
+      "id": "card-doc-summary-wall",
+      "title": "doc_summary 形态墙",
+      "file": "chat-cards/doc_summary/morph-wall.html",
+      "owner": "共同维护",
+      "summary": "总结报告卡 present_doc_summary：七壳 metric/points/material/spec/ledger/catalog/notes、多文件多外框、模块闸门、深色；tip 见 tip_block",
+      "kind": "card"
+    },
+    {
+      "id": "card-paper-compare-pick-wall",
+      "title": "paper_compare_pick 形态墙",
+      "file": "chat-cards/paper_compare_pick/morph-wall.html",
+      "owner": "共同维护",
+      "summary": "Chat 内对比选择卡 present_paper_compare_pick；确认后右侧文档台对比（非卡）",
+      "kind": "card"
+    },
+    {
+      "id": "card-map-align-wall",
+      "title": "map_align 形态墙",
+      "file": "chat-cards/map_align/morph-wall.html",
+      "owner": "共同维护",
+      "summary": "映射对照卡 present_map_align：中英双栏、窄屏叠放、复制成功、复制失败 toast；仅 chat",
+      "kind": "card"
+    },
+    {
+      "id": "card-app-link-wall",
+      "title": "app_link 形态墙",
+      "file": "chat-cards/app_link/morph-wall.html",
+      "owner": "共同维护",
+      "summary": "连接外部应用卡 present_app_link：待授权 / 已连接 / 失败 / 已取消；授权弹层为 host 浮层不入卡",
+      "kind": "card"
+    },
+    {
+      "id": "card-group-form-wall",
+      "title": "group_form 形态墙",
+      "file": "chat-cards/group_form/morph-wall.html",
+      "owner": "共同维护",
+      "summary": "建群表单卡 present_group_form（非 ask_form）：空白禁用 / 有群名 / 无群名 / 搜索未命中 / 照片·色块·默认头像 / 创建中卡隐藏",
+      "kind": "card"
+    },
+    {
+      "id": "card-group-result-wall",
+      "title": "group_result 形态墙",
+      "file": "chat-cards/group_result/morph-wall.html",
+      "owner": "共同维护",
+      "summary": "建群结果卡 present_group_result：默认 / 照片 / 色块头像、长名省略、展开成员（is-open）",
+      "kind": "card"
+    },
+    {
+      "id": "card-analysis-card-wall",
+      "title": "analysis_card 形态墙",
+      "file": "chat-cards/analysis_card/morph-wall.html",
+      "owner": "共同维护",
+      "summary": "结构化分析卡 present_analysis_card（.revise-card；aliases revise_card）：诊断+方案 / 方案型 / 边界型 / 无改动 chips / 过程方案展开 / 深色；不并入 doc_summary",
+      "kind": "card"
     }
   ]
 }

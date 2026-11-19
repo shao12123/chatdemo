@@ -1,5 +1,5 @@
 {
-  "version": "2026.11.19-23",
-  "updatedAt": "2026-11-19 19:20",
-  "note": "暂不开发不上库：撤 push_digest；ask_form 补 V17/V18；命名 v2.3"
+  "version": "2026.11.19-24",
+  "updatedAt": "2026-11-19 19:40",
+  "note": "入口拆成业务 Demo / 卡片库两组；demos.json 增 kind"
 }
