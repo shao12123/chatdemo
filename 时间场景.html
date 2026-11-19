@@ -529,7 +529,7 @@
       z-index: 8;
       top: 0;
       left: calc(100% + 14px);
-      width: 220px;
+      width: 268px;
       padding: 8px;
       border: 0.5px solid #dcdcdc;
       border-radius: 12px;
@@ -541,6 +541,9 @@
     .hist-pop .hist-label { height: auto; margin: 0; padding: 6px 8px; }
     #histPopList { display: flex; flex-direction: column; gap: 2px; }
     #histPopList button {
+      display: flex;
+      align-items: center;
+      gap: 6px;
       width: 100%;
       min-height: 34px;
       border: 0;
@@ -551,7 +554,7 @@
       font-size: 14px;
       line-height: 22px;
       text-align: left;
-      padding: 6px 12px;
+      padding: 6px 8px 6px 12px;
     }
     #histPopList button:hover { background: rgba(9, 11, 14, 0.04); }
     #histPopList button.active,
@@ -607,13 +610,18 @@
     #sessionList .session.active,
     #sessionList .session.active:hover { background: var(--brand-soft); color: var(--brand); }
     #sessionList .session-title {
+      display: flex;
+      align-items: center;
+      gap: 6px;
       height: auto;
-      padding: 6px 12px;
+      padding: 6px 8px 6px 12px;
       font-size: 14px;
       line-height: 22px;
       font-weight: 400;
       color: inherit;
     }
+    .scene-name { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .scene-tag { flex: none; height: 18px; padding: 0 6px; border-radius: 999px; background: #fff4e5; color: #b54708; font-size: 12px; line-height: 18px; font-weight: 400; }
     #stage .main-head {
       height: 60px;
       padding: 0 20px;
@@ -1585,6 +1593,7 @@
     html.theme-dark #sessionList .session.active,
     html.theme-dark #sessionList .session.active:hover,
     html.theme-dark #histPopList button.active { color: #9ec5ff; }
+    html.theme-dark .scene-tag { background: #2a2112; color: #ffd591; }
     html.theme-dark .rev-item { border-bottom-color: #292b2e; }
     html.theme-dark .rev-item-heading strong,
     html.theme-dark .rev-body,
@@ -1952,7 +1961,7 @@ const toastIcons = {
         events: () => fromSlots(SLOT.auto, [at("conflict", "已有日程", "11:00", "11:30", "existing"), late()])
       },
       {
-        id: "confirm", title: "冲突需要确认", prompt: ASK, seconds: 2, open: false, flow: "confirm",
+        id: "confirm", title: "冲突需要确认", tag: "本期不做", prompt: ASK, seconds: 2, open: false, flow: "confirm",
         summary: "4 场面试 · 12:45 午餐 · 15:45 结束", sub: "日历 · 已按建议写入", count: "本次安排 9 项",
         steps: ["看到 10:00–10:45 已有日程", "这和你指定的开始时间冲突", "排出从 10:45 开始的建议", "等你确认后再写入"],
         lead: "周四 10:00–10:45 已有日程，与你指定的开始时间冲突。建议保留原日程，将第一场面试调整至 10:45，其余安排相应顺延。可以按这个方案安排吗？",
@@ -1994,7 +2003,7 @@ const toastIcons = {
       scene.dateLabel = "11 月 5 日 · 周四";
       if (scene.open === undefined) scene.open = false;
     });
-    let sessions = scenes.map(scene => ({ id: scene.id, title: scene.title }));
+    let sessions = scenes.map(scene => ({ id: scene.id, title: scene.title, tag: scene.tag || "" }));
     let runToken = 0;
     const doc = document.getElementById("doc");
     const docScroll = document.getElementById("docScroll");
@@ -2186,10 +2195,14 @@ const toastIcons = {
       const scope = document.getElementById("revScope");
       if (scope) scope.textContent = scene ? `周四面试安排 · ${scene.title}` : "时间场景";
     }
+    function sessionLabel(item) {
+      const tag = item.tag ? `<span class="scene-tag">${esc(item.tag)}</span>` : "";
+      return `<span class="scene-name">${esc(item.title)}</span>${tag}`;
+    }
     function renderSessions() {
-      list.innerHTML = sessions.map(item => `<li class="session${item.id === activeId ? " active" : ""}" data-id="${item.id}"><button class="session-title" type="button">${esc(item.title)}</button></li>`).join("");
+      list.innerHTML = sessions.map(item => `<li class="session${item.id === activeId ? " active" : ""}" data-id="${item.id}"><button class="session-title" type="button">${sessionLabel(item)}</button></li>`).join("");
       const pop = document.getElementById("histPopList");
-      if (pop) pop.innerHTML = sessions.map(item => `<button type="button" data-id="${esc(item.id)}" class="${item.id === activeId ? "active" : ""}">${esc(item.title)}</button>`).join("");
+      if (pop) pop.innerHTML = sessions.map(item => `<button type="button" data-id="${esc(item.id)}" class="${item.id === activeId ? "active" : ""}">${sessionLabel(item)}</button>`).join("");
       const title = document.getElementById("convTitle");
       const scene = activeScene();
       title.textContent = scene && main.classList.contains("chatting") ? scene.title : "新对话";
