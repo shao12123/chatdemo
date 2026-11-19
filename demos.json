@@ -149,6 +149,13 @@
       "summary": "结构化分析卡 present_analysis_card（.revise-card；aliases revise_card）：诊断+方案 / 方案型 / 边界型 / 无改动 chips / 过程方案展开 / 深色；不并入 doc_summary"
     },
     {
+      "id": "card-push-digest-wall",
+      "title": "卡片库 · push_digest 形态墙",
+      "file": "chat-cards/push_digest/morph-wall.html",
+      "owner": "共同维护",
+      "summary": "推送汇总卡 present_push_digest（article.digest-card）：代码变更摘要 / 会议准备 / 关联内容 / 飞书聊天知会 / 高频主题汇总 canonical 多主题 / 深色；右侧 digest-view 不入库；业务 Demo hot-topics 仍暂不开发"
+    },
+    {
       "id": "gen-fault",
       "title": "生成异常与恢复",
       "file": "生成异常与恢复-PRD.html",

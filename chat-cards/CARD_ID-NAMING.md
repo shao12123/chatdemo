@@ -1,4 +1,4 @@
-# card_id 命名（v2.1 · 仅 Chat 区）
+# card_id 命名（v2.2 · 仅 Chat 区）
 
 > 卡按 **UI 壳 / 模式** 命名，不按业务故事。场景差异在触发规则与 payload。  
 > **范围：只收对话区（含输入框附件）出现的卡。** 右侧文档台 / 标注台 / PPT 预览等展示区 **不进卡片库**。  
@@ -24,6 +24,7 @@
 | 12 | **Chat 批次 · map / app**（2026-11-19）：`map_align` · `app_link` 落形态墙；授权弹层、右侧日历台 **不进库** |
 | 13 | **建群两张卡**（2026-11-19，v2.0）：`group_form` + `group_result`，**不并入 `ask_form`**（多字段事务壳：群名 / 头像 / 双栏选人 / 单主按钮）。表单 = `article.gc`；结果 = `article.gc.gc-result`。Tool：`present_group_form` · `present_group_result`。创建中卡隐藏，仅 lead + think（think 不算卡）。无授权 / 右侧面板，host overlay 不进库 |
 | 14 | **`analysis_card` 独立成卡**（2026-11-19，v2.1）：壳 = `conversations.html` 的 `.revise-card`（`reviseStreamHtml`），**不并入 `doc_summary`**。Tool：`present_analysis_card`。aliases：`revise_card` · `结构化分析卡` · CSS 前缀 `.revise-*`。字段按决策类型变薄（诊断型 / 方案型 / 边界型）；卡内无主按钮。**思考过程不是本卡**；`.pick-card`「对哪里不满意」**不是本卡**，属补输入 → 归 `ask_form`（host_only） |
+| 15 | **`push_digest` 形态墙落地**（2026-11-19，v2.2）：壳 = `高频主题汇总.html` 的 `article.digest-card` 族（浅灰气泡 + `.dr-row` 三档信息块 + `.mc-*` 部件）。Tool：`present_push_digest`。形态墙 5 变体：代码变更摘要（创建 + 赞/不感兴趣）· 会议准备 · 关联内容 · 飞书聊天知会 · 高频主题汇总 canonical（多主题）。**仅 Chat**；右侧 `.digest-view` 简报 **不进库**（E 区）。`map_entry` 仍本期不做（若启用，chat 壳为 `.rm-card` stub）。**业务 Demo**（`hot-topics`，`高频主题汇总.html`）仍「本期暂不开发」，demos.json 状态不变；形态墙另列 `card-push-digest-wall` |
 
 ---
 
@@ -55,7 +56,7 @@
 | `group_form` | 建群表单卡 | `present_group_form` | `建群卡` · `创建群组` |
 | `group_result` | 建群结果卡 | `present_group_result` | `群已创建` · `建群结果卡` |
 | `analysis_card` | 结构化分析卡 | `present_analysis_card` | `revise_card` · `结构化分析卡` · `.revise-card`（CSS 前缀 `.revise-*`） |
-| `push_digest` | 推送汇总卡 | `present_push_digest` | 暂缓 |
+| `push_digest` | 推送汇总卡 | `present_push_digest` | `digest-card` · `推送卡` · `高频主题汇总`（形态墙已落；业务 Demo 仍暂缓） |
 
 ### B. 全站件 · 无 Tool（Chat / 输入框）
 
@@ -67,14 +68,14 @@
 | `user_file` | 对话用户文件 | [有](user_file/morph-wall.html) | 类型色；无移除 |
 | `doc_entry` | 文档/产物/日历入口 | [有](doc_entry/morph-wall.html) | 含日历 mark；日程 Chat **只此卡** |
 | `ask_form` | 补充信息卡 | [有](ask_form/morph-wall.html) | host_only |
-| `map_entry` | 地图入口卡 | 本期不做 | 若落在 chat 再做 |
+| `map_entry` | 地图入口卡 | 本期不做 | 若落在 chat 再做；壳按 `.rm-card` stub（chat 入口条），**本期不做**，不并入 `push_digest` |
 
 > 旧 `file_chip` → aliases，分别映射到 `composer_file` / `user_file`。  
 > 旧 `schedule_preview` / `agenda_list` → **不进库**；日程产物入口归 `doc_entry`。
 
 ### C. 候选尚未收名
 
-（暂无。`analysis_card` 已于 v2.1 移入 A。）
+（暂无。`analysis_card` 已于 v2.1 移入 A；`push_digest` 形态墙已于 v2.2 落地。）
 
 ### E. 不进库（右侧 / 预览台 / 非卡）
 
@@ -86,6 +87,7 @@
 | 授权弹层（连接外部应用 `#authMask`） | host overlay |
 | 日历台（时间场景 `.time-cal`） | 右侧展示区 |
 | 日程 timeline / agenda 预览板（原 `schedule_preview`） | `.time-sim-card` / `.time-agenda`；场景可演示，**卡片库不收** |
+| `digest-view` 右侧详情（`push_digest`「查看详情」打开） | `aside#doc` 内 `.digest-view` 简报（学习 / 案例 / 周计划等）；展示区，**不进卡片库**；chat 内只收 `article.digest-card` |
 
 ---
 
@@ -109,6 +111,7 @@
 | `group_form` | [group_form/morph-wall.html](group_form/morph-wall.html) |
 | `group_result` | [group_result/morph-wall.html](group_result/morph-wall.html) |
 | `analysis_card` | [analysis_card/morph-wall.html](analysis_card/morph-wall.html) |
+| `push_digest` | [push_digest/morph-wall.html](push_digest/morph-wall.html) |
 
 ---
 
