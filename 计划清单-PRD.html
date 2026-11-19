@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <link rel="stylesheet" href="assets/type.css" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>计划清单 Intelligent UI · 触发判定</title>
+  <title>建议与计划识别 · 计划清单触发</title>
   <style>
     :root { --ink: #1c2330; --sub: #344054; --muted: #667085; --line: #e4e7ec; --brand: #0a59f7; --page: #f5f6f8; }
     * { box-sizing: border-box; }
@@ -54,7 +54,7 @@
 </head>
 <body>
   <header class="bar">
-    <h1>计划清单 Intelligent UI · 触发判定</h1>
+    <h1>建议与计划识别 · 计划清单触发</h1>
     <a class="btn-primary" href="生成计划清单场景.html" target="_blank" rel="noopener">打开交互 Demo ↗</a>
     <button class="btn-ghost" type="button" id="downloadDemo">下载 Demo.html</button>
     <button class="btn-ghost" type="button" id="downloadTool">下载 TOOL.md</button>
@@ -66,31 +66,58 @@
   </div>
   <div class="toast" id="toast" role="status"></div>
   <script type="text/markdown" id="toolSource">
-# 计划清单 Intelligent UI · 触发判定（Agent TOOL）
+# 建议与计划识别 · 计划清单触发（Agent TOOL）
 
 | 项目 | 内容 |
 |---|---|
 | 工具名 | `present_plan_list` |
-| 用途 | **只做一件事**：判断本轮是否走计划清单 Intelligent UI（改 UI 展现形式），而不是普通 Markdown |
-| 版本 | v0.2 · 2026-11-17 |
+| 用途 | 先分别识别本轮是不是**建议**、是不是**计划**。只有识别到计划，且主答案里有一张拿掉钟点还在的清单时，才调用本工具走 Intelligent UI。只识别到建议时用普通文字给结论，不调用 |
+| 版本 | v0.3 · 2026-11-19 |
 | 配套 | [生成计划清单场景.html](生成计划清单场景.html)（交互 Demo）。组件、字段、渲染、多轮修改待 PRD，不在本文件 |
-| 口径 | **场景 = 计划清单** · **严触发** · **首轮判定**（不含「改某一项 / 改时间」） |
+| 口径 | **建议与计划分别判定，可同时成立** · 计划清单严触发 · **首轮判定**（不含确认、沿用、改某一项） |
 
 > 把下面的 **description** 和 **系统提示增补** 贴进 Agent 的 tools / system prompt。本文件**不写** JSON Schema、校验、渲染、兜底、多轮引用；那些待 PRD。
 
 ---
 
-## 1. 要识别的场景
+## 1. 两次判定
 
-**场景名：计划清单。**
+每一轮做两次判定，互不影响。可以只识别到建议，只识别到计划，或两个都识别到。
 
-用户要的是一份**可执行的计划**：围绕一件即将发生的具体的事，有一张清单。清单是**拿掉时间之后仍然成立**的条目，可以是要做的事，也可以是要备的东西。时间可以写在条目旁边。只把活动放进时间格，不是清单。
+不要靠「建议」「计划」「推荐」「清单」这些词。
 
-| | 说明 |
-|---|---|
-| 属于本场景 | 聚餐要买什么、派对要准备什么、出发前要做的事、露营要带的东西……只要核心交付物里有一张拿掉钟点还在的清单 |
-| Demo 一个 case | 周日烤羊肉**只是示例**，用来演示日程和计划文档，**不是触发白名单** |
-| 判定方法 | 看「即将交付的产物里有没有这张清单」，不要抠关键词，也不要抠「是不是烤肉」「有没有出现计划清单这四个字」 |
+事情已经清楚，只缺钟点、日期、人数或预算：按常理补全。缺这些信息不影响两次判定。
+
+### 建议
+
+同时满足即识别为建议：
+
+1. 有一个具体处境：谁、什么场合，或一个已经说清的目标；
+2. 里面有一个还没定的选择或做法；
+3. 用户要的是这个选择的结论和理由。
+
+识别到建议之后，答案里给出结论。二选一、三选一时，结论就是选项本身。问法开放时，结论后面加短理由；需要比较时给 2～3 个选项。
+
+本轮没有同时识别到计划时，不追加清单、步骤或时间表，也不调用本工具。
+
+### 计划
+
+同时满足即识别为计划：
+
+1. 有一件即将发生的具体的事，或一个已经说清、即将去做的目标；
+2. 用户要的是可以照着做的安排；
+3. 安排里有条目：要做的事、要备的东西，或先后顺序；
+4. 拿掉钟点后，这些条目还在。
+
+识别到计划之后，清单是主体。时间可以写在条目旁边。没写具体钟点或日期，按常理假设后仍出这份安排。半天、一天、跨天都算。条目按天分开写，仍然是清单。
+
+条目是要做的事或要备的东西时，调用 `present_plan_list`。时间格用普通文字。交通行程走 `present_route_compare`。
+
+周日烤羊肉只是 Demo 示例，不是白名单。
+
+### 两个都识别到
+
+建议的结论和计划的清单都要交付。结论用普通文字。清单调用 `present_plan_list`。
 
 ---
 
@@ -98,54 +125,62 @@
 
 ### 要调用（走 Intelligent UI）
 
-同时满足：
+计划判定为是，且本轮主答案里有一张清单，拿掉钟点后条目还在。
 
-1. 用户意图是**为一件即将发生的事出计划、出清单**；
-2. 本轮主答案里有一张清单，**拿掉钟点后条目还在**（要做的事，或要备的东西，或两者都有）。
+同一轮若同时识别到建议：结论用普通文字，清单仍调用本工具。
 
 说明：
 
-- 时间可以附在清单条目上。缺具体钟点、日期：按常理假设后仍可调用。
-- 同一轮还要把活动排进时间格：**清单仍调用本工具**；时间格用普通文字另答。
-- 同一轮还夹了无关问题：**计划部分仍调用本工具**；无关部分用普通文字另答。
+- 缺具体钟点、日期、人数或预算：按常理假设后仍可调用。
+- 同一轮还要把活动排进时间格：清单仍调用本工具；时间格用普通文字另答。
+- 同一轮还夹了无关问题：计划部分仍调用本工具；无关部分用普通文字另答。
 - 同一轮还要排交通行程（从哪到哪、怎么走）：交通部分走 `present_route_compare`；计划清单仍调用本工具。
 
-### 不调用（普通 Markdown / 文本）
+### 不调用（普通文字）
 
 任一成立即不调用：
 
-- **主交付是排期**：按时长把活动排进当天或某一段时间，每一行都是时段。包括把若干场面试排进周四、标出吃饭时间，以及当天流程从进门排到结束。拿掉钟点，表就没有了；
-- 只有已排好的时间块，没有清单；
-- **主交付是行程规划**：有序交通行程段（起点 / 终点 + 时间或时长 + 交通方式）。那是 `present_route_compare`；
-- 只要菜谱、做法、攻略或景点清单，没有可执行清单；
-- 用户已经点名的几样东西（「买鸡蛋、牛奶、面包」），没有这件事的计划；
-- 知识问答；
-- 订位、下单、付款；
-- 翻译 / 总结 / 改写**已有**计划文本；
-- 项目排期、OKR、周报这类工作计划；
-- 没说要办什么事，只能先追问；
-- 与这件事的计划无关的任务。
+- 只识别到建议：用普通文字给结论；
+- 两次判定都为否。见下一节。
+
+### 两者都不识别
+
+建议判定为否，计划判定也为否：
+
+- **模糊需求**：只有笼统愿望，看不出具体处境、待定的选择，或即将要办的事。只丢出一个选项，看不出这个选择发生在什么场合，同样算。本轮先追问，不交付结论，也不交付清单。
+- **知识或做法**：要的是事实、原理、做法解释，没有要他做选择，也没有一件要办的事。
+- **排期**：主交付是时间格。拿掉钟点，内容就不成立。
+- **行程**：主交付是从哪到哪、怎么走。有序交通行程段走 `present_route_compare`。
+- **攻略或菜谱**：推荐景点、美食、玩法，或写做法，没有一件他即将要办的具体的事。
+- **已给出的条目**：用户已经点明要买什么、做什么，没有要求为这件事再做安排。
+- **执行**：订位、下单、付款、发消息、建群，以及其他替他完成动作的请求。
+- **加工已有内容**：翻译、总结、改写、换格式。对象是已经存在的计划或文本。
+- **工作管理**：项目排期、OKR、周报，以及其他岗位或团队管理安排。
 
 ### 本 TOOL 不覆盖（不要写进触发规则）
 
-以下**不作为本文件的触发条件**（是否继续用结构化 UI、怎么传参，由产品多轮逻辑 / PRD 处理，不在本 TOOL 里判定）：
+以下不识别为新的建议，也不识别为新的计划。是否继续用结构化 UI、怎么传参，由产品多轮逻辑 / PRD 处理，不在本 TOOL 里判定：
 
-- 「改成 8 人」「把下午那场改到晚上」；
-- 「把某一项换掉」。
+- 确认或沿用：同意、收到、就按已有方案继续；
+- 局部修改：改人数、改时间、替换已有计划中的某一项。
 
 ---
 
 ## 2.1 场景边界（验收清单）
 
-开发验收「进 / 不进」时，按本表，不另扩口径。
+开发验收时按本表，不另扩口径。
 
 | 边界 | 口径 |
 |---|---|
-| **清单内容** | 要做的事、要备的东西都算清单。判定是拿掉钟点后条目还在。没有要买的东西，只要这张清单还在，仍进 |
-| **计划清单 vs 排期** | 拿掉钟点后还剩一张可勾选的清单 → **进**；主交付只是时间格 → **不进**。同一句里两样都要 → 清单进本工具，时间格用普通文字 |
-| **时间跨度** | 半天 / 一天 / 跨天都进 |
-| **计划清单 vs 行程** | 看**主交付物**：有拿掉钟点还在的清单 → **进**；有序交通行程段 → **不进**，走 `present_route_compare`；两样都要 → 各走各的工具 |
-| **计划清单 vs 攻略 / 菜谱** | 一件具体的事，且有那张清单 → **进**；纯攻略、纯做法 → **不进** |
+| **建议** | 具体处境里有还没定的选择，用户要结论。识别为建议。没有同时识别到计划时，不调用本工具 |
+| **计划** | 即将发生的事，要可照做的条目，拿掉钟点后条目还在。识别为计划，调用本工具 |
+| **两个都有** | 两次判定都为是。结论用普通文字，清单调用本工具 |
+| **清单内容** | 要做的事、要备的东西都算清单。没有要买的东西，只要这张清单还在，仍调用 |
+| **计划 vs 排期** | 拿掉钟点后还剩可勾选清单 → 计划，调用；主交付只是时间格 → 两者都不识别，不调用。同一句里两样都要 → 清单调用本工具，时间格用普通文字 |
+| **时间跨度** | 半天 / 一天 / 跨天，只要清单还在，都调用 |
+| **计划 vs 行程** | 有拿掉钟点还在的清单 → 调用；有序交通行程段 → 不调用，走 `present_route_compare`；两样都要 → 各走各的工具 |
+| **建议 vs 攻略 / 菜谱** | 具体处境里的选择 → 建议；没有一件即将要办的事，只推荐景点、美食、玩法或写做法 → 两者都不识别 |
+| **缺信息** | 事情清楚，只缺钟点、日期、人数或预算 → 按常理补全后照常识别。事情本身不清楚 → 模糊需求，先追问 |
 
 ---
 
@@ -154,21 +189,25 @@
 ### 中文
 
 ```text
-何时调用：当用户意图是「计划清单」，且你要把一份可执行的计划作为本轮主答案交付时调用——一件即将发生的事，其中有一张清单。清单是拿掉时间之后仍然成立的条目，可以是要做的事，也可以是要备的东西。时间可以写在条目旁边。半天到跨天都适用。Demo 里的周日烤羊肉只是示例，不是白名单。
+每一轮分别判定两件事，互不影响：是不是建议，是不是计划。可以只命中一个，也可以两个都命中。不要靠「建议」「计划」「推荐」「清单」这些词。事情已经清楚，只缺钟点、日期、人数或预算时，按常理补全后再判定。
 
-不要调用：主交付是排期，只把活动放进时间格（每人多久、中间留多久、什么时候吃饭、当天流程从进门排到结束），拿掉钟点就没有清单；只有已排好的时间块；主交付是交通行程（从哪到哪、怎么走），那走行程对比工具；只要菜谱、攻略或景点清单；用户已经点名的几样东西，没有这件事的计划；知识问答；订位下单；把已有计划拿去改写或翻译；项目排期、OKR、周报；没说要办什么事只能追问；以及其他无关任务。
+建议：有具体处境（谁、什么场合，或已经说清的目标），里面有还没定的选择或做法，用户要的是结论和理由。识别到之后给出结论。二选一、三选一时结论就是选项本身；问法开放时加短理由，需要比较时给 2～3 个选项。本轮没有同时识别到计划时，不追加清单、步骤或时间表，也不调用本工具。
 
-本工具只负责声明「本轮计划用 Intelligent UI 展示」。同一轮如果还要排时间格，清单仍调用本工具，时间格用普通文字。同一轮如果还要排交通，交通走行程对比工具，计划清单仍调用本工具。不要用本工具的描述去处理「改成 8 人」「把某一项换掉」等后续轮次是否调用——那些不在本触发规则范围内。
+计划：有一件即将发生的具体的事，或一个已经说清、即将去做的目标；用户要可以照着做的安排；安排里有条目（要做的事、要备的东西，或先后顺序）；拿掉钟点后条目还在。识别到之后调用本工具，用 Intelligent UI 展示清单。时间可以写在条目旁边。半天到跨天都算。条目按天分开写仍然是清单。主交付若变成当天的时间格，则计划判定为否。时间格用普通文字。交通行程走 present_route_compare。两个都识别到时：结论用普通文字，清单仍调用本工具。周日烤羊肉只是示例，不是白名单。
+
+不要调用：只识别到建议；以及两次判定都为否。两次都为否包括：模糊需求（只有笼统愿望，或只丢出一个选项但看不出场合，本轮先追问）；知识或做法解释；主交付是时间格的排期；从哪到哪、怎么走的行程；没有具体要办的事的攻略或菜谱；用户已经点明条目、没有要求再做安排；订位、下单、付款、发消息、建群；翻译、总结、改写已有内容；项目排期、OKR、周报。确认、沿用、改人数、改时间、替换已有计划中的某一项，不在本触发规则里判定。
 ```
 
 ### English（平台 description 要求英文时用）
 
 ```text
-WHEN TO CALL: Call when the user intent is a plan list (计划清单) and you are ready to deliver one executable plan as the main answer for a concrete upcoming occasion, and that plan contains a checklist. A checklist is a set of items that still hold after the clock is removed: actions to do, things to prepare, or both. Times may sit beside items. Half-day through multi-day all count. The Sunday roast demo is an example only, not a whitelist.
+Each turn, judge two things separately. Either, both, or neither may apply. Do not rely on the words "suggestion", "plan", "recommend", or "list". If the occasion is already clear and only the clock, date, headcount, or budget is missing, fill those in by common sense before judging.
 
-DO NOT CALL for: scheduling whose main deliverable is only time slots (how long each block is, gaps between blocks, when to eat, or a run-of-show from start to finish)—nothing remains if the clock is removed; an existing list of time blocks with no checklist; itineraries whose main deliverable is transport legs (from/to + time + mode)—those use the route-compare tool; recipes, guides, or sight lists; a few items the user already named, with no plan for the occasion; knowledge Q&A; booking or payment; rewriting or translating an existing plan; project schedules, OKRs, or weekly reports; clarification-only turns when the occasion itself is missing; or unrelated tasks.
+SUGGESTION: a concrete situation (who, what occasion, or a stated goal) contains an undecided choice, and the user wants a conclusion and the reason. Deliver the conclusion. For a closed choice, the conclusion is the option itself. For an open question, add a short reason; when comparison helps, give 2–3 options. If this turn is not also a plan, do not add a checklist, steps, or a timetable, and do not call this tool.
 
-This tool only declares that this turn’s plan should use Intelligent UI. If the same turn also asks for a timetable, still call this tool for the checklist and put the time slots in plain text. If the same turn also asks for transport, send transport to the route-compare tool and still call this tool for the plan list. Do not use this description to decide follow-ups like “make it 8 people” or “swap one item”—those are out of scope for this trigger tool.
+PLAN: there is a concrete upcoming occasion or a stated goal about to be done; the user wants an arrangement they can follow; the arrangement has items (actions, things to prepare, or an order); the items still hold after the clock is removed. Then call this tool so the checklist uses Intelligent UI. Times may sit beside items. Half-day through multi-day all count. Items grouped by day are still a checklist. If the main deliverable becomes time slots for the day, the plan judgment is no. Put time slots in plain text. Transport goes to present_route_compare. When both judgments are yes, put the conclusion in plain text and still call this tool for the checklist. The Sunday roast demo is an example only, not a whitelist.
+
+DO NOT CALL when only the suggestion judgment is yes, or when both judgments are no. Both are no for: vague requests (a bare wish, or a bare option with no occasion — ask first); facts, principles, or how-to explanations; schedules whose main deliverable is time slots; trips whose main deliverable is from/to and how to get there; guides or recipes with no concrete occasion the user is about to host; items the user already named, with no request to arrange the occasion; booking, ordering, paying, sending, or creating a group; translating, summarizing, or rewriting existing content; project schedules, OKRs, or weekly reports. Confirmations and local edits (change the headcount, change a time, swap one item) are out of scope for this trigger.
 ```
 
 ---
@@ -176,82 +215,121 @@ This tool only declares that this turn’s plan should use Intelligent UI. If th
 ## 4. 系统提示增补（可贴进 system / developer）
 
 ```text
-# 计划清单 UI 触发（present_plan_list）
+# 建议与计划（present_plan_list）
 
-你有一个工具 present_plan_list。它只用于判定：本轮计划是否改用 Intelligent UI，而不是普通 Markdown。
+每一轮做两次判定，都要做，互不影响：
+1. 是不是建议
+2. 是不是计划
 
-## 判定口诀
-识别「计划清单」场景，看即将交付的产物：
-- 产物里有一张清单，拿掉钟点后条目还在 → 调用
-- 清单项是要做的事，或要备的东西，都算
-- 主交付只是时间格（把活动排进当天）→ 不调用
-- 主交付是交通行程段 → 不调用，走 present_route_compare
-- 否则 → 不调用，用普通文本 / Markdown
+可以只命中一个，也可以两个都命中。不要因为命中了计划就否掉建议，也不要因为命中了建议就否掉计划。不要靠「建议」「计划」「推荐」「清单」这些词。
 
-不要把 Demo 的周日烤羊肉当成唯一可触发的 query。
+事情已经清楚，只缺钟点、日期、人数或预算：按常理补全，再做这两次判定。
 
-## 要调用
-- 为一件即将发生的事出计划、出清单
-- 聚餐要买什么、派对要准备什么、出发前要做的事、要带的东西，凡属这类清单都算
+## 建议
+同时满足即是：
+- 有具体处境：谁、什么场合，或一个已经说清的目标
+- 里面有还没定的选择或做法
+- 用户要的是结论和理由
 
-## 不调用
-- 「帮我排进当天」这种排期：产出只有时段，没有可勾选清单
-- 当天流程从进门排到结束，拿掉钟点表就没了
-- 「从哪到哪、怎么走」的行程规划
-- 纯做法、纯攻略
-- 「买鸡蛋、牛奶、面包」这种已经写好的几样东西
-- 只有已排好的时间块，没有清单
-- 知识问答
-- 没说要办什么事：先追问
-- 订位、下单
-- 翻译 / 总结 / 改写已有计划
+给出结论。二选一、三选一时，结论就是选项本身。问法开放时加短理由，需要比较时给 2～3 个选项。本轮没有同时识别到计划时，不追加清单、步骤或时间表，不调用 present_plan_list。
+
+## 计划
+同时满足即是：
+- 有一件即将发生的具体的事，或一个已经说清、即将去做的目标
+- 用户要可以照着做的安排
+- 有条目：要做的事、要备的东西，或先后顺序
+- 拿掉钟点后条目还在
+
+清单是主体。时间可以写在条目旁边。半天到跨天都算。条目按天分开写仍然是清单。主交付变成当天的时间格时，计划判定为否。
+
+识别到计划后调用 present_plan_list。时间格用普通文字。交通行程走 present_route_compare。
+
+## 两个都识别到
+结论用普通文字。清单调用 present_plan_list。
+
+## 两者都不识别
+建议为否，计划也为否，不调用：
+- 模糊需求：只有笼统愿望，或只丢出一个选项但看不出场合。先追问
+- 知识或做法解释
+- 排期：主交付是时间格，拿掉钟点内容就不成立
+- 行程：从哪到哪、怎么走
+- 攻略或菜谱：没有一件即将要办的具体的事
+- 用户已经点明要买什么、做什么，没有要求再做安排
+- 订位、下单、付款、发消息、建群
+- 翻译、总结、改写已有内容
 - 项目排期、OKR、周报
-- 与这件事的计划无关的任务
 
-## 边界提醒
-- 同一轮既要时间格又要清单：清单走本工具，时间格用普通文字
-- 同一轮既要交通又要计划清单：交通走 present_route_compare，清单走本工具
-- 「改成 8 人」「把某一项换掉」等后续轮次：本触发规则不覆盖，不要根据本段决定是否调用
+## 本文件不判定
+确认、沿用、改人数、改时间、替换已有计划中的某一项：不识别为新的建议或计划。这些后续轮次还要不要继续用 Intelligent UI，不要根据本段决定。
+
+不要把周日烤羊肉当成唯一可触发的 query。
 ```
 
 ---
 
 ## 5. 正例 / 反例（评测用）
 
-### 应调用
+反例按类型覆盖，不是句子白名单。
+
+### 只识别为建议（不调用，普通文字给结论）
 
 | 用户说法 | 说明 |
 |---|---|
-| 周日请朋友吃烤羊肉，人数还没定，帮我出一份计划清单 | Demo 示例。采购和要做的事拿掉钟点还在 |
-| 周四要面 4 个人，帮我列面试前要准备的东西，以及每个人要确认的问题 | 拿掉钟点，清单还在 |
-| 面试前一天，帮我排准备事项和时间 | 准备事项拿掉钟点还在 |
+| 周末在家请 6 个朋友，人均 80，火锅还是烤肉？ | 场合清楚，选择未定。不要追加采购清单 |
+| 下周四面资深前端，要不要提前把题目发出去？ | 要的是结论 |
+| 5 岁生日在家办还是去室内乐园？ | 二选一，结论就是选项本身 |
+| 一周跑步三次，早晨跑还是晚上跑？ | 目标清楚，选择未定 |
+| 12 人聚餐，有人吃素，餐厅选哪种？ | 开放建议，结论加短理由 |
+| 入职第一周，先熟悉业务还是先搭开发环境？ | 具体处境里的做法选择 |
+
+### 只识别为计划（调用）
+
+| 用户说法 | 说明 |
+|---|---|
+| 周日请朋友来家里吃烤羊肉，人数还没定，出一份计划 | Demo 示例。人数按常理补全。采购和要做的事拿掉钟点还在 |
 | 下周露营两天，列装备和出发前要做的事 | 要备的东西也是清单 |
+| 周四要面 4 个人，列面试前要准备的东西，以及每个人要确认的问题 | 拿掉钟点，清单还在 |
+| 周六搬家，列前一天和当天分别要做的事 | 按天分开写仍然是清单 |
+| 20 人小型分享会，列场地、物料和当天要确认的事项 | 当天要确认的事项不是时间格 |
+| 下周五带爸妈去体检，列出发前要准备的材料和当天要办的事 | 材料和要办的事拿掉钟点还在 |
+| 面试前一天，帮我排准备事项和时间 | 准备事项调用本工具，时间用普通文字 |
 | 周日去野餐，帮我排出发前要做的事和要带的东西 | 同轮若还要路线，路线走行程工具 |
 
-### 不应调用
+### 两个都识别到（结论用文字，清单调用）
 
 | 用户说法 | 说明 |
 |---|---|
-| 周四面 4 个人，10 点开始，每人 45 分钟，中间留 15 分钟写评价。帮我排进当天，并标出什么时候吃饭。 | 排期。每一行都是时间格，没有清单 |
-| 孩子生日派对当天的流程，从进门排到切蛋糕 | 排期。流程的每一行都是时间格 |
-| 我住徐汇滨江，9:30 陆家嘴、12:00 静安寺，帮我排出发时间和路线 | 行程规划，走 `present_route_compare` |
-| 徐汇滨江到陆家嘴怎么走最快？ | 单段指路 |
-| 明天 9 点开会，11 点写周报 | 只有时间块，没有清单 |
-| 羊肉怎么烤才嫩 | 知识问答 |
-| 买鸡蛋、牛奶、面包 | 已点名的几样东西，没有计划 |
-| 云南 7 日游攻略，推荐景点和特色美食 | 纯攻略 |
-| 这道糖醋排骨写个做法 | 只要菜谱 |
-| 帮我订周六晚上的餐厅 | 订位 |
-| 把刚才的计划写成周报 | 改写已有文本 |
-| 帮我做个 Q3 OKR | 工作计划 |
-| 我想请客，你看着办 | 没说办什么事，先追问 |
+| 周日家庭出游，市内公园和近郊农场二选一，选完列要带的东西和出发前要做的事 | 选择是建议，清单是计划 |
+| 同事离职欢送，下午茶还是晚饭？定了之后给一份准备清单 | 先结论，再清单 |
+| 第一次办生日派对，建议一个简单的形式，并列出要买的东西和要做的事 | 形式是建议，采购和事项是计划 |
+
+### 两者都不识别（不调用）
+
+| 用户说法 | 说明 |
+|---|---|
+| 火锅还是烤肉？ | 模糊需求。只有选项，看不出场合 |
+| 我想请客，你看着办 | 模糊需求。先追问 |
+| 羊肉怎么烤才嫩 | 知识或做法 |
+| 周四面 4 个人，10 点开始，每人 45 分钟，中间留 15 分钟写评价。帮我排进当天，并标出什么时候吃饭。 | 排期。拿掉钟点，表就没了 |
+| 孩子生日派对当天的流程，从进门排到切蛋糕 | 排期 |
+| 我住徐汇滨江，9:30 陆家嘴、12:00 静安寺，帮我排出发时间和路线 | 行程，走 `present_route_compare` |
+| 徐汇滨江到陆家嘴怎么走最快？ | 行程 |
+| 明天 9 点开会，11 点写周报 | 只有时间块 |
+| 云南 7 日游，推荐景点和特色美食 | 攻略。没有一件即将要办的事 |
+| 这道糖醋排骨写个做法 | 菜谱 |
+| 买鸡蛋、牛奶、面包 | 已给出的条目 |
+| 帮我订周六晚上的餐厅 | 执行 |
+| 把刚才的计划写成周报 | 加工已有内容 |
+| 帮我做个 Q3 OKR | 工作管理 |
 
 ### 不纳入本 TOOL 评测（后续轮次）
 
 | 用户说法 | 说明 |
 |---|---|
-| 改成 8 人 | 本触发规则不覆盖 |
-| 把某一项换掉 | 本触发规则不覆盖 |
+| 好，就按这个 | 确认或沿用。不识别为新的建议或计划 |
+| 对 | 确认或沿用 |
+| 改成 8 人 | 局部修改。本触发规则不覆盖 |
+| 第一项改成买牛肉 | 局部修改。本触发规则不覆盖 |
 
 ---
 
@@ -259,9 +337,10 @@ This tool only declares that this turn’s plan should use Intelligent UI. If th
 
 | 文档 | 负责 |
 |---|---|
-| **本文件** | 什么样的首轮 query / 产物要改 UI；边界清单；description + 系统提示 + 正反例 |
+| **本文件** | 首轮如何分别识别建议与计划；识别到计划且清单拿掉钟点还在时才改 UI；description + 系统提示 + 正反例 |
 | **PRD** | 日程卡和计划文档长什么样、字段、调用后怎么渲染、校验、兜底、多轮改某一项 |
 | **Demo** | 周日烤羊肉这一个示例的交互与视觉；不是触发白名单 |
+
 </script>
   <script>
     const source = document.getElementById("toolSource").textContent.replace(/^\n/, "");
