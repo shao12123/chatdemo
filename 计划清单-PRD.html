@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <link rel="stylesheet" href="assets/type.css" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>计划清单 Intelligent UI · 触发判定</title>
+  <style>
+    :root { --ink: #1c2330; --sub: #344054; --muted: #667085; --line: #e4e7ec; --brand: #0a59f7; --page: #f5f6f8; }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: var(--page); color: var(--ink); font: var(--fs-body-large)/var(--lh-body-large) "MoreAI UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "微软雅黑", "Noto Sans SC", sans-serif; }
+    .bar { position: sticky; top: 0; z-index: 5; display: flex; align-items: center; gap: 12px; padding: 12px 24px; background: rgba(255,255,255,.92); backdrop-filter: blur(8px); border-bottom: 1px solid var(--line); }
+    .bar h1 { flex: 1; min-width: 0; margin: 0; font-size: 16px; line-height: 24px; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .bar a, .bar button { display: inline-flex; align-items: center; gap: 6px; height: 32px; padding: 0 12px; border-radius: 8px; font: 500 13px/20px inherit; cursor: pointer; text-decoration: none; white-space: nowrap; }
+    .btn-primary { border: 0; background: var(--brand); color: #fff; }
+    .btn-primary:hover { filter: brightness(.94); }
+    .btn-ghost { border: 1px solid var(--line); background: #fff; color: var(--ink); }
+    .btn-ghost:hover { border-color: #b9cdfb; color: var(--brand); }
+    .wrap { display: grid; grid-template-columns: 240px minmax(0, 1fr); gap: 24px; max-width: 1180px; margin: 0 auto; padding: 24px; }
+    nav.toc { position: sticky; top: 76px; align-self: start; max-height: calc(100vh - 100px); overflow: auto; padding: 12px 8px; border-radius: 12px; background: #fff; }
+    nav.toc a { display: block; padding: 4px 8px; border-radius: 6px; color: var(--sub); font-size: 13px; line-height: 20px; text-decoration: none; }
+    nav.toc a.l3 { padding-left: 20px; color: var(--muted); font-size: 12px; }
+    nav.toc a:hover, nav.toc a.on { background: #f3f7ff; color: var(--brand); }
+    article { min-width: 0; padding: 32px 40px 64px; border-radius: 16px; background: #fff; }
+    article h1 { margin: 0 0 16px; font-size: 26px; line-height: 36px; }
+    article h2 { margin: 36px 0 12px; padding-top: 8px; font-size: 20px; line-height: 30px; border-top: 1px solid var(--line); }
+    article h2:first-of-type { border-top: 0; }
+    article h3 { margin: 24px 0 8px; font-size: 16px; line-height: 24px; }
+    article p, article li { color: var(--sub); }
+    article p { margin: 8px 0; }
+    article ul, article ol { margin: 8px 0; padding-left: 22px; }
+    article li { margin: 3px 0; }
+    article li.task { list-style: none; margin-left: -22px; }
+    article li.task::before { content: "☐"; margin-right: 8px; color: var(--muted); }
+    article strong { color: var(--ink); }
+    article code { padding: 1px 6px; border-radius: 4px; background: #f2f4f7; color: #b42318; font: 12.5px/1.6 ui-monospace, SFMono-Regular, Menlo, monospace; }
+    article pre { margin: 12px 0; padding: 14px 16px; border-radius: 12px; background: #1c2330; color: #e4e7ec; overflow: auto; font: 12.5px/1.6 ui-monospace, SFMono-Regular, Menlo, monospace; }
+    article pre code { padding: 0; background: none; color: inherit; }
+    article blockquote { margin: 12px 0; padding: 10px 14px; border-left: 3px solid #5b86f5; border-radius: 0 10px 10px 0; background: #f5f6f8; }
+    article blockquote p { margin: 0; color: var(--ink); }
+    article a { color: var(--brand); }
+    article hr { border: 0; border-top: 1px solid var(--line); margin: 24px 0; }
+    .tbl { overflow-x: auto; margin: 12px 0; border: 1px solid #eceef2; border-radius: 12px; }
+    table { width: 100%; border-collapse: collapse; font-size: 13px; line-height: 20px; }
+    th { padding: 8px 12px; background: #f7f8fa; color: var(--muted); font-weight: 500; text-align: left; border-bottom: 1px solid #eceef2; white-space: nowrap; }
+    td { padding: 8px 12px; color: var(--ink); vertical-align: top; border-bottom: 1px solid #f0f1f4; }
+    tr:last-child td { border-bottom: 0; }
+    td .st-wait { display: inline-block; padding: 0 6px; border-radius: 99px; background: #fff4e5; color: #b54708; font-size: 12px; font-weight: 600; white-space: nowrap; }
+    td .st-ok { display: inline-block; padding: 0 6px; border-radius: 99px; background: #e7f8ef; color: #067647; font-size: 12px; font-weight: 600; white-space: nowrap; }
+    .toast { position: fixed; left: 50%; bottom: 32px; transform: translateX(-50%); padding: 8px 16px; border-radius: 8px; background: #1c2330; color: #fff; font-size: 13px; opacity: 0; pointer-events: none; transition: opacity .2s; }
+    .toast.show { opacity: 1; }
+    @media (max-width: 900px) { .wrap { grid-template-columns: 1fr; padding: 12px; } nav.toc { display: none; } article { padding: 20px; } }
+  </style>
+</head>
+<body>
+  <header class="bar">
+    <h1>计划清单 Intelligent UI · 触发判定</h1>
+    <a class="btn-primary" href="生成计划清单场景.html" target="_blank" rel="noopener">打开交互 Demo ↗</a>
+    <button class="btn-ghost" type="button" id="downloadDemo">下载 Demo.html</button>
+    <button class="btn-ghost" type="button" id="downloadTool">下载 TOOL.md</button>
+    <button class="btn-ghost" type="button" id="copyTool">复制 TOOL</button>
+  </header>
+  <div class="wrap">
+    <nav class="toc" id="toc" aria-label="目录"></nav>
+    <article id="doc"></article>
+  </div>
+  <div class="toast" id="toast" role="status"></div>
+  <script type="text/markdown" id="toolSource">
+# 计划清单 Intelligent UI · 触发判定（Agent TOOL）
+
+| 项目 | 内容 |
+|---|---|
+| 工具名 | `present_plan_list` |
+| 用途 | **只做一件事**：判断本轮是否走计划清单 Intelligent UI（改 UI 展现形式），而不是普通 Markdown |
+| 版本 | v0.2 · 2026-11-17 |
+| 配套 | [生成计划清单场景.html](生成计划清单场景.html)（交互 Demo）。组件、字段、渲染、多轮修改待 PRD，不在本文件 |
+| 口径 | **场景 = 计划清单** · **严触发** · **首轮判定**（不含「改某一项 / 改时间」） |
+
+> 把下面的 **description** 和 **系统提示增补** 贴进 Agent 的 tools / system prompt。本文件**不写** JSON Schema、校验、渲染、兜底、多轮引用；那些待 PRD。
+
+---
+
+## 1. 要识别的场景
+
+**场景名：计划清单。**
+
+用户要的是一份**可执行的计划**：围绕一件即将发生的具体的事，有一张清单。清单是**拿掉时间之后仍然成立**的条目，可以是要做的事，也可以是要备的东西。时间可以写在条目旁边。只把活动放进时间格，不是清单。
+
+| | 说明 |
+|---|---|
+| 属于本场景 | 聚餐要买什么、派对要准备什么、出发前要做的事、露营要带的东西……只要核心交付物里有一张拿掉钟点还在的清单 |
+| Demo 一个 case | 周日烤羊肉**只是示例**，用来演示日程和计划文档，**不是触发白名单** |
+| 判定方法 | 看「即将交付的产物里有没有这张清单」，不要抠关键词，也不要抠「是不是烤肉」「有没有出现计划清单这四个字」 |
+
+---
+
+## 2. 何时调用 / 何时不调用
+
+### 要调用（走 Intelligent UI）
+
+同时满足：
+
+1. 用户意图是**为一件即将发生的事出计划、出清单**；
+2. 本轮主答案里有一张清单，**拿掉钟点后条目还在**（要做的事，或要备的东西，或两者都有）。
+
+说明：
+
+- 时间可以附在清单条目上。缺具体钟点、日期：按常理假设后仍可调用。
+- 同一轮还要把活动排进时间格：**清单仍调用本工具**；时间格用普通文字另答。
+- 同一轮还夹了无关问题：**计划部分仍调用本工具**；无关部分用普通文字另答。
+- 同一轮还要排交通行程（从哪到哪、怎么走）：交通部分走 `present_route_compare`；计划清单仍调用本工具。
+
+### 不调用（普通 Markdown / 文本）
+
+任一成立即不调用：
+
+- **主交付是排期**：按时长把活动排进当天或某一段时间，每一行都是时段。包括把若干场面试排进周四、标出吃饭时间，以及当天流程从进门排到结束。拿掉钟点，表就没有了；
+- 只有已排好的时间块，没有清单；
+- **主交付是行程规划**：有序交通行程段（起点 / 终点 + 时间或时长 + 交通方式）。那是 `present_route_compare`；
+- 只要菜谱、做法、攻略或景点清单，没有可执行清单；
+- 用户已经点名的几样东西（「买鸡蛋、牛奶、面包」），没有这件事的计划；
+- 知识问答；
+- 订位、下单、付款；
+- 翻译 / 总结 / 改写**已有**计划文本；
+- 项目排期、OKR、周报这类工作计划；
+- 没说要办什么事，只能先追问；
+- 与这件事的计划无关的任务。
+
+### 本 TOOL 不覆盖（不要写进触发规则）
+
+以下**不作为本文件的触发条件**（是否继续用结构化 UI、怎么传参，由产品多轮逻辑 / PRD 处理，不在本 TOOL 里判定）：
+
+- 「改成 8 人」「把下午那场改到晚上」；
+- 「把某一项换掉」。
+
+---
+
+## 2.1 场景边界（验收清单）
+
+开发验收「进 / 不进」时，按本表，不另扩口径。
+
+| 边界 | 口径 |
+|---|---|
+| **清单内容** | 要做的事、要备的东西都算清单。判定是拿掉钟点后条目还在。没有要买的东西，只要这张清单还在，仍进 |
+| **计划清单 vs 排期** | 拿掉钟点后还剩一张可勾选的清单 → **进**；主交付只是时间格 → **不进**。同一句里两样都要 → 清单进本工具，时间格用普通文字 |
+| **时间跨度** | 半天 / 一天 / 跨天都进 |
+| **计划清单 vs 行程** | 看**主交付物**：有拿掉钟点还在的清单 → **进**；有序交通行程段 → **不进**，走 `present_route_compare`；两样都要 → 各走各的工具 |
+| **计划清单 vs 攻略 / 菜谱** | 一件具体的事，且有那张清单 → **进**；纯攻略、纯做法 → **不进** |
+
+---
+
+## 3. description（可贴进 tools）
+
+### 中文
+
+```text
+何时调用：当用户意图是「计划清单」，且你要把一份可执行的计划作为本轮主答案交付时调用——一件即将发生的事，其中有一张清单。清单是拿掉时间之后仍然成立的条目，可以是要做的事，也可以是要备的东西。时间可以写在条目旁边。半天到跨天都适用。Demo 里的周日烤羊肉只是示例，不是白名单。
+
+不要调用：主交付是排期，只把活动放进时间格（每人多久、中间留多久、什么时候吃饭、当天流程从进门排到结束），拿掉钟点就没有清单；只有已排好的时间块；主交付是交通行程（从哪到哪、怎么走），那走行程对比工具；只要菜谱、攻略或景点清单；用户已经点名的几样东西，没有这件事的计划；知识问答；订位下单；把已有计划拿去改写或翻译；项目排期、OKR、周报；没说要办什么事只能追问；以及其他无关任务。
+
+本工具只负责声明「本轮计划用 Intelligent UI 展示」。同一轮如果还要排时间格，清单仍调用本工具，时间格用普通文字。同一轮如果还要排交通，交通走行程对比工具，计划清单仍调用本工具。不要用本工具的描述去处理「改成 8 人」「把某一项换掉」等后续轮次是否调用——那些不在本触发规则范围内。
+```
+
+### English（平台 description 要求英文时用）
+
+```text
+WHEN TO CALL: Call when the user intent is a plan list (计划清单) and you are ready to deliver one executable plan as the main answer for a concrete upcoming occasion, and that plan contains a checklist. A checklist is a set of items that still hold after the clock is removed: actions to do, things to prepare, or both. Times may sit beside items. Half-day through multi-day all count. The Sunday roast demo is an example only, not a whitelist.
+
+DO NOT CALL for: scheduling whose main deliverable is only time slots (how long each block is, gaps between blocks, when to eat, or a run-of-show from start to finish)—nothing remains if the clock is removed; an existing list of time blocks with no checklist; itineraries whose main deliverable is transport legs (from/to + time + mode)—those use the route-compare tool; recipes, guides, or sight lists; a few items the user already named, with no plan for the occasion; knowledge Q&A; booking or payment; rewriting or translating an existing plan; project schedules, OKRs, or weekly reports; clarification-only turns when the occasion itself is missing; or unrelated tasks.
+
+This tool only declares that this turn’s plan should use Intelligent UI. If the same turn also asks for a timetable, still call this tool for the checklist and put the time slots in plain text. If the same turn also asks for transport, send transport to the route-compare tool and still call this tool for the plan list. Do not use this description to decide follow-ups like “make it 8 people” or “swap one item”—those are out of scope for this trigger tool.
+```
+
+---
+
+## 4. 系统提示增补（可贴进 system / developer）
+
+```text
+# 计划清单 UI 触发（present_plan_list）
+
+你有一个工具 present_plan_list。它只用于判定：本轮计划是否改用 Intelligent UI，而不是普通 Markdown。
+
+## 判定口诀
+识别「计划清单」场景，看即将交付的产物：
+- 产物里有一张清单，拿掉钟点后条目还在 → 调用
+- 清单项是要做的事，或要备的东西，都算
+- 主交付只是时间格（把活动排进当天）→ 不调用
+- 主交付是交通行程段 → 不调用，走 present_route_compare
+- 否则 → 不调用，用普通文本 / Markdown
+
+不要把 Demo 的周日烤羊肉当成唯一可触发的 query。
+
+## 要调用
+- 为一件即将发生的事出计划、出清单
+- 聚餐要买什么、派对要准备什么、出发前要做的事、要带的东西，凡属这类清单都算
+
+## 不调用
+- 「帮我排进当天」这种排期：产出只有时段，没有可勾选清单
+- 当天流程从进门排到结束，拿掉钟点表就没了
+- 「从哪到哪、怎么走」的行程规划
+- 纯做法、纯攻略
+- 「买鸡蛋、牛奶、面包」这种已经写好的几样东西
+- 只有已排好的时间块，没有清单
+- 知识问答
+- 没说要办什么事：先追问
+- 订位、下单
+- 翻译 / 总结 / 改写已有计划
+- 项目排期、OKR、周报
+- 与这件事的计划无关的任务
+
+## 边界提醒
+- 同一轮既要时间格又要清单：清单走本工具，时间格用普通文字
+- 同一轮既要交通又要计划清单：交通走 present_route_compare，清单走本工具
+- 「改成 8 人」「把某一项换掉」等后续轮次：本触发规则不覆盖，不要根据本段决定是否调用
+```
+
+---
+
+## 5. 正例 / 反例（评测用）
+
+### 应调用
+
+| 用户说法 | 说明 |
+|---|---|
+| 周日请朋友吃烤羊肉，人数还没定，帮我出一份计划清单 | Demo 示例。采购和要做的事拿掉钟点还在 |
+| 周四要面 4 个人，帮我列面试前要准备的东西，以及每个人要确认的问题 | 拿掉钟点，清单还在 |
+| 面试前一天，帮我排准备事项和时间 | 准备事项拿掉钟点还在 |
+| 下周露营两天，列装备和出发前要做的事 | 要备的东西也是清单 |
+| 周日去野餐，帮我排出发前要做的事和要带的东西 | 同轮若还要路线，路线走行程工具 |
+
+### 不应调用
+
+| 用户说法 | 说明 |
+|---|---|
+| 周四面 4 个人，10 点开始，每人 45 分钟，中间留 15 分钟写评价。帮我排进当天，并标出什么时候吃饭。 | 排期。每一行都是时间格，没有清单 |
+| 孩子生日派对当天的流程，从进门排到切蛋糕 | 排期。流程的每一行都是时间格 |
+| 我住徐汇滨江，9:30 陆家嘴、12:00 静安寺，帮我排出发时间和路线 | 行程规划，走 `present_route_compare` |
+| 徐汇滨江到陆家嘴怎么走最快？ | 单段指路 |
+| 明天 9 点开会，11 点写周报 | 只有时间块，没有清单 |
+| 羊肉怎么烤才嫩 | 知识问答 |
+| 买鸡蛋、牛奶、面包 | 已点名的几样东西，没有计划 |
+| 云南 7 日游攻略，推荐景点和特色美食 | 纯攻略 |
+| 这道糖醋排骨写个做法 | 只要菜谱 |
+| 帮我订周六晚上的餐厅 | 订位 |
+| 把刚才的计划写成周报 | 改写已有文本 |
+| 帮我做个 Q3 OKR | 工作计划 |
+| 我想请客，你看着办 | 没说办什么事，先追问 |
+
+### 不纳入本 TOOL 评测（后续轮次）
+
+| 用户说法 | 说明 |
+|---|---|
+| 改成 8 人 | 本触发规则不覆盖 |
+| 把某一项换掉 | 本触发规则不覆盖 |
+
+---
+
+## 6. 和 PRD / Demo 的分工
+
+| 文档 | 负责 |
+|---|---|
+| **本文件** | 什么样的首轮 query / 产物要改 UI；边界清单；description + 系统提示 + 正反例 |
+| **PRD** | 日程卡和计划文档长什么样、字段、调用后怎么渲染、校验、兜底、多轮改某一项 |
+| **Demo** | 周日烤羊肉这一个示例的交互与视觉；不是触发白名单 |
+</script>
+  <script>
+    const source = document.getElementById("toolSource").textContent.replace(/^\n/, "");
+    const esc = s => s.replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+    function inline(text) {
+      let s = esc(text);
+      s = s.replace(/`([^`]+)`/g, (_, c) => `<code>${c}</code>`);
+      s = s.replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>");
+      s = s.replace(/\[([^\]]+)\]\(([^)]+)\)/g, (_, t, u) => `<a href="${u}"${/\.html$/.test(u) ? ' target="_blank" rel="noopener"' : ""}>${t}</a>`);
+      return s;
+    }
+    function slug(text, used) {
+      let base = text.replace(/[^\w\u4e00-\u9fa5]+/g, "-").replace(/^-|-$/g, "") || "sec";
+      let id = base, n = 2;
+      while (used.has(id)) id = base + "-" + n++;
+      used.add(id);
+      return id;
+    }
+    function render(md) {
+      const lines = md.split("\n");
+      const out = [];
+      const toc = [];
+      const used = new Set();
+      let i = 0;
+      const isTableSep = l => /^\s*\|?\s*:?-{2,}/.test(l) && l.includes("|");
+      while (i < lines.length) {
+        const line = lines[i];
+        if (/^```/.test(line)) {
+          const buf = [];
+          i++;
+          while (i < lines.length && !/^```/.test(lines[i])) buf.push(lines[i++]);
+          i++;
+          out.push(`<pre><code>${esc(buf.join("\n"))}</code></pre>`);
+          continue;
+        }
+        const h = line.match(/^(#{1,3})\s+(.*)$/);
+        if (h) {
+          const level = h[1].length;
+          const id = slug(h[2], used);
+          if (level > 1) toc.push({ level, id, text: h[2] });
+          out.push(`<h${level} id="${id}">${inline(h[2])}</h${level}>`);
+          i++;
+          continue;
+        }
+        if (/^---\s*$/.test(line)) { out.push("<hr>"); i++; continue; }
+        if (/^>\s?/.test(line)) {
+          const buf = [];
+          while (i < lines.length && /^>\s?/.test(lines[i])) buf.push(lines[i++].replace(/^>\s?/, ""));
+          out.push(`<blockquote><p>${inline(buf.join(" "))}</p></blockquote>`);
+          continue;
+        }
+        if (line.includes("|") && i + 1 < lines.length && isTableSep(lines[i + 1])) {
+          const cells = l => l.trim().replace(/^\||\|$/g, "").split("|").map(c => c.trim());
+          const head = cells(line);
+          i += 2;
+          const rows = [];
+          while (i < lines.length && lines[i].includes("|") && lines[i].trim()) rows.push(cells(lines[i++]));
+          out.push(`<div class="tbl"><table><thead><tr>${head.map(c => `<th>${inline(c)}</th>`).join("")}</tr></thead><tbody>${rows.map(r => `<tr>${r.map(c => `<td>${c === "待确认" ? '<span class="st-wait">待确认</span>' : c === "已确认" ? '<span class="st-ok">已确认</span>' : inline(c)}</td>`).join("")}</tr>`).join("")}</tbody></table></div>`);
+          continue;
+        }
+        if (/^\s*([-*]|\d+\.)\s+/.test(line)) {
+          const ordered = /^\s*\d+\./.test(line);
+          const items = [];
+          while (i < lines.length && /^\s*([-*]|\d+\.)\s+/.test(lines[i])) {
+            const raw = lines[i];
+            const depth = raw.match(/^\s*/)[0].length;
+            const text = raw.replace(/^\s*([-*]|\d+\.)\s+/, "");
+            items.push({ depth, text, ordered: /^\s*\d+\./.test(raw) });
+            i++;
+          }
+          let html = "";
+          const stack = [];
+          items.forEach(item => {
+            const lvl = item.depth >= 3 ? 1 : 0;
+            while (stack.length > lvl + 1) html += `</li></${stack.pop()}>`;
+            if (stack.length < lvl + 1) { const tag = item.ordered ? "ol" : "ul"; stack.push(tag); html += `<${tag}>`; }
+            else html += "</li>";
+            const task = item.text.match(/^\[ \]\s+(.*)$/);
+            html += task ? `<li class="task">${inline(task[1])}` : `<li>${inline(item.text)}`;
+          });
+          while (stack.length) html += `</li></${stack.pop()}>`;
+          out.push(html);
+          continue;
+        }
+        if (!line.trim()) { i++; continue; }
+        const buf = [];
+        while (i < lines.length && lines[i].trim() && !/^(#{1,3}\s|```|>|---\s*$|\s*([-*]|\d+\.)\s)/.test(lines[i]) && !(lines[i].includes("|") && i + 1 < lines.length && isTableSep(lines[i + 1]))) buf.push(lines[i++]);
+        out.push(`<p>${inline(buf.join(" "))}</p>`);
+      }
+      return { html: out.join("\n"), toc };
+    }
+    const { html, toc } = render(source);
+    document.getElementById("doc").innerHTML = html;
+    document.getElementById("toc").innerHTML = toc.map(t => `<a class="l${t.level}" href="#${t.id}">${esc(t.text)}</a>`).join("");
+    const toast = document.getElementById("toast");
+    let timer = 0;
+    function notify(text) { toast.textContent = text; toast.classList.add("show"); clearTimeout(timer); timer = setTimeout(() => toast.classList.remove("show"), 1600); }
+    function downloadText(text, filename) {
+      const link = document.createElement("a");
+      link.href = URL.createObjectURL(new Blob([text], { type: "text/markdown;charset=utf-8" }));
+      link.download = filename;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      setTimeout(() => URL.revokeObjectURL(link.href), 2000);
+    }
+    function copyText(text, okMsg) {
+      const done = () => notify(okMsg);
+      const fallback = () => {
+        const area = document.createElement("textarea");
+        area.value = text;
+        area.style.position = "fixed";
+        area.style.left = "-999px";
+        document.body.appendChild(area);
+        area.select();
+        try { document.execCommand("copy"); done(); } catch (e) { notify("复制失败，请用下载按钮"); }
+        area.remove();
+      };
+      if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(text).then(done).catch(fallback);
+      else fallback();
+    }
+    document.getElementById("downloadTool").addEventListener("click", () => {
+      downloadText(source, "计划清单-TOOL.md");
+      notify("已开始下载 TOOL.md");
+    });
+    document.getElementById("copyTool").addEventListener("click", () => {
+      copyText(source, "已复制 TOOL，可直接贴进 Agent");
+    });
+    document.getElementById("downloadDemo").addEventListener("click", async () => {
+      const name = "生成计划清单场景.html";
+      try {
+        const res = await fetch(name);
+        if (!res.ok) throw new Error(String(res.status));
+        const blob = await res.blob();
+        const link = document.createElement("a");
+        link.href = URL.createObjectURL(blob);
+        link.download = name;
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+        setTimeout(() => URL.revokeObjectURL(link.href), 2000);
+        notify("已开始下载 Demo.html");
+      } catch (e) {
+        const link = document.createElement("a");
+        link.href = name;
+        link.download = name;
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+        notify("已尝试下载 Demo.html");
+      }
+    });
+    const links = [...document.querySelectorAll("nav.toc a")];
+    const heads = links.map(a => document.getElementById(a.getAttribute("href").slice(1)));
+    window.addEventListener("scroll", () => {
+      let on = 0;
+      heads.forEach((h, k) => { if (h && h.getBoundingClientRect().top < 120) on = k; });
+      links.forEach((a, k) => a.classList.toggle("on", k === on));
+    }, { passive: true });
+  
+  </script>
+</body>
+</html>

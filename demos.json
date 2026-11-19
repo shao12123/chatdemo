@@ -95,9 +95,9 @@
     {
       "id": "plan-list",
       "title": "生成计划清单",
-      "file": "生成计划清单场景.html",
+      "file": "计划清单-PRD.html",
       "owner": "张宏尧",
-      "summary": "周日烤羊肉计划：对话里的计划文件、右侧文档目录、人数 4 到 10、框选标注；文件名和预览窗口都带 V1"
+      "summary": "PRD + Agent TOOL：计划清单触发判定；顶部可打开交互 Demo，可下载 Demo.html / TOOL.md，可复制 TOOL"
     }
   ]
 }
