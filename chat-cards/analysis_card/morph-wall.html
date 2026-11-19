@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>card_id · analysis_card · 形态墙</title>
+  <style>
+    :root {
+      --page: #f5f6f8; --ink: #000; --muted: rgba(0,0,0,.6); --faint: rgba(0,0,0,.4);
+      --line: #e3e4e7; --brand: #0a59f7; --chip: #fff; --chip-line: #e3e4e7;
+    }
+    html.theme-dark {
+      color-scheme: dark;
+      --page: #090b0e; --ink: #fff; --muted: rgba(255,255,255,.6); --faint: rgba(255,255,255,.4);
+      --line: #292b2e; --brand: #317af7; --chip: #191a1d; --chip-line: #434448;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: "PingFang SC", "Helvetica Neue", sans-serif; background: var(--page); color: var(--ink); }
+    .top {
+      position: sticky; top: 0; z-index: 20; display: flex; flex-wrap: wrap; gap: 12px; justify-content: space-between;
+      padding: 16px 24px; border-bottom: 1px solid var(--line);
+      background: color-mix(in srgb, var(--page) 92%, transparent); backdrop-filter: blur(8px);
+    }
+    .top h1 { margin: 0; font-size: 18px; line-height: 26px; }
+    .top p { margin: 4px 0 0; color: var(--muted); font-size: 13px; line-height: 20px; max-width: 48rem; }
+    .meta { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+    .meta code { padding: 4px 10px; border-radius: 8px; background: var(--chip); border: 1px solid var(--chip-line); font-size: 12px; }
+    .meta code b { color: var(--faint); }
+    .tools { display: flex; flex-wrap: wrap; gap: 8px; align-content: flex-start; }
+    .tools a, .tools button {
+      display: inline-flex; align-items: center; height: 32px; padding: 0 12px; border-radius: 8px;
+      border: 1px solid var(--chip-line); background: var(--chip); color: var(--ink); font-size: 13px;
+      text-decoration: none; cursor: pointer; font-family: inherit;
+    }
+    .layout { display: grid; grid-template-columns: 210px minmax(0,1fr); }
+    nav { padding: 16px 12px 32px 24px; border-right: 1px solid var(--line); }
+    nav a { display: block; padding: 8px 10px; border-radius: 8px; color: var(--muted); text-decoration: none; font-size: 13px; }
+    nav a:hover { background: var(--chip); color: var(--ink); }
+    nav a small { display: block; color: var(--faint); font-size: 11px; margin-top: 2px; }
+    main { padding: 20px 24px 64px; max-width: 780px; }
+    .panel { scroll-margin-top: 96px; margin: 0 0 24px; padding: 16px; border: 1px solid var(--line); border-radius: 16px; background: var(--chip); }
+    .panel-head h2 { margin: 0; font-size: 15px; }
+    .panel-head p { margin: 6px 0 12px; color: var(--muted); font-size: 12px; line-height: 18px; }
+    .tag { display: inline-block; margin-left: 8px; height: 20px; padding: 0 8px; border-radius: 99px; background: #f3f7ff; color: var(--brand); font-size: 11px; line-height: 20px; font-weight: 600; }
+    html.theme-dark .tag { background: #0a1831; }
+    .tag.gray { background: var(--page); color: var(--muted); }
+    .stage { max-width: 736px; display: flex; flex-direction: column; gap: 10px; align-items: flex-start; }
+    .note { margin: 12px 0 0; padding: 10px 12px; border-radius: 10px; background: var(--page); color: var(--muted); font-size: 12px; line-height: 18px; }
+    .note code, .panel-head code { font-size: 11px; }
+    .note a, .panel-head a { color: var(--brand); }
+    .cap { margin: 0; color: var(--faint); font-size: 12px; line-height: 18px; }
+    .lead-ctx { margin: 0; font-size: 14px; line-height: 22px; color: var(--ink); max-width: 100%; }
+    @media (max-width: 800px) {
+      .layout { grid-template-columns: 1fr; }
+      nav { display: flex; gap: 4px; overflow-x: auto; border-right: 0; border-bottom: 1px solid var(--line); }
+      nav a { white-space: nowrap; }
+      nav a small { display: none; }
+    }
+
+    /* ===== 抽自 conversations.html L137–155 · .revise-*（原样，仅换行/注释） ===== */
+    .revise-card { display: flex; flex-direction: column; gap: 8px; width: min(440px, 100%); }
+    .revise-lead { margin: 0; font-size: 14px; line-height: 22px; font-weight: 650; }
+    .revise-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .revise-cell { background: #f6f8fb; border-radius: 10px; padding: 8px 10px; min-width: 0; }
+    .revise-cell > span { display: block; margin-bottom: 4px; color: #667085; font-size: 12px; line-height: 18px; }
+    .revise-cell > b { display: block; font-size: 13px; line-height: 20px; font-weight: 600; }
+    .revise-plans { display: flex; flex-direction: column; }
+    .revise-plan { display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 28px; padding: 5px 0; font-size: 13px; line-height: 20px; }
+    .revise-plan.on { font-weight: 650; }
+    .revise-more { display: none; flex-direction: column; }
+    .revise-cell.plans.open .revise-more { display: flex; }
+    .revise-more .revise-plan { border-top: 1px solid #e6ebf3; }
+    .revise-fold { display: flex; align-items: center; gap: 4px; width: 100%; margin-top: 2px; border: 0; border-top: 1px solid #e6ebf3; background: transparent; padding: 6px 0 1px; color: #667085; font-size: 12px; line-height: 18px; text-align: left; cursor: pointer; font-family: inherit; }
+    .revise-fold svg { flex: none; transition: transform .15s ease; }
+    .revise-cell.plans.open .revise-fold svg { transform: rotate(180deg); }
+    .revise-plan i { flex: none; height: 18px; padding: 0 6px; border-radius: 99px; background: #e7f8ef; color: #067647; font-style: normal; font-size: 12px; line-height: 18px; font-weight: 600; }
+    .revise-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+    .revise-chips b { height: 24px; padding: 0 8px; border-radius: 8px; background: #fff; color: #245bdb; font-size: 12px; line-height: 24px; font-weight: 600; }
+    .revise-grid.single { grid-template-columns: 1fr; }
+    /* 源页另有：#stage .revise-card { align-self: flex-start; max-width: 100%; } */
+    .revise-card { align-self: flex-start; max-width: 100%; }
+
+    /* ===== 深色 · 源 conversations.html 无 .revise-* 深色规则；本墙补 token（上线前并回主页 html.theme-dark） ===== */
+    html.theme-dark .revise-lead { color: #fff; }
+    html.theme-dark .revise-cell { background: #25272b; }
+    html.theme-dark .revise-cell > span { color: rgba(255,255,255,.6); }
+    html.theme-dark .revise-cell > b { color: #fff; }
+    html.theme-dark .revise-plan { color: #fff; }
+    html.theme-dark .revise-more .revise-plan,
+    html.theme-dark .revise-fold { border-top-color: #3a3c41; }
+    html.theme-dark .revise-fold { color: rgba(255,255,255,.6); }
+    html.theme-dark .revise-plan i { background: #12301f; color: #5ba854; }
+    html.theme-dark .revise-chips b { background: #111216; color: #8fb0ff; }
+  </style>
+</head>
+<body>
+  <header class="top">
+    <div>
+      <h1>形态墙 · analysis_card</h1>
+      <p>结构化分析卡：把一次需要对齐的决策摊开——结论 / 问题·原因或边界 / 选用方案 / 理由 / 本版改动范围。字段按决策类型变薄（诊断型 · 方案型 · 边界型）。只含 chat 内 <code>.revise-card</code>。Agent 经 <code>present_analysis_card</code> 出卡。</p>
+      <div class="meta">
+        <code><b>card_id</b> analysis_card</code>
+        <code><b>tool</b> present_analysis_card</code>
+        <code><b>section</b> A · 通用壳 · 有 Tool</code>
+        <code><b>aliases</b> revise_card · 结构化分析卡 · .revise-card</code>
+        <code><b>source</b> conversations.html · .revise-* / reviseStreamHtml</code>
+      </div>
+    </div>
+    <div class="tools">
+      <button type="button" id="themeBtn">深色</button>
+      <a href="../doc_summary/morph-wall.html">doc_summary</a>
+      <a href="../ask_form/morph-wall.html">ask_form</a>
+      <a href="../option_compare/morph-wall.html">option_compare</a>
+      <a href="../../conversations.html">Demo</a>
+      <a href="../CARD_ID-NAMING.md">命名</a>
+    </div>
+  </header>
+
+  <div class="layout">
+    <nav>
+      <a href="#v1"><b>V1</b> 诊断 + 方案<small>canonical</small></a>
+      <a href="#v2"><b>V2</b> 方案型<small>无问题/原因 · .single</small></a>
+      <a href="#v3"><b>V3</b> 边界型<small>能说 / 不能说</small></a>
+      <a href="#v4"><b>V4</b> 无「这一版会改」<small>chips 可选</small></a>
+      <a href="#v5"><b>V5</b> 过程方案展开<small>.plans.open</small></a>
+      <a href="#v6"><b>V6</b> 深色<small>theme-dark</small></a>
+    </nav>
+    <main>
+      <section class="panel" id="v1">
+        <div class="panel-head">
+          <h2>V1 · 诊断 + 方案<span class="tag">canonical</span></h2>
+          <p>论文修订 Demo：lead → 问题 / 原因两栏 → 最终方案（「被选用」）+ 过程方案折叠（默认收起）→ 选用理由 →「这一版会改」标签。可点「过程方案」开合。</p>
+        </div>
+        <div class="stage" data-mount="v1"></div>
+        <p class="note">
+          范围：仅 <code>.revise-card</code>。字段：<code>lead</code> · <code>problem</code> · <code>cause</code> · <code>plans[]</code>（首项=被选用）· <code>reason</code> · <code>chips[]</code>。折叠只改展示，不改已选方案；卡内<b>无</b>主按钮 / 多选确认。<br>
+          <b>边界：</b>① 思考过程（执行步骤折叠）<b>不是</b>本卡；② 点「再生成一版」前的 <code>.pick-card</code>「对哪里不满意」<b>不是</b>本卡，属于补输入 → 归 <a href="../ask_form/morph-wall.html"><code>ask_form</code></a>（host_only，pick 为其单选壳的遗留写法）；③ <b>不并入</b> <code>doc_summary</code>。
+        </p>
+      </section>
+
+      <section class="panel" id="v2">
+        <div class="panel-head">
+          <h2>V2 · 方案型<span class="tag">no problem / cause</span></h2>
+          <p>推荐方案（被选用）→ 备选（可折）→ 选用理由。无「问题 / 原因」栏；或只留一栏时用 <code>.revise-grid.single</code>。</p>
+        </div>
+        <div class="stage">
+          <p class="cap">2a · 无 grid（只有方案 + 理由）</p>
+          <div data-mount="v2a"></div>
+          <p class="cap">2b · <code>.revise-grid.single</code>（只有「问题」一栏，无「原因」）</p>
+          <div data-mount="v2b"></div>
+        </div>
+        <p class="note">渲染规则（同源 <code>reviseStreamHtml</code>）：<code>problem || cause</code> 有值才出 grid；<code>cause</code> 为空 → 加 <code>.single</code>。</p>
+      </section>
+
+      <section class="panel" id="v3">
+        <div class="panel-head">
+          <h2>V3 · 边界型<span class="tag">能说 / 不能说</span></h2>
+          <p>同一 <code>.revise-card</code> 壳，文案换成「能说什么 / 不能说什么」→ 建议措辞 → 行动范围。用于风险裁剪、口径、合规类回复。</p>
+        </div>
+        <div class="stage" data-mount="v3"></div>
+        <p class="note">V3 是<b>文案变体</b>：CSS 不新增类；左右栏仍复用 <code>.revise-cell</code>（标签 <code>span</code> 改为「能说什么 / 不能说什么」）。「建议措辞」复用 <code>.revise-plan</code> 行，不出「被选用」角标。</p>
+      </section>
+
+      <section class="panel" id="v4">
+        <div class="panel-head">
+          <h2>V4 · 无「这一版会改」<span class="tag">chips 可选</span></h2>
+          <p>非改稿场景（只做判断，不绑定改动范围）：<code>chips</code> 为 <code>null</code> 时整个模块不渲染（有数据才渲染）。</p>
+        </div>
+        <div class="stage" data-mount="v4"></div>
+        <p class="note">验收（源 Demo）：「本版改动范围（有则必须有）」。无改动范围时不要用空 chips 占位；也不要塞通用空话凑模块。</p>
+      </section>
+
+      <section class="panel" id="v5">
+        <div class="panel-head">
+          <h2>V5 · 过程方案展开<span class="tag">.plans.open</span></h2>
+          <p>展开后：被选用方案在上（带角标），过程方案按行列出、<b>无</b>角标，可与已选用区分。再点「收起过程方案」恢复。</p>
+        </div>
+        <div class="stage" data-mount="v5"></div>
+      </section>
+
+      <section class="panel" id="v6">
+        <div class="panel-head">
+          <h2>V6 · 深色<span class="tag">theme-dark</span></h2>
+          <p>点顶栏「深色」切换整页（V6 为深色验收面板）。<code>conversations.html</code> 现无 <code>.revise-*</code> 深色规则，本墙补了一套 token。</p>
+        </div>
+        <div class="stage">
+          <div data-mount="v6"></div>
+        </div>
+        <p class="note">深色 token（墙内定义）：cell <code>#25272b</code> · 分割线 <code>#3a3c41</code> · 次文 <code>rgba(255,255,255,.6)</code> · 被选用角标 <code>#12301f / #5ba854</code> · chip <code>#111216 / #8fb0ff</code>。上线前需并回主页 <code>html.theme-dark</code>。</p>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    const esc = v => String(v).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+    const CHEV = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>';
+
+    /* 与源 reviseStreamHtml 同构（去掉流式 caret，折叠改为本墙内联开合） */
+    function reviseHtml(v) {
+      let html = `<div class="revise-card">`;
+      if (v.lead) html += `<p class="revise-lead">${esc(v.lead)}</p>`;
+      if (v.problem || v.cause) {
+        html += `<div class="revise-grid${v.cause ? "" : " single"}">`;
+        if (v.problem) html += `<div class="revise-cell"><span>${esc(v.problemLabel || "问题")}</span><b>${esc(v.problem)}</b></div>`;
+        if (v.cause) html += `<div class="revise-cell"><span>${esc(v.causeLabel || "原因")}</span><b>${esc(v.cause)}</b></div>`;
+        html += `</div>`;
+      }
+      if (v.plans && v.plans.length) {
+        const rest = v.plans.slice(1);
+        const open = !!v.plansOpen && rest.length;
+        const badge = v.noBadge ? "" : "<i>被选用</i>";
+        html += `<div class="revise-cell plans${open ? " open" : ""}"><span>${esc(v.plansLabel || "最终方案")}</span><div class="revise-plan on"><span>${esc(v.plans[0])}</span>${badge}</div>`;
+        if (rest.length) {
+          html += `<button class="revise-fold" type="button" data-plans-toggle>${CHEV}<span>${open ? "收起过程方案" : "过程方案"}</span></button>`;
+          html += `<div class="revise-more">${rest.map(p => `<div class="revise-plan"><span>${esc(p)}</span></div>`).join("")}</div>`;
+        }
+        html += `</div>`;
+      }
+      if (v.reason) html += `<div class="revise-cell"><span>选用理由</span><b>${esc(v.reason)}</b></div>`;
+      if (v.chips) html += `<div class="revise-cell"><span>${esc(v.chipsLabel || "这一版会改")}</span><div class="revise-chips">${v.chips.map(c => `<b>${esc(c)}</b>`).join("")}</div></div>`;
+      return html + `</div>`;
+    }
+    const ctx = t => `<p class="lead-ctx">${esc(t)}</p>`;
+
+    const DIAG = {
+      lead: "这一版的主问题是研究问题和证据对不上。",
+      problem: "研究问题写的是「影响」，证据只有描述性统计。",
+      cause: "第 2 节文献综述没有支撑因果判断，结论段又直接下了因果。",
+      plans: ["收窄研究问题为「相关性」，结论降级", "补一组对照数据再保留因果表述", "整篇重写，换研究题目"],
+      reason: "改动最小，且不用用户额外提供数据。",
+      chips: ["研究问题", "第 2 节", "结论段", "摘要"]
+    };
+
+    const mounts = {
+      v1: () => reviseHtml(DIAG),
+      v2a: () => reviseHtml({
+        lead: "推荐按周迭代：先上线核心流程，再补细节。",
+        plans: ["按周迭代，每周一个可验收增量", "一次性大版本发布", "先做外围页面，核心流程延后"],
+        reason: "团队 3 人，风险早暴露，并且每周都有可核对的产出。"
+      }),
+      v2b: () => reviseHtml({
+        lead: "目前的主要风险是数据口径不一致。",
+        problem: "销售表与财务表的「订单日期」一个按下单、一个按付款。",
+        plans: ["统一按付款日期汇总"],
+        reason: "财务口径是对外披露口径，以它为准能避免对账差异。"
+      }),
+      v3: () => reviseHtml({
+        lead: "这条回复要先划清口径边界，再给措辞。",
+        problem: "目前已有的实验数据支持「提升了留存」。",
+        cause: "不能说「因果证明」「适用于所有用户」，样本只覆盖新用户。",
+        problemLabel: "能说什么",
+        causeLabel: "不能说什么",
+        plansLabel: "建议措辞",
+        plans: ["在新用户样本中，次日留存提升约 3 个百分点", "该结果暂不外推到老用户"],
+        noBadge: true,
+        reason: "只陈述数据直接支持的范围，评审时不会被追问。",
+        chips: ["对外口径", "不扩写适用人群"],
+        chipsLabel: "行动范围"
+      }),
+      v4: () => reviseHtml({
+        lead: "这个结论可以先用，但有一处需要核对。",
+        problem: "样本量只有 42，置信区间较宽。",
+        cause: "分组时有 6 份问卷缺失，未补采。",
+        plans: ["保留结论，并在备注中标明样本量", "补采后再给结论"],
+        reason: "不影响当前决策方向，补采可以并行进行。",
+        chips: null
+      }),
+      v5: () => reviseHtml({ ...DIAG, plansOpen: true }),
+      v6: () => reviseHtml(DIAG)
+    };
+
+    document.querySelectorAll("[data-mount]").forEach(el => {
+      el.innerHTML = mounts[el.dataset.mount]();
+    });
+    /* 在各面板 stage 前加一句 ctx，便于看上下文 */
+    [["v1", "再生成一版"], ["v4", "这个结论靠谱吗"], ["v5", "再生成一版"]].forEach(([id, t]) => {
+      const el = document.querySelector(`[data-mount="${id}"]`);
+      if (el) el.insertAdjacentHTML("beforebegin", ctx(`用户：${t}`));
+    });
+
+    document.addEventListener("click", e => {
+      const btn = e.target.closest("[data-plans-toggle]");
+      if (!btn) return;
+      const cell = btn.closest(".revise-cell.plans");
+      const open = cell.classList.toggle("open");
+      btn.querySelector("span").textContent = open ? "收起过程方案" : "过程方案";
+    });
+
+    document.getElementById("themeBtn").onclick = () => {
+      const on = document.documentElement.classList.toggle("theme-dark");
+      themeBtn.textContent = on ? "浅色" : "深色";
+    };
+  </script>
+</body>
+</html>

@@ -142,6 +142,13 @@
       "summary": "建群结果卡 present_group_result：默认 / 照片 / 色块头像、长名省略、展开成员（is-open）"
     },
     {
+      "id": "card-analysis-card-wall",
+      "title": "卡片库 · analysis_card 形态墙",
+      "file": "chat-cards/analysis_card/morph-wall.html",
+      "owner": "共同维护",
+      "summary": "结构化分析卡 present_analysis_card（.revise-card；aliases revise_card）：诊断+方案 / 方案型 / 边界型 / 无改动 chips / 过程方案展开 / 深色；不并入 doc_summary"
+    },
+    {
       "id": "gen-fault",
       "title": "生成异常与恢复",
       "file": "生成异常与恢复-PRD.html",

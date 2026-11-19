@@ -1,5 +1,5 @@
 {
-  "version": "2026.11.19-20",
-  "updatedAt": "2026-11-19 18:45",
-  "note": "建群两卡：group_form / group_result（不并 ask_form）；命名 v2.0"
+  "version": "2026.11.19-21",
+  "updatedAt": "2026-11-19 18:55",
+  "note": "analysis_card 入库（.revise-card）；不并 doc_summary；命名 v2.1"
 }

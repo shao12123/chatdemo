@@ -1,4 +1,4 @@
-# card_id 命名（v2.0 · 仅 Chat 区）
+# card_id 命名（v2.1 · 仅 Chat 区）
 
 > 卡按 **UI 壳 / 模式** 命名，不按业务故事。场景差异在触发规则与 payload。  
 > **范围：只收对话区（含输入框附件）出现的卡。** 右侧文档台 / 标注台 / PPT 预览等展示区 **不进卡片库**。  
@@ -23,6 +23,7 @@
 | 11 | **日程管理 Chat 只挂 `doc_entry`**（2026-11-19，v1.9）：日历 mark 入口（如「周四面试日程」）；**撤** `schedule_preview` / `agenda_list`。timeline / agenda 预览板（含「安排中」）**不进卡片库**（场景 Demo 可有，库不收） |
 | 12 | **Chat 批次 · map / app**（2026-11-19）：`map_align` · `app_link` 落形态墙；授权弹层、右侧日历台 **不进库** |
 | 13 | **建群两张卡**（2026-11-19，v2.0）：`group_form` + `group_result`，**不并入 `ask_form`**（多字段事务壳：群名 / 头像 / 双栏选人 / 单主按钮）。表单 = `article.gc`；结果 = `article.gc.gc-result`。Tool：`present_group_form` · `present_group_result`。创建中卡隐藏，仅 lead + think（think 不算卡）。无授权 / 右侧面板，host overlay 不进库 |
+| 14 | **`analysis_card` 独立成卡**（2026-11-19，v2.1）：壳 = `conversations.html` 的 `.revise-card`（`reviseStreamHtml`），**不并入 `doc_summary`**。Tool：`present_analysis_card`。aliases：`revise_card` · `结构化分析卡` · CSS 前缀 `.revise-*`。字段按决策类型变薄（诊断型 / 方案型 / 边界型）；卡内无主按钮。**思考过程不是本卡**；`.pick-card`「对哪里不满意」**不是本卡**，属补输入 → 归 `ask_form`（host_only） |
 
 ---
 
@@ -53,6 +54,7 @@
 | `app_link` | 连接外部应用卡 | `present_app_link` | `连接外部应用` · `应用授权卡` |
 | `group_form` | 建群表单卡 | `present_group_form` | `建群卡` · `创建群组` |
 | `group_result` | 建群结果卡 | `present_group_result` | `群已创建` · `建群结果卡` |
+| `analysis_card` | 结构化分析卡 | `present_analysis_card` | `revise_card` · `结构化分析卡` · `.revise-card`（CSS 前缀 `.revise-*`） |
 | `push_digest` | 推送汇总卡 | `present_push_digest` | 暂缓 |
 
 ### B. 全站件 · 无 Tool（Chat / 输入框）
@@ -70,9 +72,9 @@
 > 旧 `file_chip` → aliases，分别映射到 `composer_file` / `user_file`。  
 > 旧 `schedule_preview` / `agenda_list` → **不进库**；日程产物入口归 `doc_entry`。
 
-### C. 候选尚未收名（须先确认在 Chat）
+### C. 候选尚未收名
 
-`analysis_card` — 暂缓：`conversations.html` 里「结构化分析卡」只见规则 / 文案，未找到清晰的 chat 卡壳（待确认是否并入 `doc_summary` 或独立壳）。
+（暂无。`analysis_card` 已于 v2.1 移入 A。）
 
 ### E. 不进库（右侧 / 预览台 / 非卡）
 
@@ -106,6 +108,7 @@
 | `app_link` | [app_link/morph-wall.html](app_link/morph-wall.html) |
 | `group_form` | [group_form/morph-wall.html](group_form/morph-wall.html) |
 | `group_result` | [group_result/morph-wall.html](group_result/morph-wall.html) |
+| `analysis_card` | [analysis_card/morph-wall.html](analysis_card/morph-wall.html) |
 
 ---
 
