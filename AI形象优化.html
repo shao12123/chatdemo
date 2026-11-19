@@ -28,12 +28,12 @@
       --sidebar: linear-gradient(180deg, rgba(248,250,255,.8) 0%, rgba(234,242,255,.8) 54%, rgba(234,242,255,.8) 61%, rgba(243,243,255,.8) 100%);
       --stage: var(--page);
       --shadow: 0 1px 2px rgba(0,0,0,.05);
-      --font: "HarmonyOS Sans SC", "HarmonyOS Sans", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "微软雅黑", "Noto Sans SC", "Source Han Sans SC", "Noto Sans CJK SC", sans-serif;
+      --font: Inter, "PingFang SC", -apple-system, BlinkMacSystemFont, "Helvetica Neue", sans-serif;
     }
     * { box-sizing: border-box; }
     html, body { height: 100%; margin: 0; }
     body { font-family: var(--font); color: var(--ink); background: var(--page); letter-spacing: 0; }
-    button, textarea { font-family: inherit; letter-spacing: 0; }
+    button, textarea, input, select { font-family: inherit; letter-spacing: 0; }
     button { cursor: pointer; }
     .app { display: flex; height: 100%; height: 100vh; height: 100dvh; min-height: 640px; overflow: hidden; }
     .sidebar { width: 210px; flex: none; display: flex; flex-direction: column; background: var(--sidebar); color: var(--nav); }
