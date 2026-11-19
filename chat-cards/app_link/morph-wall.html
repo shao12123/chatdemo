@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>card_id · app_link · 形态墙</title>
+  <style>
+    :root {
+      --page: #f5f6f8; --ink: #000; --muted: rgba(0,0,0,.6); --faint: rgba(0,0,0,.4);
+      --line: #e3e4e7; --brand: #0a59f7; --chip: #fff; --chip-line: #e3e4e7;
+    }
+    html.theme-dark {
+      color-scheme: dark;
+      --page: #090b0e; --ink: #fff; --muted: rgba(255,255,255,.6); --faint: rgba(255,255,255,.4);
+      --line: #292b2e; --brand: #317af7; --chip: #191a1d; --chip-line: #434448;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: "PingFang SC", "Helvetica Neue", sans-serif; background: var(--page); color: var(--ink); }
+    .top {
+      position: sticky; top: 0; z-index: 20; display: flex; flex-wrap: wrap; gap: 12px; justify-content: space-between;
+      padding: 16px 24px; border-bottom: 1px solid var(--line);
+      background: color-mix(in srgb, var(--page) 92%, transparent); backdrop-filter: blur(8px);
+    }
+    .top h1 { margin: 0; font-size: 18px; line-height: 26px; }
+    .top p { margin: 4px 0 0; color: var(--muted); font-size: 13px; line-height: 20px; max-width: 48rem; }
+    .meta { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+    .meta code { padding: 4px 10px; border-radius: 8px; background: var(--chip); border: 1px solid var(--chip-line); font-size: 12px; }
+    .meta code b { color: var(--faint); }
+    .tools { display: flex; flex-wrap: wrap; gap: 8px; align-content: flex-start; }
+    .tools a, .tools button {
+      display: inline-flex; align-items: center; height: 32px; padding: 0 12px; border-radius: 8px;
+      border: 1px solid var(--chip-line); background: var(--chip); color: var(--ink); font-size: 13px;
+      text-decoration: none; cursor: pointer; font-family: inherit;
+    }
+    .layout { display: grid; grid-template-columns: 210px minmax(0,1fr); }
+    nav { padding: 16px 12px 32px 24px; border-right: 1px solid var(--line); }
+    nav a { display: block; padding: 8px 10px; border-radius: 8px; color: var(--muted); text-decoration: none; font-size: 13px; }
+    nav a:hover { background: var(--chip); color: var(--ink); }
+    nav a small { display: block; color: var(--faint); font-size: 11px; margin-top: 2px; }
+    main { padding: 20px 24px 64px; max-width: 780px; }
+    .panel { scroll-margin-top: 96px; margin: 0 0 24px; padding: 16px; border: 1px solid var(--line); border-radius: 16px; background: var(--chip); }
+    .panel-head h2 { margin: 0; font-size: 15px; }
+    .panel-head p { margin: 6px 0 12px; color: var(--muted); font-size: 12px; line-height: 18px; }
+    .tag { display: inline-block; margin-left: 8px; height: 20px; padding: 0 8px; border-radius: 99px; background: #f3f7ff; color: var(--brand); font-size: 11px; line-height: 20px; font-weight: 600; }
+    html.theme-dark .tag { background: #0a1831; }
+    .tag.gray { background: var(--page); color: var(--muted); }
+    .stage { max-width: 736px; display: flex; flex-direction: column; gap: 10px; align-items: flex-start; }
+    .note { margin: 12px 0 0; padding: 10px 12px; border-radius: 10px; background: var(--page); color: var(--muted); font-size: 12px; line-height: 18px; }
+    .note a, .panel-head a { color: var(--brand); }
+    .note code, .panel-head code { font-size: 11px; }
+    .cap { margin: 0; color: var(--faint); font-size: 12px; line-height: 18px; }
+    .lead { margin: 0; font-size: 14px; line-height: 24px; font-weight: 400; color: var(--ink); max-width: 100%; }
+
+    /* tokens ← 连接外部应用场景.html --gc-* */
+    :root { --gc-bg: #fff; --gc-ink: #1f2329; --gc-muted: #646a73; --gc-line: #e5e6eb; --gc-line-soft: #eef0f3; --gc-hover: #f5f6f7; --brand-hover: #1e61ea; }
+    html.theme-dark { --gc-bg: #191a1d; --gc-ink: #fff; --gc-muted: rgba(255,255,255,.62); --gc-line: #434448; --gc-line-soft: #292b2e; --gc-hover: rgba(255,255,255,.06); --brand-hover: #2762c6; }
+
+    /* ← article.link（授权弹层 .auth-mask 属 host 浮层，不进本墙） */
+    .link {
+      width: min(436px, 100%); display: flex; align-items: center; gap: 12px; margin-top: 0; padding: 12px 14px;
+      border: 1px solid var(--gc-line-soft); border-radius: 12px; background: var(--gc-bg); color: var(--gc-ink);
+    }
+    .link-ico { width: 40px; height: 40px; flex: none; border: 1px solid var(--gc-line-soft); border-radius: 8px; display: grid; place-items: center; color: var(--gc-ink); background: var(--gc-bg); }
+    .link-copy { min-width: 0; flex: 1; }
+    .link-name { display: flex; align-items: center; gap: 4px; font-size: 14px; line-height: 22px; font-weight: 600; color: var(--gc-ink); }
+    .link-name svg { color: var(--brand); flex: none; }
+    .link-desc { color: var(--gc-muted); font-size: 12px; line-height: 22px; }
+    .link-actions { display: flex; align-items: center; gap: 8px; flex: none; }
+    .link-auth, .link-retry {
+      display: inline-flex; align-items: center; justify-content: center; height: 30px; flex: none; padding: 0 16px;
+      border-radius: 8px; font-size: 14px; font-weight: 400; line-height: 24px; font-family: inherit; cursor: pointer;
+      border: 1px solid #84acfb; background: linear-gradient(180deg, #4a85ff 0%, #3370ff 100%); color: #fff;
+    }
+    .link-auth:hover, .link-retry:hover {
+      background: linear-gradient(90deg, rgba(10,89,247,.5), rgba(10,89,247,.5)), linear-gradient(180deg, #4a85ff 0%, #3370ff 100%);
+    }
+    .link-manage {
+      display: inline-flex; align-items: center; justify-content: center; height: 30px; flex: none; padding: 0 16px;
+      border: 1px solid var(--gc-line); border-radius: 8px; background: var(--gc-bg); color: var(--gc-ink);
+      font-size: 14px; font-weight: 400; line-height: 24px; font-family: inherit; cursor: pointer;
+    }
+    .link-manage:hover { background: var(--gc-hover); }
+    .link-fail { flex: none; color: #e84026; font-size: 13px; line-height: 20px; font-weight: 650; }
+    html.theme-dark .link-auth, html.theme-dark .link-retry { border-color: #2762c6; background: var(--brand); color: #fff; }
+    html.theme-dark .link-auth:hover, html.theme-dark .link-retry:hover { background: var(--brand-hover); }
+    html.theme-dark .link-fail { color: #ff8a78; }
+    .toast-lite { padding: 8px 12px; border-radius: 10px; background: var(--page); color: var(--muted); font-size: 12px; line-height: 18px; }
+
+    @media (max-width: 800px) {
+      .layout { grid-template-columns: 1fr; }
+      nav { display: flex; gap: 4px; overflow-x: auto; border-right: 0; border-bottom: 1px solid var(--line); }
+      nav a { white-space: nowrap; }
+      nav a small { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <header class="top">
+    <div>
+      <h1>形态墙 · app_link</h1>
+      <p>连接外部应用卡：图标 + 应用名（已连带蓝色对勾）+ 一句说明 + 右侧单按钮（授权 / 管理）。只含 chat 内 article.link；授权弹层 .auth-mask 是 host 浮层，不属于卡。Agent 经 present_app_link 出卡。</p>
+      <div class="meta">
+        <code><b>card_id</b> app_link</code>
+        <code><b>tool</b> present_app_link</code>
+        <code><b>section</b> A · 通用壳 · 有 Tool</code>
+        <code><b>aliases</b> 连接外部应用 · 应用授权卡</code>
+        <code><b>source</b> 连接外部应用场景.html · article.link / linkCardHtml()</code>
+      </div>
+    </div>
+    <div class="tools">
+      <button type="button" id="themeBtn">深色</button>
+      <a href="../map_align/morph-wall.html">map_align</a>
+      <a href="../schedule_preview/morph-wall.html">schedule_preview</a>
+      <a href="../ask_form/morph-wall.html">ask_form</a>
+      <a href="../error_card/morph-wall.html">error_card</a>
+      <a href="../doc_entry/morph-wall.html">doc_entry</a>
+      <a href="../../conversations.html">Demo</a>
+      <a href="../CARD_ID-NAMING.md">命名</a>
+    </div>
+  </header>
+
+  <div class="layout">
+    <nav>
+      <a href="#v1"><b>V1</b> 待授权 ask<small>canonical · 授权</small></a>
+      <a href="#v2"><b>V2</b> 已连接 linked<small>管理</small></a>
+      <a href="#v3"><b>V3</b> 连接失败<small>failed · 授权重试</small></a>
+      <a href="#v4"><b>V4</b> 已取消<small>cancelled</small></a>
+    </nav>
+    <main>
+      <section class="panel" id="v1">
+        <div class="panel-head">
+          <h2>V1 · 待授权 ask<span class="tag">canonical</span></h2>
+          <p>未连接：主按钮「授权」。点击后由 host 打开授权弹层（同意 → V2；关窗 → V4）。</p>
+        </div>
+        <div class="stage" data-mount="ask"></div>
+        <p class="note"><b>范围</b>：本墙只画 chat 内 <code>.link</code>。授权弹层 <code>#authMask</code> / <code>.auth-go</code> 属 host overlay，写在 Tool 回调约定里，不做 V 面板。<br>payload：<code>app{id,name,icon,desc}</code> · <code>state: ask|linked|failed|cancelled</code>。</p>
+      </section>
+      <section class="panel" id="v2">
+        <div class="panel-head">
+          <h2>V2 · 已连接 linked<span class="tag gray">状态</span></h2>
+          <p>名称后出现品牌色对勾；按钮换成次级「管理」（描边）。一张卡一个主按钮：此态无主按钮。</p>
+        </div>
+        <div class="stage" data-mount="linked"></div>
+        <p class="note">授权成功后同一张卡原地从 ask 转 linked（lead 文案也换成已连接版）。</p>
+      </section>
+      <section class="panel" id="v3">
+        <div class="panel-head">
+          <h2>V3 · 连接失败 failed<span class="tag gray">异常</span></h2>
+          <p>卡外观与待授权一致，按钮仍叫「授权」，点击重新走授权。失败原因写在 lead，不另出错误卡。</p>
+        </div>
+        <div class="stage" data-mount="failed"></div>
+        <p class="note"><code>.link-fail</code> 红字样式在源里保留但当前 demo 未使用；若要卡内标红须另评审。与 <a href="../error_card/morph-wall.html">error_card</a> 的关系：连接失败可选择只改 lead，不强制接 net-card。</p>
+      </section>
+      <section class="panel" id="v4">
+        <div class="panel-head">
+          <h2>V4 · 已取消 cancelled<span class="tag gray">状态</span></h2>
+          <p>用户关掉授权窗：卡回到可再授权，lead 说明「还没连上」。</p>
+        </div>
+        <div class="stage" data-mount="cancelled"></div>
+        <p class="note">与 V1 的差别只在 lead 文案与 <code>state</code>；视觉同 ask。</p>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    const GH = `<span class="link-ico"><svg width="22" height="22" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82A7.68 7.68 0 0 1 8 3.87c.68.003 1.36.092 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg></span>`;
+    const BADGE = `<svg width="14" height="14" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="7" fill="currentColor"/><path d="M4.7 8.1 6.8 10.2 11.4 5.7" fill="none" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+
+    function actions(state) {
+      if (state === "linked") return `<button class="link-manage" type="button">管理</button>`;
+      if (state === "failed") return `<button class="link-auth" type="button" data-link-retry>授权</button>`;
+      return `<button class="link-auth" type="button" data-link-auth>授权</button>`;
+    }
+    function card(state) {
+      return `<article class="link" aria-label="连接 GitHub" data-state="${state}">${GH}<div class="link-copy"><div class="link-name">GitHub ${BADGE}</div><div class="link-desc">让 AI Chat 使用 GitHub</div></div><div class="link-actions">${actions(state)}</div></article>`;
+    }
+    const lead = t => `<p class="lead">${t}</p>`;
+
+    const mounts = {
+      ask: () => `${lead("连接前先确认授权。点授权后才能使用这个应用。")}${card("ask")}<p class="cap">点「授权」只触发 host 授权弹层（本墙不画弹层）</p><div class="toast-lite" id="authHint" hidden>→ host 打开 .auth-mask：同意授权后本卡转 V2；关窗转 V4</div>`,
+      linked: () => `${lead("GitHub 已经连上。AI Chat 只会使用你批准的权限，密码也不会经过这里。")}${card("linked")}`,
+      failed: () => `${lead("GitHub 这次没有连上。点卡片上的授权，确认后可以再试一次。")}${card("failed")}`,
+      cancelled: () => `${lead("授权窗口关掉了，GitHub 还没连上。<br>需要的话再点授权，确认后才会可用。")}${card("cancelled")}`
+    };
+
+    document.addEventListener("click", e => {
+      if (e.target.closest("[data-link-auth], [data-link-retry]")) {
+        const hint = document.getElementById("authHint");
+        if (hint) { hint.hidden = false; setTimeout(() => { hint.hidden = true; }, 2200); }
+      }
+    });
+    document.querySelectorAll("[data-mount]").forEach(el => { el.innerHTML = mounts[el.dataset.mount](); });
+    document.getElementById("themeBtn").onclick = () => {
+      const on = document.documentElement.classList.toggle("theme-dark");
+      themeBtn.textContent = on ? "浅色" : "深色";
+    };
+  </script>
+</body>
+</html>

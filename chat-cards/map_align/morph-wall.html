@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>card_id · map_align · 形态墙</title>
+  <style>
+    :root {
+      --page: #f5f6f8; --ink: #000; --muted: rgba(0,0,0,.6); --faint: rgba(0,0,0,.4);
+      --line: #e3e4e7; --brand: #0a59f7; --chip: #fff; --chip-line: #e3e4e7;
+    }
+    html.theme-dark {
+      color-scheme: dark;
+      --page: #090b0e; --ink: #fff; --muted: rgba(255,255,255,.6); --faint: rgba(255,255,255,.4);
+      --line: #292b2e; --brand: #317af7; --chip: #191a1d; --chip-line: #434448;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: "PingFang SC", "Helvetica Neue", sans-serif; background: var(--page); color: var(--ink); }
+    .top {
+      position: sticky; top: 0; z-index: 20; display: flex; flex-wrap: wrap; gap: 12px; justify-content: space-between;
+      padding: 16px 24px; border-bottom: 1px solid var(--line);
+      background: color-mix(in srgb, var(--page) 92%, transparent); backdrop-filter: blur(8px);
+    }
+    .top h1 { margin: 0; font-size: 18px; line-height: 26px; }
+    .top p { margin: 4px 0 0; color: var(--muted); font-size: 13px; line-height: 20px; max-width: 48rem; }
+    .meta { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+    .meta code { padding: 4px 10px; border-radius: 8px; background: var(--chip); border: 1px solid var(--chip-line); font-size: 12px; }
+    .meta code b { color: var(--faint); }
+    .tools { display: flex; flex-wrap: wrap; gap: 8px; align-content: flex-start; }
+    .tools a, .tools button {
+      display: inline-flex; align-items: center; height: 32px; padding: 0 12px; border-radius: 8px;
+      border: 1px solid var(--chip-line); background: var(--chip); color: var(--ink); font-size: 13px;
+      text-decoration: none; cursor: pointer; font-family: inherit;
+    }
+    .layout { display: grid; grid-template-columns: 210px minmax(0,1fr); }
+    nav { padding: 16px 12px 32px 24px; border-right: 1px solid var(--line); }
+    nav a { display: block; padding: 8px 10px; border-radius: 8px; color: var(--muted); text-decoration: none; font-size: 13px; }
+    nav a:hover { background: var(--chip); color: var(--ink); }
+    nav a small { display: block; color: var(--faint); font-size: 11px; margin-top: 2px; }
+    main { padding: 20px 24px 64px; max-width: 780px; }
+    .panel { scroll-margin-top: 96px; margin: 0 0 24px; padding: 16px; border: 1px solid var(--line); border-radius: 16px; background: var(--chip); }
+    .panel-head h2 { margin: 0; font-size: 15px; }
+    .panel-head p { margin: 6px 0 12px; color: var(--muted); font-size: 12px; line-height: 18px; }
+    .tag { display: inline-block; margin-left: 8px; height: 20px; padding: 0 8px; border-radius: 99px; background: #f3f7ff; color: var(--brand); font-size: 11px; line-height: 20px; font-weight: 600; }
+    html.theme-dark .tag { background: #0a1831; }
+    .tag.gray { background: var(--page); color: var(--muted); }
+    .stage { max-width: 736px; display: flex; flex-direction: column; gap: 10px; align-items: flex-start; }
+    .note { margin: 12px 0 0; padding: 10px 12px; border-radius: 10px; background: var(--page); color: var(--muted); font-size: 12px; line-height: 18px; }
+    .note a, .panel-head a { color: var(--brand); }
+    .note code, .panel-head code { font-size: 11px; }
+    .cap { margin: 0; color: var(--faint); font-size: 12px; line-height: 18px; }
+    .lead { margin: 0; font-size: 14px; line-height: 24px; font-weight: 400; color: var(--ink); max-width: 100%; }
+
+    /* tokens ← 映射对照场景.html */
+    :root { --card: #fff; --secondary: rgba(0,0,0,.6); --map-zh: #eef0f3; --map-en: #f3f7ff; --map-line: #e3e4e7; --map-pair: #d6e4ff; }
+    html.theme-dark { --card: #111216; --secondary: rgba(255,255,255,.6); --map-zh: #191a1d; --map-en: #0a1831; --map-line: #292b2e; --map-pair: rgba(49,122,247,.32); }
+
+    /* ← article.map（仅 chat；无右侧台） */
+    .map { position: relative; align-self: flex-start; width: 100%; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); border: 1px solid var(--map-line); border-radius: 16px; overflow: hidden; }
+    .map-block { min-width: 0; background: var(--map-zh); padding: 12px 16px 16px; }
+    .map-target { background: var(--map-en); border-left: 1px solid var(--map-line); padding-left: 26px; }
+    .map-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 28px; margin-bottom: 8px; }
+    .map-head span { color: var(--secondary); font-size: 12px; line-height: 22px; font-weight: 500; }
+    .map-target .map-head span { font-size: 14px; line-height: 22px; font-weight: 600; }
+    .map-copy { width: 28px; height: 28px; flex: none; border: 0; border-radius: 8px; background: transparent; color: var(--secondary); padding: 0; display: grid; place-items: center; cursor: pointer; }
+    .map-copy:hover { background: rgba(9, 11, 14, 0.04); }
+    html.theme-dark .map-copy:hover { background: #292b2e; color: var(--ink); }
+    .map-swap { position: absolute; z-index: 2; left: 50%; top: 12px; width: 28px; height: 28px; margin: 0 0 0 -14px; border: 1px solid var(--map-line); border-radius: 50%; background: var(--card); color: var(--secondary); display: grid; place-items: center; padding: 0; pointer-events: none; }
+    html.theme-dark .map-swap { background: #191a1d; border-color: #434448; color: rgba(255,255,255,.6); }
+    .map-block p { margin: 0; color: var(--ink); font-size: 14px; line-height: 24px; font-weight: 400; }
+    .map-target p { font-size: 16px; line-height: 24px; font-weight: 400; }
+    .map-pair { border-radius: 4px; padding: 1px 2px; margin: 0 -1px; cursor: pointer; -webkit-box-decoration-break: clone; box-decoration-break: clone; }
+    .map-pair.on { background: var(--map-pair); }
+    /* 场景里是 @media (max-width:760px)；形态墙用 .is-stack 强制演示 */
+    .map.is-stack { grid-template-columns: minmax(0, 1fr); }
+    .map.is-stack .map-target { border-left: 0; border-top: 1px solid var(--map-line); padding-left: 16px; }
+    .map.is-stack .map-swap { display: none; }
+    .frame-narrow { width: 340px; max-width: 100%; display: flex; flex-direction: column; gap: 10px; padding: 12px; border: 1px dashed var(--chip-line); border-radius: 12px; }
+
+    /* 复制失败 toast（host 浮层，非 error_card） */
+    .toast { display: inline-flex; align-items: center; gap: 8px; height: 48px; padding: 0 16px; border: .5px solid #dcdcdc; border-radius: 12px; background: #fff; color: rgba(0,0,0,.9); font-size: 14px; line-height: 24px; box-shadow: 0 8px 10px -5px rgba(0,0,0,.08), 0 16px 24px 2px rgba(0,0,0,.04), 0 6px 30px 5px rgba(0,0,0,.05); }
+    html.theme-dark .toast { background: #111216; color: #fff; border-color: #434448; box-shadow: none; }
+    .toast[hidden] { display: none; }
+
+    @media (max-width: 800px) {
+      .layout { grid-template-columns: 1fr; }
+      nav { display: flex; gap: 4px; overflow-x: auto; border-right: 0; border-bottom: 1px solid var(--line); }
+      nav a { white-space: nowrap; }
+      nav a small { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <header class="top">
+    <div>
+      <h1>形态墙 · map_align</h1>
+      <p>映射对照卡：左中文 / 右英文双栏（窄屏上下叠），词句配对悬停高亮，英文侧复制整句。只含 chat 内 article.map；无右侧台。Agent 经 present_map_align 出卡。</p>
+      <div class="meta">
+        <code><b>card_id</b> map_align</code>
+        <code><b>tool</b> present_map_align</code>
+        <code><b>section</b> A · 通用壳 · 有 Tool</code>
+        <code><b>aliases</b> 映射对照 · 翻译对照</code>
+        <code><b>source</b> 映射对照场景.html · article.map / mapHtml()</code>
+      </div>
+    </div>
+    <div class="tools">
+      <button type="button" id="themeBtn">深色</button>
+      <a href="../doc_entry/morph-wall.html">doc_entry</a>
+      <a href="../ask_form/morph-wall.html">ask_form</a>
+      <a href="../error_card/morph-wall.html">error_card</a>
+      <a href="../app_link/morph-wall.html">app_link</a>
+      <a href="../schedule_preview/morph-wall.html">schedule_preview</a>
+      <a href="../../conversations.html">Demo</a>
+      <a href="../CARD_ID-NAMING.md">命名</a>
+    </div>
+  </header>
+
+  <div class="layout">
+    <nav>
+      <a href="#v1"><b>V1</b> 双栏对照<small>canonical · zh | en</small></a>
+      <a href="#v2"><b>V2</b> 窄屏叠放<small>stack 说明</small></a>
+      <a href="#v3"><b>V3</b> 复制成功<small>对勾 2s · 无 toast</small></a>
+      <a href="#v4"><b>V4</b> 复制失败<small>failCopy 路径</small></a>
+    </nav>
+    <main>
+      <section class="panel" id="v1">
+        <div class="panel-head">
+          <h2>V1 · 双栏对照<span class="tag">canonical</span></h2>
+          <p>中文词句 ↔ 英文词句成对高亮；右栏 16px 译文，左栏 14px 原文。悬停任一词，两边同时标出。</p>
+        </div>
+        <div class="stage" data-mount="bilingual"></div>
+        <p class="note">payload 要点：<code>zh[]</code> / <code>en[]</code> 带 <code>pairId</code>；英文语序可与中文不同（如本例 e/f 互换），按各自 order 渲染；<code>copyText</code> 为整句英文。</p>
+      </section>
+      <section class="panel" id="v2">
+        <div class="panel-head">
+          <h2>V2 · 窄屏 / 上下叠放<span class="tag gray">布局变体</span></h2>
+          <p>视口 ≤ 760px 时单列：英文栏在下，左边距恢复 16px，交换图标隐藏。</p>
+        </div>
+        <div class="stage" data-mount="stack"></div>
+        <p class="note">纯 CSS 响应式，不是新 card_id。</p>
+      </section>
+      <section class="panel" id="v3">
+        <div class="panel-head">
+          <h2>V3 · 复制成功<span class="tag gray">状态</span></h2>
+          <p>复制成功后按钮换成绿色对勾，停留 2 秒恢复复制图标。<b>成功不弹提示。</b></p>
+        </div>
+        <div class="stage" data-mount="copied"></div>
+        <p class="note">对应场景里 <code>showMapCopied</code>：2000ms 回弹。</p>
+      </section>
+      <section class="panel" id="v4">
+        <div class="panel-head">
+          <h2>V4 · 复制失败（failCopy）<span class="tag gray">异常</span></h2>
+          <p>按钮保持复制图标，host 浮出 toast「复制失败」。卡片本身不变，不会替换成错误卡。</p>
+        </div>
+        <div class="stage" data-mount="fail"></div>
+        <p class="note">失败提示是 host toast，<b>不走</b> <a href="../error_card/morph-wall.html">error_card</a>。卡内无重试按钮：用户再点一次复制即可。</p>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    const COPY = `<svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.2" aria-hidden="true"><rect x="4.5" y="4.5" width="7" height="7.5" rx="1.5"/><path d="M9.5 2.5H4A1.5 1.5 0 0 0 2.5 4v5.5"/></svg>`;
+    const CHECK = `<svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="#0f8204" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.8 7.4 5.7 10.2 11.2 4.2"/></svg>`;
+    const ERR = `<svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="7.3" fill="#e84026"/><path d="M5.6 5.6l4.8 4.8M10.4 5.6l-4.8 4.8" stroke="#fff" stroke-width="1.3" stroke-linecap="round"/></svg>`;
+    const SWAP = `<span class="map-swap" aria-hidden="true"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 8h13M14 4l4 4-4 4M20 16H7M10 12l-4 4 4 4"/></svg></span>`;
+
+    const pairs = [
+      ["a", "我们", "We"], ["b", "可以先做", "can start with"], ["c", "两周试用", "a two-week trial"],
+      ["d", "但不承诺", "but we can't promise"], ["e", "这期间", "during that period"], ["f", "一定能定制", "that customization will be available"]
+    ];
+    const TARGET = "We can start with a two-week trial, but we can't promise that customization will be available during that period.";
+
+    function line(side) {
+      const order = side === "zh" ? ["a","b","c","d","e","f"] : ["a","b","c","d","f","e"];
+      return order.map((id, i) => {
+        const p = pairs.find(x => x[0] === id);
+        let glue = "";
+        if (side === "zh" && id === "d") glue = "，";
+        if (side === "en" && i) glue = id === "d" ? ", " : " ";
+        return glue + `<span class="map-pair" data-pair="${id}">${p[side === "zh" ? 1 : 2]}</span>`;
+      }).join("") + (side === "zh" ? "。" : ".");
+    }
+    function card({ stack = false, copied = false, failMode = false } = {}) {
+      return `<article class="map${stack ? " is-stack" : ""}" aria-label="翻译对照" ${failMode ? "data-fail-copy" : ""}>
+        <section class="map-block"><div class="map-head"><span>中文</span></div><p>${line("zh")}</p></section>${SWAP}
+        <section class="map-block map-target"><div class="map-head"><span>English</span><button class="map-copy" type="button" data-map-copy aria-label="${copied ? "已复制" : "复制"}">${copied ? CHECK : COPY}</button></div><p>${line("en")}</p></section>
+      </article>`;
+    }
+    const LEAD = `<p class="lead">悬停词句，两边会一起标出对应。</p>`;
+
+    const mounts = {
+      bilingual: () => `${LEAD}${card()}`,
+      stack: () => `<p class="cap">≤760px 视口：上中文 / 下英文，分隔线改为横线，隐藏交换图标（本墙用 .is-stack 强制）</p><div class="frame-narrow">${LEAD}${card({ stack: true })}</div>`,
+      copied: () => `<p class="cap">静态：复制成功后的对勾态（可点下方按钮体验 2 秒回弹）</p>${LEAD}${card({ copied: true })}<p class="cap">交互：</p>${card()}`,
+      fail: () => `${LEAD}${card({ failMode: true })}<p class="cap">点英文侧复制 → 触发失败（按钮保持复制图标，host 弹 toast）</p><div class="toast" id="failToast" role="status"><span>${ERR}</span><span>复制失败</span></div>`
+    };
+
+    // 悬停配对
+    document.addEventListener("mouseover", e => {
+      const p = e.target.closest("[data-pair]");
+      document.querySelectorAll(".map-pair").forEach(el => el.classList.toggle("on", !!p && el.dataset.pair === p.dataset.pair));
+    });
+    document.addEventListener("mouseout", e => {
+      if (e.target.closest("[data-pair]")) document.querySelectorAll(".map-pair").forEach(el => el.classList.remove("on"));
+    });
+    // 复制：成功换对勾 2s；failCopy 路径只出 toast
+    const timers = new WeakMap();
+    document.addEventListener("click", e => {
+      const btn = e.target.closest("[data-map-copy]");
+      if (!btn) return;
+      const failMode = btn.closest("[data-fail-copy]");
+      if (failMode) {
+        const toast = document.getElementById("failToast");
+        toast.hidden = false; clearTimeout(timers.get(toast));
+        timers.set(toast, setTimeout(() => { toast.hidden = true; }, 1600));
+        return;
+      }
+      btn.innerHTML = CHECK; btn.setAttribute("aria-label", "已复制");
+      clearTimeout(timers.get(btn));
+      timers.set(btn, setTimeout(() => { btn.innerHTML = COPY; btn.setAttribute("aria-label", "复制"); }, 2000));
+    });
+    document.querySelectorAll("[data-mount]").forEach(el => { el.innerHTML = mounts[el.dataset.mount](); });
+    document.getElementById("themeBtn").onclick = () => {
+      const on = document.documentElement.classList.toggle("theme-dark");
+      themeBtn.textContent = on ? "浅色" : "深色";
+    };
+  </script>
+</body>
+</html>

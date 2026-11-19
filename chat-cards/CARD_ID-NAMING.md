@@ -1,4 +1,4 @@
-# card_id 命名（v1.7 · 仅 Chat 区）
+# card_id 命名（v1.8 · 仅 Chat 区）
 
 > 卡按 **UI 壳 / 模式** 命名，不按业务故事。场景差异在触发规则与 payload。  
 > **范围：只收对话区（含输入框附件）出现的卡。** 右侧文档台 / 标注台 / PPT 预览等展示区 **不进卡片库**。  
@@ -20,6 +20,8 @@
 | 8 | **补输入只有一张 `ask_form`**（2026-11-19）：天气编号壳为 canonical；多题 / 多选走 payload；路线旧 `.ask` 不另开卡 |
 | 9 | **卡片库只保留 Chat 区**（2026-11-19，v1.7）：右侧文档台、标注 dock、PPT 预览等 **不做 card_id / 形态墙** |
 | 10 | 已撤出库：`course_paper` · `annotation_edit`（原 A 区；形态墙已删）。对话入口条仍用 `doc_entry` |
+| 11 | **`schedule_preview` 单卡**（2026-11-19，v1.8）：`agenda_list` 为其 **别名**，不另开 card_id；body 变体 `timeline` \| `agenda`。选项条 / 日期闸门归 `ask_form`；失败包裹壳（悬停重试）为可选，是否收敛 `error_card` 待评审 |
+| 12 | **Chat 批次 · map / app / time**（2026-11-19，v1.8）：`map_align`（映射对照）· `app_link`（连接外部应用）· `schedule_preview`（日程预览）落形态墙；授权弹层 `#authMask`、右侧日历台 `.time-cal` / `#doc` **不进库** |
 
 ---
 
@@ -46,7 +48,9 @@
 | `doc_summary` | 总结报告卡 | `present_doc_summary` | |
 | `paper_compare_pick` | 对比选择卡 | `present_paper_compare_pick` | 仅「对比哪些文件」 |
 | `weather_card` | 天气卡 | `present_weather_card` | `天气场景` · `wx` |
-| `map_align` | 映射对照卡 | `present_map_align` | |
+| `map_align` | 映射对照卡 | `present_map_align` | `映射对照` |
+| `app_link` | 连接外部应用卡 | `present_app_link` | `连接外部应用` · `应用授权卡` |
+| `schedule_preview` | 日程预览卡 | `present_schedule_preview` | `agenda_list` · `日程预览` · `建议日程` |
 | `push_digest` | 推送汇总卡 | `present_push_digest` | 暂缓 |
 
 ### B. 全站件 · 无 Tool（Chat / 输入框）
@@ -65,7 +69,7 @@
 
 ### C. 候选尚未收名（须先确认在 Chat）
 
-`group_form` · `group_result` · `app_link` · `schedule_preview` · `agenda_list` · `analysis_card`
+`group_form` · `group_result` · `analysis_card`
 
 ### E. 不进库（右侧 / 预览台）
 
@@ -74,6 +78,8 @@
 | 右侧文档台（原 `course_paper`） | `aside#doc` 写入 / Tab / 任务板 / 对比板 |
 | 标注台（原 `annotation_edit`） | PPT 刘海队列 · 课程 `mark-dock` |
 | 地图全屏 / 预览台 | 非 chat 气泡 |
+| 授权弹层（连接外部应用 `#authMask`） | host overlay，非 chat 内卡 |
+| 日历台（时间场景 `.time-cal`） | 右侧展示区；对话内仅 `schedule_preview` / `doc_entry` |
 
 ---
 
@@ -92,6 +98,9 @@
 | `weather_card` | [weather_card/morph-wall.html](weather_card/morph-wall.html) |
 | `doc_summary` | [doc_summary/morph-wall.html](doc_summary/morph-wall.html) |
 | `paper_compare_pick` | [paper_compare_pick/morph-wall.html](paper_compare_pick/morph-wall.html) |
+| `map_align` | [map_align/morph-wall.html](map_align/morph-wall.html) |
+| `app_link` | [app_link/morph-wall.html](app_link/morph-wall.html) |
+| `schedule_preview` | [schedule_preview/morph-wall.html](schedule_preview/morph-wall.html) |
 
 ---
 

@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>card_id · schedule_preview · 形态墙</title>
+  <style>
+    :root {
+      --page: #f5f6f8; --ink: #000; --muted: rgba(0,0,0,.6); --faint: rgba(0,0,0,.4);
+      --line: #e3e4e7; --brand: #0a59f7; --chip: #fff; --chip-line: #e3e4e7;
+    }
+    html.theme-dark {
+      color-scheme: dark;
+      --page: #090b0e; --ink: #fff; --muted: rgba(255,255,255,.6); --faint: rgba(255,255,255,.4);
+      --line: #292b2e; --brand: #317af7; --chip: #191a1d; --chip-line: #434448;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: "PingFang SC", "Helvetica Neue", sans-serif; background: var(--page); color: var(--ink); }
+    .top {
+      position: sticky; top: 0; z-index: 20; display: flex; flex-wrap: wrap; gap: 12px; justify-content: space-between;
+      padding: 16px 24px; border-bottom: 1px solid var(--line);
+      background: color-mix(in srgb, var(--page) 92%, transparent); backdrop-filter: blur(8px);
+    }
+    .top h1 { margin: 0; font-size: 18px; line-height: 26px; }
+    .top p { margin: 4px 0 0; color: var(--muted); font-size: 13px; line-height: 20px; max-width: 48rem; }
+    .meta { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+    .meta code { padding: 4px 10px; border-radius: 8px; background: var(--chip); border: 1px solid var(--chip-line); font-size: 12px; }
+    .meta code b { color: var(--faint); }
+    .tools { display: flex; flex-wrap: wrap; gap: 8px; align-content: flex-start; }
+    .tools a, .tools button {
+      display: inline-flex; align-items: center; height: 32px; padding: 0 12px; border-radius: 8px;
+      border: 1px solid var(--chip-line); background: var(--chip); color: var(--ink); font-size: 13px;
+      text-decoration: none; cursor: pointer; font-family: inherit;
+    }
+    .layout { display: grid; grid-template-columns: 210px minmax(0,1fr); }
+    nav { padding: 16px 12px 32px 24px; border-right: 1px solid var(--line); }
+    nav a { display: block; padding: 8px 10px; border-radius: 8px; color: var(--muted); text-decoration: none; font-size: 13px; }
+    nav a:hover { background: var(--chip); color: var(--ink); }
+    nav a small { display: block; color: var(--faint); font-size: 11px; margin-top: 2px; }
+    main { padding: 20px 24px 64px; max-width: 780px; }
+    .panel { scroll-margin-top: 96px; margin: 0 0 24px; padding: 16px; border: 1px solid var(--line); border-radius: 16px; background: var(--chip); }
+    .panel-head h2 { margin: 0; font-size: 15px; }
+    .panel-head p { margin: 6px 0 12px; color: var(--muted); font-size: 12px; line-height: 18px; }
+    .tag { display: inline-block; margin-left: 8px; height: 20px; padding: 0 8px; border-radius: 99px; background: #f3f7ff; color: var(--brand); font-size: 11px; line-height: 20px; font-weight: 600; }
+    html.theme-dark .tag { background: #0a1831; }
+    .tag.gray { background: var(--page); color: var(--muted); }
+    .stage { max-width: 736px; display: flex; flex-direction: column; gap: 10px; align-items: flex-start; }
+    .note { margin: 12px 0 0; padding: 10px 12px; border-radius: 10px; background: var(--page); color: var(--muted); font-size: 12px; line-height: 18px; }
+    .note a, .panel-head a { color: var(--brand); }
+    .note code, .panel-head code { font-size: 11px; }
+    .cap { margin: 0; color: var(--faint); font-size: 12px; line-height: 18px; }
+    .lead { margin: 0; font-size: 14px; line-height: 24px; font-weight: 400; color: var(--ink); max-width: 100%; }
+
+    /* tokens ← 时间场景.html --cal-* */
+    :root {
+      --cal-bg: #fff; --cal-ink: #1f2329; --cal-muted: #858e9c; --cal-line: #eef0f3; --cal-grid: #e9edf2; --cal-soft: #f4f5f7;
+      --event-bg: #e8f0ff; --event-ink: #1655c8; --event-line: #3274ed;
+      --exist-bg: #f0f1f4; --exist-ink: #586374; --exist-line: #8b95a4;
+      --lunch-bg: #e7f6ee; --lunch-ink: #146c43; --lunch-line: #1f9d62;
+      --pend-bg: #fff7e8; --pend-ink: #8a5a10; --pend-line: #d9a441; --brand-hover: #1e61ea;
+    }
+    html.theme-dark {
+      --cal-bg: #111216; --cal-ink: #fff; --cal-muted: rgba(255,255,255,.62); --cal-line: #34363b; --cal-grid: #3a3d44; --cal-soft: #191a1d;
+      --event-bg: #10233f; --event-ink: #c5dbff; --event-line: #6aa2ff;
+      --exist-bg: #22242b; --exist-ink: rgba(255,255,255,.78); --exist-line: #9aa3b2;
+      --lunch-bg: #10261a; --lunch-ink: #b6f0cf; --lunch-line: #49d18f;
+      --pend-bg: #2a2112; --pend-ink: #ffd591; --pend-line: #e0b15a; --brand-hover: #2762c6;
+    }
+
+    /* ← .time-sim-* / .time-agenda-* / .time-action-* */
+    .time-sim-card, .time-agenda { width: min(440px, 100%); margin-top: 0; border: 1px solid var(--cal-line); border-radius: 10px; background: var(--cal-bg); color: var(--cal-ink); overflow: hidden; }
+    .time-sim-head, .time-agenda-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 14px 16px 12px; border-bottom: 1px solid var(--cal-line); }
+    .time-sim-head strong, .time-agenda-head strong { font-size: 14px; font-weight: 650; }
+    .time-sim-head span, .time-agenda-head span { font-size: 12px; color: var(--cal-muted); }
+    .time-sim-note, .time-agenda-note { margin: 0; padding: 10px 16px 0; color: var(--cal-muted); font-size: 12px; line-height: 18px; }
+    .time-sim-grid { display: grid; grid-template-columns: 48px minmax(0, 1fr); margin: 8px 14px 12px 0; }
+    .time-sim-hours, .time-sim-col { position: relative; }
+    .time-sim-hour { position: absolute; right: 8px; transform: translateY(-6px); font-size: 11px; color: var(--cal-muted); font-variant-numeric: tabular-nums; }
+    .time-sim-col { border-left: 1px solid var(--cal-grid); background: repeating-linear-gradient(to bottom, var(--cal-grid) 0, var(--cal-grid) 1px, transparent 1px, transparent 80px); }
+    .time-sim-event { position: absolute; left: 5px; right: 0; border-left: 3px solid var(--event-line); border-radius: 3px; background: var(--event-bg); color: var(--event-ink); overflow: hidden; padding: 3px 7px; line-height: 1.2; box-sizing: border-box; }
+    .time-sim-event b, .time-sim-event small { display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .time-sim-event b { font-size: 12px; font-weight: 600; }
+    .time-sim-event small { font-size: 11px; margin-top: 2px; }
+    .time-sim-event.lunch { background: var(--lunch-bg); border-left-color: var(--lunch-line); color: var(--lunch-ink); }
+    .time-sim-event.existing { background: var(--exist-bg); border-left-color: var(--exist-line); color: var(--exist-ink); }
+    .time-sim-event.pending { background: var(--pend-bg); color: var(--pend-ink); border-left-color: var(--pend-line); }
+    .time-agenda-day { padding: 8px 16px 4px; }
+    .time-agenda-day > b { display: block; margin: 6px 0; font-size: 13px; line-height: 20px; }
+    .time-agenda-day ul { list-style: none; margin: 0; padding: 0; }
+    .time-agenda-day li { display: grid; grid-template-columns: 104px minmax(0, 1fr) auto; gap: 8px; padding: 6px 0; border-top: 1px solid var(--cal-line); font-size: 13px; line-height: 20px; }
+    .time-agenda-day em { font-style: normal; color: var(--cal-muted); font-size: 12px; }
+    .time-sim-foot, .time-agenda-foot { display: flex; align-items: center; justify-content: flex-end; gap: 8px; padding: 12px 16px 16px; border-top: 1px solid var(--cal-line); }
+    .time-action-btn { display: inline-flex; align-items: center; justify-content: center; height: 30px; flex: none; margin-left: auto; padding: 0 16px; border: 1px solid #84acfb; border-radius: 8px; background: linear-gradient(180deg, #4a85ff 0%, #3370ff 100%); color: #fff; font: inherit; font-size: 14px; font-weight: 400; line-height: 22px; cursor: pointer; }
+    .time-action-btn:hover:not(:disabled) { background: linear-gradient(90deg, rgba(10,89,247,.5), rgba(10,89,247,.5)), linear-gradient(180deg, #4a85ff 0%, #3370ff 100%); }
+    .time-action-btn:disabled { border-color: transparent; background: var(--cal-soft); color: var(--cal-muted); cursor: default; }
+    html.theme-dark .time-action-btn:not(:disabled) { border-color: #2762c6; background: var(--brand); color: #fff; }
+    html.theme-dark .time-action-btn:hover:not(:disabled) { background: var(--brand-hover); }
+    html.theme-dark .time-action-btn:disabled { border-color: transparent; background: #292b2e; color: rgba(255,255,255,.78); }
+    .time-progress { margin: 0 auto 0 0; color: var(--cal-muted); font-size: 13px; }
+
+    /* 选择 / 日期闸门（归 ask_form，此处仅示意与 agenda 同屏） */
+    .time-choices { display: flex; flex-direction: column; gap: 8px; width: min(440px, 100%); margin-top: 0; }
+    .time-choice, .time-date-btn { width: 100%; border: 1px solid var(--cal-line); border-radius: 10px; background: var(--cal-bg); color: var(--cal-ink); text-align: left; padding: 10px 12px; font: inherit; cursor: pointer; }
+    .time-choice b, .time-date-btn b { display: block; font-size: 14px; line-height: 22px; }
+    .time-choice small, .time-date-btn small { display: block; margin-top: 2px; color: var(--cal-muted); font-size: 12px; line-height: 18px; }
+    .time-choice[aria-pressed="true"], .time-date-btn[aria-pressed="true"], .time-choice:hover:not(:disabled), .time-date-btn:hover:not(:disabled) { background: #f3f7ff; border-color: #3370ff; }
+    html.theme-dark .time-choice[aria-pressed="true"], html.theme-dark .time-date-btn[aria-pressed="true"],
+    html.theme-dark .time-choice:hover:not(:disabled), html.theme-dark .time-date-btn:hover:not(:disabled) { background: #0a1831; border-color: #317af7; }
+
+    /* ← .time-failure-* / .time-lines / .time-note */
+    .time-failure-message { width: min(440px, 100%); }
+    .time-failure-message .lead { margin: 0; }
+    .time-failure-message .time-lines, .time-failure-message .artifact, .time-failure-message .time-note { margin-top: 8px; }
+    .time-lines { list-style: none; margin: 8px 0 0; padding: 0; width: min(440px, 100%); }
+    .time-lines li { display: grid; grid-template-columns: 112px minmax(0, 1fr) auto; gap: 8px; align-items: baseline; padding: 5px 0; border-top: 1px solid var(--cal-line); font-size: 14px; line-height: 22px; }
+    .time-lines b { font-variant-numeric: tabular-nums; font-weight: 650; }
+    .time-lines em { color: var(--cal-muted); font-style: normal; font-size: 12px; }
+    .time-note { margin: 8px 0 0; color: var(--cal-muted); font-size: 12px; line-height: 18px; }
+    .time-retry-row { height: 34px; display: flex; justify-content: flex-end; align-items: center; }
+    .time-retry-btn { width: 32px; height: 32px; border: 0; border-radius: 7px; background: transparent; color: var(--cal-muted); display: grid; place-items: center; opacity: 0; cursor: pointer; }
+    .time-failure-message:hover .time-retry-btn, .time-failure-message:focus-within .time-retry-btn, .time-failure-message.show-retry .time-retry-btn, .time-retry-btn:focus-visible { opacity: 1; }
+    .time-retry-btn:hover, .time-retry-btn:focus-visible { background: rgba(9,11,14,.06); color: var(--cal-ink); }
+    html.theme-dark .time-retry-btn:hover { background: rgba(255,255,255,.08); color: #fff; }
+    @media (hover: none) { .time-retry-btn { opacity: 1; } }
+
+    /* doc_entry 简版（V8 产物入口；完整见 doc_entry 墙） */
+    .artifact { position: relative; display: flex; align-items: center; width: 300px; max-width: 100%; min-height: 54px; padding: 7px 13px; border: 1px solid #eef0f3; border-radius: 12px; background: #fff; overflow: hidden; }
+    html.theme-dark .artifact { background: #111216; border-color: #292b2e; }
+    .artifact-open { display: flex; align-items: center; gap: 12px; min-width: 0; flex: 1; padding: 0; border: 0; background: transparent; color: inherit; font: inherit; text-align: left; cursor: pointer; }
+    .artifact-mark { display: grid; place-items: center; flex: none; width: 32px; height: 32px; border-radius: 8px; background: #e6eefe; color: var(--brand); }
+    html.theme-dark .artifact-mark { background: #0a1831; }
+    .artifact-copy { min-width: 0; flex: 1; overflow: hidden; }
+    .artifact-copy b { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: #1e293b; font-size: 14px; line-height: 20px; font-weight: 500; }
+    html.theme-dark .artifact-copy b { color: #fff; }
+    .artifact-copy small { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: rgba(0,0,0,.4); font-size: 12px; line-height: 20px; }
+    html.theme-dark .artifact-copy small { color: rgba(255,255,255,.4); }
+    .artifact:hover { background: #f9f9f9; }
+    html.theme-dark .artifact:hover { background: #191a1d; }
+    .gate-flag { display: inline-flex; align-items: center; gap: 6px; height: 22px; padding: 0 8px; border-radius: 6px; background: var(--page); color: var(--muted); font-size: 11px; }
+
+    @media (max-width: 800px) {
+      .layout { grid-template-columns: 1fr; }
+      nav { display: flex; gap: 4px; overflow-x: auto; border-right: 0; border-bottom: 1px solid var(--line); }
+      nav a { white-space: nowrap; }
+      nav a small { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <header class="top">
+    <div>
+      <h1>形态墙 · schedule_preview</h1>
+      <p>日程预览卡（一张）：body 两种 — timeline 时间轴 / agenda 分日列表；头部状态（待确认 → 安排中 → 已确认），脚部唯一主按钮「按建议安排」。选项条与日期闸门归 ask_form；失败 / 部分失败用 .time-failure-message 包裹（自带悬停重试，非 error_card）。只含 chat；右侧 .time-cal 日历台不进库。</p>
+      <div class="meta">
+        <code><b>card_id</b> schedule_preview</code>
+        <code><b>tool</b> present_schedule_preview</code>
+        <code><b>section</b> A · 通用壳 · 有 Tool</code>
+        <code><b>aliases</b> agenda_list · 日程预览 · 建议日程</code>
+        <code><b>body</b> timeline | agenda</code>
+        <code><b>source</b> 时间场景.html · .time-sim-card / .time-agenda</code>
+      </div>
+    </div>
+    <div class="tools">
+      <button type="button" id="themeBtn">深色</button>
+      <a href="../doc_entry/morph-wall.html">doc_entry</a>
+      <a href="../ask_form/morph-wall.html">ask_form</a>
+      <a href="../error_card/morph-wall.html">error_card</a>
+      <a href="../map_align/morph-wall.html">map_align</a>
+      <a href="../app_link/morph-wall.html">app_link</a>
+      <a href="../../conversations.html">Demo</a>
+      <a href="../CARD_ID-NAMING.md">命名</a>
+    </div>
+  </header>
+
+  <div class="layout">
+    <nav>
+      <a href="#v1"><b>V1</b> timeline · 待确认<small>canonical · 冲突建议</small></a>
+      <a href="#v2"><b>V2</b> 安排中<small>creating · 按钮禁用 + progress</small></a>
+      <a href="#v3"><b>V3</b> 已确认<small>confirmed · 颜色落定</small></a>
+      <a href="#v4"><b>V4</b> agenda 分日列表<small>body: agenda</small></a>
+      <a href="#v5"><b>V5</b> agenda + 选项<small>choices → ask_form</small></a>
+      <a href="#v6"><b>V6</b> 日期闸门<small>date → ask_form</small></a>
+      <a href="#v7"><b>V7</b> 失败 · 重试<small>全失败 · 悬停重试</small></a>
+      <a href="#v8"><b>V8</b> 部分失败 + 产物<small>partial · doc_entry</small></a>
+    </nav>
+    <main>
+      <section class="panel" id="v1">
+        <div class="panel-head">
+          <h2>V1 · timeline · 待确认<span class="tag">canonical</span></h2>
+          <p>一天 10:00–16:00 时间轴；已有日程灰（保留），建议项琥珀色（尚未创建）；脚部唯一主按钮。</p>
+        </div>
+        <div class="stage" data-mount="timeline"></div>
+        <p class="note"><b>范围</b>：只含 chat 内 <code>.time-sim-card</code>；右侧 <code>.time-cal</code> 日历台、<code>#doc</code> 不进库。<br>payload：<code>body: &quot;timeline&quot;</code> · <code>dateLabel</code> · <code>events[{title,start,end,kind}]</code> · <code>status</code>。</p>
+      </section>
+      <section class="panel" id="v2">
+        <div class="panel-head">
+          <h2>V2 · 安排中<span class="tag gray">状态</span></h2>
+          <p>点「按建议安排」后：按钮变灰「安排中…」，左侧出现 progress 文案；颜色仍是待确认琥珀。</p>
+        </div>
+        <div class="stage" data-mount="creating"></div>
+        <p class="note">同一张卡原地更新，无新 card_id。</p>
+      </section>
+      <section class="panel" id="v3">
+        <div class="panel-head">
+          <h2>V3 · 已确认<span class="tag gray">状态</span></h2>
+          <p>状态改「已确认」；按钮灰禁用「已确认」；建议块转为正式色（面试蓝 / 午餐绿 / 已有灰）。</p>
+        </div>
+        <div class="stage" data-mount="confirmed"></div>
+        <p class="note">确认后 AI 回复可附 <code>doc_entry</code>（见 V8），点开右侧日历台（<b>非卡</b>）。</p>
+      </section>
+      <section class="panel" id="v4">
+        <div class="panel-head">
+          <h2>V4 · agenda 分日列表<span class="tag gray">body 变体</span></h2>
+          <p>把同一份建议按「日」分组成列表（时间 / 标题 / 标签），适合跨天或改期；头部与脚部同 timeline。</p>
+        </div>
+        <div class="stage" data-mount="agenda"></div>
+        <p class="note"><code>agenda_list</code> 是 <b>本卡别名</b>，不另开 card_id。<code>body: &quot;agenda&quot;</code> 即可。</p>
+      </section>
+      <section class="panel" id="v5">
+        <div class="panel-head">
+          <h2>V5 · agenda + 选项条<span class="tag gray">闸门</span></h2>
+          <p>agenda 预览 + 下方方案选项。选项条（A/B 方案）语义是补输入，<b>归 ask_form</b>；此处仅示意与预览同屏。</p>
+        </div>
+        <div class="stage" data-mount="choices"></div>
+        <p class="note">实现：AI 先 <code>present_schedule_preview</code>（无脚部按钮）或 host 出 <a href="../ask_form/morph-wall.html">ask_form</a>；用户选完后预览才带主按钮。选项高亮样式沿用 ask_form 壳，不单独维护。</p>
+      </section>
+      <section class="panel" id="v6">
+        <div class="panel-head">
+          <h2>V6 · 日期闸门<span class="tag gray">闸门</span></h2>
+          <p>缺日期时的二选一按钮组（本周四 / 下周四）——<b>归 ask_form</b>，不属于预览卡。</p>
+        </div>
+        <div class="stage" data-mount="date"></div>
+        <p class="note">与 V5 同理；确认日期后再出 timeline / agenda。</p>
+      </section>
+      <section class="panel" id="v7">
+        <div class="panel-head">
+          <h2>V7 · 全部失败 · 重试<span class="tag gray">异常</span></h2>
+          <p>lead 说明 + 右下悬停重试图标（本墙强制露出）。保留 demo 的轻量失败 chrome，不是 error_card 的 net-card。</p>
+        </div>
+        <div class="stage" data-mount="fail"></div>
+        <p class="note"><b>对照</b>：<a href="../error_card/morph-wall.html">error_card</a> 为全站标准错误卡（灰底圆角 14 + 重试主按钮）。日程失败当前沿用场景自带的悬停重试，是否收敛到 error_card 待评审；标记为「可选包裹壳」。</p>
+      </section>
+      <section class="panel" id="v8">
+        <div class="panel-head">
+          <h2>V8 · 部分失败 + 产物入口<span class="tag gray">异常</span></h2>
+          <p>已创建项保留；失败项列出「未写入」；仍给 <a href="../doc_entry/morph-wall.html">doc_entry</a> 入口看已成功部分；悬停重试仅补失败项。</p>
+        </div>
+        <div class="stage" data-mount="partial"></div>
+        <p class="note"><code>doc_entry</code> 打开右侧日历台，仅展示成功创建的日程（台面不进卡片库）。</p>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    const toMin = v => { const [h, m] = v.split(":").map(Number); return h * 60 + m; };
+    const PPM = 80 / 60;
+    const retryIcon = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 11a8 8 0 0 0-14-4L4 9"></path><path d="M4 4v5h5"></path><path d="M4 13a8 8 0 0 0 14 4l2-2"></path><path d="M20 20v-5h-5"></path></svg>`;
+    const calGlyph = `<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="3" width="12" height="11" rx="1.5"/><path d="M2 6.5h12M5.5 1.8v2.4M10.5 1.8v2.4"/></svg>`;
+
+    const EV = [
+      { t: "面试 1", s: "10:00", e: "10:45", k: "interview" }, { t: "面试 1 评价", s: "10:45", e: "11:00", k: "interview" },
+      { t: "面试 2", s: "11:00", e: "11:45", k: "interview" }, { t: "面试 2 评价", s: "11:45", e: "12:00", k: "interview" },
+      { t: "午餐", s: "12:00", e: "13:00", k: "lunch" },
+      { t: "面试 3", s: "13:00", e: "13:45", k: "interview" }, { t: "面试 3 评价", s: "13:45", e: "14:00", k: "interview" },
+      { t: "面试 4", s: "14:00", e: "14:45", k: "interview" }, { t: "面试 4 评价", s: "14:45", e: "15:00", k: "interview" },
+      { t: "已有日程", s: "15:30", e: "16:00", k: "existing" }
+    ];
+
+    function sim({ pending = true, creating = false, confirmed = false }) {
+      const startH = 10, endH = 16, h = (endH - startH) * 80;
+      const hours = Array.from({ length: endH - startH }, (_, i) => `<span class="time-sim-hour" style="top:${i * 80}px">${String(startH + i).padStart(2, "0")}:00</span>`).join("");
+      const blocks = EV.map(it => {
+        const kind = it.k === "existing" ? "existing" : pending ? "pending" : it.k;
+        const top = (toMin(it.s) - startH * 60) * PPM, height = Math.max(18, (toMin(it.e) - toMin(it.s)) * PPM);
+        return `<div class="time-sim-event ${kind}" style="top:${top}px;height:${height}px"><b>${it.t}${it.k === "existing" ? " · 保留" : ""}</b><small>${it.s} – ${it.e}</small></div>`;
+      }).join("");
+      const status = confirmed ? "已确认" : "待确认 · 尚未创建";
+      const label = creating ? "安排中…" : confirmed ? "已确认" : "按建议安排";
+      return `<section class="time-sim-card" aria-label="建议日程"><div class="time-sim-head"><strong>11 月 5 日 · 周四</strong><span>${status}</span></div><div class="time-sim-note">灰色为已有日程，其余为建议安排。</div><div class="time-sim-grid"><div class="time-sim-hours" style="height:${h}px">${hours}</div><div class="time-sim-col" style="height:${h}px">${blocks}</div></div><div class="time-sim-foot"><button type="button" class="time-action-btn" ${creating || confirmed ? "disabled" : ""}>${label}</button>${creating ? `<div class="time-progress" role="status">正在模拟创建日程…</div>` : ""}</div></section>`;
+    }
+
+    function agenda({ groups, confirmed = false, hideAction = false }) {
+      const days = groups.map(g => `<div class="time-agenda-day"><b>${g.day}</b><ul>${g.rows.map(r => `<li><b>${r[0]}</b><span>${r[1]}</span><em>${r[2]}</em></li>`).join("")}</ul></div>`).join("");
+      const foot = hideAction ? "" : `<div class="time-agenda-foot"><button type="button" class="time-action-btn" ${confirmed ? "disabled" : ""}>${confirmed ? "已确认" : "按建议安排"}</button></div>`;
+      const note = confirmed ? "下面是已经确认的时间。" : "确认前只在对话里展示，右侧日历不会出现这些新日程。";
+      return `<section class="time-agenda" aria-label="建议日程"><div class="time-agenda-head"><strong>建议安排</strong><span>${confirmed ? "已确认" : "待确认 · 尚未创建"}</span></div><p class="time-agenda-note">${note}</p>${days}${foot}</section>`;
+    }
+    const AGENDA = [
+      { day: "11 月 5 日 · 周四", rows: [["10:00–10:45", "面试 1", "建议"], ["11:00–11:45", "面试 2", "建议"], ["12:00–13:00", "午餐", "建议"], ["15:30–16:00", "已有日程", "已有，保留"]] },
+      { day: "11 月 6 日 · 周五", rows: [["10:00–10:45", "面试 3", "建议"], ["11:00–11:45", "面试 4", "建议"]] }
+    ];
+    const lead = t => `<p class="lead">${t}</p>`;
+    const retry = `<div class="time-retry-row"><button type="button" class="time-retry-btn" aria-label="重试失败项" title="重试失败项">${retryIcon}</button></div>`;
+    const entry = sub => `<div class="artifact"><button class="artifact-open" type="button"><span class="artifact-mark" aria-hidden="true">${calGlyph}</span><span class="artifact-copy"><b>周四面试日程</b><small>${sub}</small></span></button></div>`;
+
+    const mounts = {
+      timeline: () => `${lead("周四 10:00–10:45 已有日程，与你指定的开始时间冲突。建议保留原日程，将第一场面试调整至 10:45，其余安排相应顺延。可以按这个方案安排吗？")}${sim({})}`,
+      creating: () => `${sim({ creating: true })}`,
+      confirmed: () => `${lead("已模拟安排好调整后的 4 场面试、评价和午餐，原有日程保留不变。完整日程在右侧。")}${sim({ pending: false, confirmed: true })}`,
+      agenda: () => `${lead("跨两天的安排已排好，确认后才会写入日历。")}${agenda({ groups: AGENDA })}`,
+      choices: () => `<span class="gate-flag">选项条 → ask_form（本墙不独立成卡）</span>${agenda({ groups: AGENDA.slice(0, 1), hideAction: true })}<div class="time-choices"><button type="button" class="time-choice" aria-pressed="false"><b>方案 A · 保持周四</b><small>面试 4 场连排，15:00 结束</small></button><button type="button" class="time-choice" aria-pressed="false"><b>方案 B · 拆到周五</b><small>周四 2 场，周五 2 场</small></button></div>`,
+      date: () => `<span class="gate-flag">日期选择 → ask_form（本墙不独立成卡）</span>${lead("面试想安排在哪一天？")}<div class="time-choices"><button type="button" class="time-date-btn" aria-pressed="false"><b>11 月 5 日 · 周四</b><small>本周四</small></button><button type="button" class="time-date-btn" aria-pressed="false"><b>11 月 12 日 · 周四</b><small>下周四</small></button></div>`,
+      fail: () => `<div class="time-failure-message show-retry">${lead("日程已排好，但 9 项模拟创建均失败，自动重试后仍未成功。没有新增日程，原有日程不受影响。")}${retry}</div>`,
+      partial: () => `<div class="time-failure-message show-retry">${lead("已模拟创建 7 项日程，午餐和面试 4 的评价创建失败，自动重试后仍未成功。右侧仅展示成功创建的日程。")}<ul class="time-lines"><li><b>12:00–13:00</b><span>午餐</span><em>未写入 · 周四</em></li><li><b>14:45–15:00</b><span>面试 4 评价</span><em>未写入 · 周四</em></li></ul>${entry("日历 · 已创建 7 项，失败 2 项")}<p class="time-note">候选人还没填姓名，所以用面试 1 到面试 4 占位，也没有发邀请。</p>${retry}</div>`
+    };
+    document.querySelectorAll("[data-mount]").forEach(el => { el.innerHTML = mounts[el.dataset.mount](); });
+    document.getElementById("themeBtn").onclick = () => {
+      const on = document.documentElement.classList.toggle("theme-dark");
+      themeBtn.textContent = on ? "浅色" : "深色";
+    };
+  </script>
+</body>
+</html>
