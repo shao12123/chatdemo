@@ -1,4 +1,4 @@
-# card_id 命名（v1.4 · 通用壳）
+# card_id 命名（v1.5 · 通用壳）
 
 > 卡按 **UI 壳 / 模式** 命名，不按业务故事。场景差异在触发规则与 payload。  
 > 形态墙见各子目录 `morph-wall.html`。
@@ -15,7 +15,8 @@
 | 4 | 全站件 **前端挂，无 Tool**（含附件两卡） |
 | 5 | **思考过程不算卡** |
 | 6 | **输入框附件 ≠ chat 用户文件**：拆成 `composer_file` + `user_file`（2026-11-19） |
-| 7 | **`ask_form` = host_only**：无 `present_` Tool，归全站件（2026-11-19 定）；天气补问后的结果卡仍走 `weather_card` |
+| 7 | **`ask_form` = host_only**：无 `present_` Tool（2026-11-19） |
+| 8 | **补输入只有一张 `ask_form`**（2026-11-19）：天气编号壳为 canonical；多题 / 多选走 payload；路线 radio·多选·分步旧 `.ask` **不另开卡**，待收敛进本壳 |
 
 ---
 
@@ -55,7 +56,7 @@
 | `composer_file` | 输入框附件 | [有](composer_file/morph-wall.html) | 悬停角标 × / 上传中 |
 | `user_file` | 对话用户文件 | [有](user_file/morph-wall.html) | 类型色；无移除 |
 | `doc_entry` | 文档/产物入口 | [有](doc_entry/morph-wall.html) | artifact |
-| `ask_form` | 补充信息卡 | [有](ask_form/morph-wall.html) | host_only；别名 天气补问 · 补充信息卡；选项 + 日期区间 |
+| `ask_form` | 补充信息卡 | [有](ask_form/morph-wall.html) | host_only；见下方「ask_form 范围」 |
 | `map_entry` | 地图入口卡 | 本期不做 | |
 
 > 旧 `file_chip` → aliases，分别映射到 `composer_file` / `user_file`。
@@ -63,6 +64,8 @@
 ### C. 候选尚未收名（下批）
 
 `group_form` · `group_result` · `app_link` · `schedule_preview` · `agenda_list` · `analysis_card`
+
+> `group_form` 仅当建群交互**明显不是**「补问壳」时再拆；否则先用 `ask_form` + preset。
 
 ### D. 已有形态墙
 
@@ -77,6 +80,18 @@
 | `doc_entry` | [doc_entry/morph-wall.html](doc_entry/morph-wall.html) |
 | `ask_form` | [ask_form/morph-wall.html](ask_form/morph-wall.html) |
 | `weather_card` | [weather_card/morph-wall.html](weather_card/morph-wall.html) |
+
+---
+
+## ask_form 范围
+
+| 算本卡 | 不算本卡 / 待办 |
+|---|---|
+| 天气编号选项 + 自定义行 + 确认/跳过 ± 日历（canonical） | 三个路线方案 **radio / 方框多选 / 分步幻灯** 旧 DOM —— **遗留，收敛进本壳**，不新开 `route_ask` |
+| `mode: multi`：多行可同时 `is-on`（仍用 `.ask-num`） | |
+| 多题：host 多次挂载，或一卡多 field（`fields[]`） | |
+| `conversations` / 标注的多题 `askCard` 语义 | 问卷步进 UI 应对齐本壳，不另开 id |
+| 结果旁挂的 `weather_card` 等 | 结果卡用各自 card_id，不塞进 ask |
 
 ---
 

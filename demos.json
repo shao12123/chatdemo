@@ -90,7 +90,7 @@
       "title": "卡片库 · ask_form 形态墙",
       "file": "chat-cards/ask_form/morph-wall.html",
       "owner": "共同维护",
-      "summary": "补充信息卡（天气补问）：选项/日期区间日历/完成/跳过/提交后合成；host_only 无 Tool"
+      "summary": "唯一补输入壳 ask_form（host_only）：天气 canonical + 多选/多题 payload；路线旧 .ask 不另开卡"
     },
     {
       "id": "card-weather-card-wall",

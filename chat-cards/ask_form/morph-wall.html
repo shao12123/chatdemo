@@ -51,6 +51,10 @@
     .row { display: flex; flex-wrap: wrap; gap: 16px; align-items: flex-start; }
     .lab { margin: 0 0 8px; color: var(--faint); font-size: 12px; }
     .lab:not(:first-child) { margin-top: 16px; }
+    .ask-field-h {
+      margin: 10px 8px 4px; color: var(--faint); font-size: 12px; line-height: 18px; font-weight: 500;
+    }
+    .ask-field-h:first-child { margin-top: 0; }
     .note { margin: 12px 0 0; padding: 10px 12px; border-radius: 10px; background: var(--page); color: var(--muted); font-size: 12px; line-height: 18px; }
     .note code { font-size: 11px; }
     .gate { width: 436px; max-width: 100%; padding: 10px 12px; border: 1px dashed var(--chip-line); border-radius: 12px; color: var(--faint); font-size: 12px; line-height: 18px; }
@@ -401,10 +405,10 @@
   <header class="top">
     <div>
       <h1>形态墙 · ask_form</h1>
-      <p>补充信息卡 <code>.ask</code>（<b>host_only</b>，无 <code>present_</code> Tool）。样式与逻辑抄自「天气场景」；含选项、日期区间日历、完成 / 跳过 / 提交后合成与深色。结果天气卡见 weather_card。</p>
+      <p>唯一「向用户补输入」壳（<b>host_only</b>）。canonical = 天气编号选项；多选 / 多题 = payload；路线 radio·分步旧 DOM <b>不另开卡</b>。结果天气见 weather_card。</p>
       <div class="meta"><code><b>card_id</b> ask_form</code>
         <code><b>tool</b> 无 · host_only</code>
-        <code><b>aliases</b> 天气补问 · 补充信息卡</code></div>
+        <code><b>aliases</b> 天气补问 · 补充信息卡 · askCard</code></div>
     </div>
     <div class="tools">
       <button type="button" id="themeBtn">深色</button>
@@ -427,6 +431,10 @@
       <a href="#v10"><b>V10</b> Skipped<small>.ask-note</small></a>
       <a href="#v11"><b>V11</b> 提交后<small>note + 紧凑 wx</small></a>
       <a href="#v12"><b>V12</b> 深色<small>theme-dark</small></a>
+      <a href="#v13"><b>V13</b> 多选<small>mode: multi</small></a>
+      <a href="#v14"><b>V14</b> 多题 / 多字段<small>fields[] · host</small></a>
+      <a href="#v15"><b>V15</b> 分步换题<small>host 换题</small></a>
+      <a href="#v16"><b>V16</b> 遗留对照<small>路线旧 .ask</small></a>
     </nav>
     <main>
       <section class="panel" id="v1">
@@ -560,6 +568,51 @@
         <div class="stage">
           <div data-mount="v12"></div>
         </div>        <p class="note">与 weather_card V14 一致：<code>.wx</code> 本身不随深色改渐变。</p>
+      </section>
+      <section class="panel" id="v13">
+        <div class="panel-head">
+          <div>
+            <h2>V13 · 多选<span class="tag">preset</span></h2>
+            <p><code>mode: multi</code>：仍用天气 <code>.ask-num</code>，多行可同时 <code>is-on</code>；≥1 项启用确认。不引入路线方框 checkbox。</p>
+          </div>
+        </div>
+        <div class="stage">
+          <div data-mount="v13"></div>
+        </div>
+        <p class="note">产品实现：点击切换集合；确认提交 <code>picked: string[]</code>。</p>
+      </section>
+      <section class="panel" id="v14">
+        <div class="panel-head">
+          <div>
+            <h2>V14 · 多题 / 多字段<span class="tag">preset</span></h2>
+            <p>一卡内多组字段（对齐 <code>conversations</code> askCard 语义）。每组一小标题 + 选项行；底部仍一对 跳过/确认。</p>
+          </div>
+        </div>
+        <div class="stage">
+          <div data-mount="v14"></div>
+        </div>
+      </section>
+      <section class="panel" id="v15">
+        <div class="panel-head">
+          <div>
+            <h2>V15 · 分步换题<span class="tag">host</span></h2>
+            <p>多题向导 = host <b>换同一壳的 payload</b>（题号写在 title 旁），不是路线那种幻灯 <code>.ask-step</code> 第二套 UI。</p>
+          </div>
+        </div>
+        <div class="stage">
+          <div data-mount="v15"></div>
+        </div>
+      </section>
+      <section class="panel" id="v16">
+        <div class="panel-head">
+          <div>
+            <h2>V16 · 遗留对照<span class="tag">不另开卡</span></h2>
+            <p><code>三个路线方案.html</code> 的 radio / 方框多选 / 分步幻灯：同类能力，<b>旧 DOM</b>。收敛目标 = 本墙 V1–V15；禁止新开 <code>route_ask</code>。</p>
+          </div>
+        </div>
+        <div class="stage">
+          <div class="gate">遗留 · 三个路线 <code>.ask-opt.radio / .multi</code> + <code>.ask-step</code><br>→ 迁到天气壳 <code>.ask-num</code> + <code>mode: multi</code> / host 换题<br><b>不</b>登记为第二张 card_id</div>
+        </div>
       </section>
     </main>
   </div>
@@ -953,7 +1006,62 @@
         { label: "单日：note 含最高/最低 + 单行 .wx", state: { picked: "custom", custom: "10月31日", rangeEnd: "10月31日", done: true } },
         { label: "近 7 天：选项分支", state: { picked: "d7", done: true } }
       ]),
-      v12: el => multi(el, [{ label: "与浅色同一 DOM；仅换 html.theme-dark 覆盖（ask 底 var(--card)、描边 #292b2e、触发器/日历 #191a1d）", state: { picked: "custom", custom: "10月24日", rangeEnd: "", calOpen: true, hover: "10月28日" } }])
+      v12: el => multi(el, [{ label: "与浅色同一 DOM；仅换 html.theme-dark 覆盖（ask 底 var(--card)、描边 #292b2e、触发器/日历 #191a1d）", state: { picked: "custom", custom: "10月24日", rangeEnd: "", calOpen: true, hover: "10月28日" } }]),
+      v13: el => {
+        el.innerHTML = "";
+        const p = document.createElement("p");
+        p.className = "lab";
+        p.textContent = "mode: multi · 已选 2 项（可点切换）；确认 enabled";
+        el.appendChild(p);
+        const host = document.createElement("div");
+        el.appendChild(host);
+        const opts = [
+          { id: "a", label: "准点优先" },
+          { id: "b", label: "少换乘" },
+          { id: "c", label: "步行少" }
+        ];
+        let picked = new Set(["a", "c"]);
+        const check = `<svg width="22" height="22" viewBox="0 0 22 22" fill="none"><path d="M6 11.2 9.2 14.4 16 7.6" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+        function paint() {
+          const rows = opts.map((item, i) => {
+            const on = picked.has(item.id);
+            const mark = on
+              ? `<span class="ask-num" aria-hidden="true">${check}</span>`
+              : `<span class="ask-num">${i + 1}</span>`;
+            return `<button type="button" class="ask-opt${on ? " is-on" : ""}" data-mid="${item.id}">${mark}<span class="ask-label">${esc(item.label)}</span></button>`;
+          }).join("");
+          const ready = picked.size > 0;
+          host.innerHTML = `<div class="ask"><div class="ask-head"><p class="ask-title">更在意哪些？（可多选）</p></div><div class="ask-list">${rows}</div><div class="ask-foot"><button type="button" class="ask-skip">跳过</button><button type="button" class="ask-next"${ready ? "" : " disabled"}>确认</button></div></div>`;
+          host.querySelectorAll("[data-mid]").forEach(btn => {
+            btn.addEventListener("click", () => {
+              const id = btn.dataset.mid;
+              if (picked.has(id)) picked.delete(id); else picked.add(id);
+              paint();
+            });
+          });
+        }
+        paint();
+      },
+      v14: el => {
+        el.innerHTML = `<p class="lab">一卡 fields[]：两组字段各选一项（合成示意）</p>
+<div class="ask">
+  <div class="ask-head"><p class="ask-title">补齐生成条件</p></div>
+  <div class="ask-list">
+    <p class="ask-field-h">研究问题</p>
+    <button type="button" class="ask-opt is-on"><span class="ask-num" aria-hidden="true"><svg width="22" height="22" viewBox="0 0 22 22" fill="none"><path d="M6 11.2 9.2 14.4 16 7.6" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="ask-label">AI 是否改变初级程序员的评审判断</span></button>
+    <button type="button" class="ask-opt"><span class="ask-num">2</span><span class="ask-label">AI 是否降低评审成本</span></button>
+    <p class="ask-field-h">材料范围</p>
+    <button type="button" class="ask-opt"><span class="ask-num">1</span><span class="ask-label">公开论文和工具文档</span></button>
+    <button type="button" class="ask-opt is-on"><span class="ask-num" aria-hidden="true"><svg width="22" height="22" viewBox="0 0 22 22" fill="none"><path d="M6 11.2 9.2 14.4 16 7.6" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="ask-label">只使用课程指定阅读</span></button>
+  </div>
+  <div class="ask-foot"><button type="button" class="ask-skip">跳过</button><button type="button" class="ask-next">确认</button></div>
+</div>`;
+      },
+      v15: el => multi(el, [
+        { label: "第 1/3 题 · host 只换 title / options", html: `<div class="ask"><div class="ask-head"><p class="ask-title">研究问题 <span style="color:var(--faint);font-weight:400">1/3</span></p></div><div class="ask-list"><button type="button" class="ask-opt"><span class="ask-num">1</span><span class="ask-label">AI 是否改变初级程序员的评审判断</span></button><button type="button" class="ask-opt is-on"><span class="ask-num" aria-hidden="true"><svg width="22" height="22" viewBox="0 0 22 22" fill="none"><path d="M6 11.2 9.2 14.4 16 7.6" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="ask-label">AI 是否降低评审成本</span></button></div><div class="ask-foot"><button type="button" class="ask-skip">跳过</button><button type="button" class="ask-next">下一题</button></div></div>` },
+        { label: "第 2/3 题 · 同一壳", html: `<div class="ask"><div class="ask-head"><p class="ask-title">材料范围 <span style="color:var(--faint);font-weight:400">2/3</span></p></div><div class="ask-list"><button type="button" class="ask-opt"><span class="ask-num">1</span><span class="ask-label">公开论文和工具文档</span></button><button type="button" class="ask-opt"><span class="ask-num">2</span><span class="ask-label">只使用课程指定阅读</span></button></div><div class="ask-foot"><button type="button" class="ask-skip">跳过</button><button type="button" class="ask-next" disabled>下一题</button></div></div>` }
+      ]),
+      v16: el => { el.innerHTML = ""; }
     };
     document.querySelectorAll("[data-mount]").forEach(el => mounts[el.dataset.mount](el));
     document.querySelectorAll("[data-reset]").forEach(btn => {
