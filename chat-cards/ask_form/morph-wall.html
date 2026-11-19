@@ -399,13 +399,42 @@
     html.theme-dark .ask-next { border-color: #2762c6; background: var(--brand); }
     html.theme-dark .lead,
     html.theme-dark .ask-note { color: var(--ink); }
+
+    /* ===== 以下 .pick-card / .steps / .choice / .custom-box / .card-foot 抄自 conversations.html（V17 renderRevise · V18 askCard onboard）===== */
+    .pick-card { --nav: #5a6275; --brand-hover: #0847c4; align-self: flex-start; width: min(440px, 100%); border: 1px solid #f0f0f0; border-radius: 16px; background: #fff; box-shadow: 0 2px 8px rgba(0,0,0,.04); padding: 14px; color: var(--ink); }
+    .steps { display: flex; align-items: center; gap: 6px; margin-bottom: 12px; }
+    .steps i { width: 8px; height: 8px; border-radius: 50%; background: #e3e5e8; }
+    .steps i.on { background: var(--brand); }
+    .steps i.got { background: #b9d0ff; }
+    .steps b { flex: 1; height: 1px; background: #eceef2; }
+    .pick-card h3 { margin: 0 0 10px; font-size: 14px; line-height: 22px; font-weight: 600; }
+    .choice { display: flex; align-items: center; gap: 8px; width: 100%; min-height: 36px; margin-bottom: 6px; border: 1px solid #eceff3; border-radius: 8px; background: #fff; color: var(--ink); text-align: left; padding: 6px 10px; font: inherit; font-size: 14px; line-height: 22px; cursor: pointer; }
+    .choice .radio { width: 14px; height: 14px; border: 1.5px solid #c5c8ce; border-radius: 50%; flex: none; }
+    .choice.selected { border-color: #b9d0ff; background: #f3f7ff; color: var(--brand); }
+    .choice.selected .radio { border: 4px solid var(--brand); }
+    .card-foot { display: flex; justify-content: flex-end; gap: 8px; margin-top: 8px; }
+    .card-foot button { height: 32px; border-radius: 8px; border: 0; background: transparent; color: var(--nav); padding: 0 12px; font: inherit; font-size: 14px; cursor: pointer; }
+    .card-foot button.primary { background: var(--brand); color: #fff; }
+    .card-foot button.primary:disabled { background: #d7e4ff; color: #fff; opacity: 1; cursor: default; }
+    .card-foot button:disabled { color: #c5c8ce; cursor: default; }
+    .custom-box { display: none; margin: 0 0 6px; }
+    .custom-box.show { display: block; }
+    .custom-box input { width: 100%; height: 36px; border: 1px solid #eceff3; border-radius: 8px; padding: 0 10px; font: inherit; font-size: 14px; background: #fff; color: var(--ink); }
+    html.theme-dark .pick-card { --nav: rgba(255,255,255,.6); background: var(--card); border-color: #292b2e; }
+    html.theme-dark .choice,
+    html.theme-dark .custom-box input { background: #191a1d; border-color: #434448; color: var(--ink); }
+    html.theme-dark .choice.selected { background: rgba(49,122,247,.16); border-color: #2762c6; color: #8db4fb; }
+    html.theme-dark .steps i { background: #434448; }
+    html.theme-dark .steps i.got { background: #2762c6; }
+    html.theme-dark .steps b { background: #292b2e; }
+    html.theme-dark .card-foot button.primary:disabled { background: #1e3a6e; color: rgba(255,255,255,.6); }
   </style>
 </head>
 <body>
   <header class="top">
     <div>
       <h1>形态墙 · ask_form</h1>
-      <p>唯一「向用户补输入」壳（<b>host_only</b>）。canonical = 天气编号选项；多选 / 多题 = payload；路线 radio·分步旧 DOM <b>不另开卡</b>。结果天气见 weather_card。</p>
+      <p>唯一「向用户补输入」壳（<b>host_only</b>）。canonical = 天气编号选项（V1–V15）；多选 / 多题 = payload；路线 radio·分步旧 DOM <b>不另开卡</b>。另收 <code>conversations.html</code> 补输入壳 <code>.pick-card</code>：V17「对哪里不满意」（<code>renderRevise</code>）· V18 多题步进（<code>askCard</code> onboard）——同属 <b>ask_form</b>，不是 <code>analysis_card</code> / <code>paper_compare_pick</code>。结果天气见 weather_card。</p>
       <div class="meta"><code><b>card_id</b> ask_form</code>
         <code><b>tool</b> 无 · host_only</code>
         <code><b>aliases</b> 天气补问 · 补充信息卡 · askCard</code></div>
@@ -435,6 +464,8 @@
       <a href="#v14"><b>V14</b> 多题 / 多字段<small>fields[] · host</small></a>
       <a href="#v15"><b>V15</b> 分步换题<small>host 换题</small></a>
       <a href="#v16"><b>V16</b> 遗留对照<small>路线旧 .ask</small></a>
+      <a href="#v17"><b>V17</b> 对哪里不满意<small>.pick-card · renderRevise</small></a>
+      <a href="#v18"><b>V18</b> 多题步进<small>.pick-card · .steps</small></a>
     </nav>
     <main>
       <section class="panel" id="v1">
@@ -607,12 +638,36 @@
         <div class="panel-head">
           <div>
             <h2>V16 · 遗留对照<span class="tag">不另开卡</span></h2>
-            <p><code>三个路线方案.html</code> 的 radio / 方框多选 / 分步幻灯：同类能力，<b>旧 DOM</b>。收敛目标 = 本墙 V1–V15；禁止新开 <code>route_ask</code>。</p>
+            <p><code>三个路线方案.html</code> 的 radio / 方框多选 / 分步幻灯：同类能力，<b>旧 DOM</b>。收敛目标 = 本墙 V1–V15（<code>conversations</code> 现行 <code>.pick-card</code> 见 V17 / V18）；禁止新开 <code>route_ask</code>。</p>
           </div>
         </div>
         <div class="stage">
           <div class="gate">遗留 · 三个路线 <code>.ask-opt.radio / .multi</code> + <code>.ask-step</code><br>→ 迁到天气壳 <code>.ask-num</code> + <code>mode: multi</code> / host 换题<br><b>不</b>登记为第二张 card_id</div>
         </div>
+      </section>
+      <section class="panel" id="v17">
+        <div class="panel-head">
+          <div>
+            <h2>V17 · 对哪里不满意<span class="tag">ask_form</span></h2>
+            <p>来自 <code>conversations.html</code> <code>renderRevise()</code>：<code>.pick-card</code> + <code>.choice</code> radio 行 + 「自定义」行（<code>.custom-box</code> 输入）+ 「确认并生成」。选中预设或自定义非空才启用确认。</p>
+          </div><button type="button" class="mini" data-reset="v17">重置</button>
+        </div>
+        <div class="stage">
+          <div data-mount="v17"></div>
+        </div>
+        <p class="note"><b>归属</b>：同一 <code>card_id: ask_form</code>（host 补输入壳的第二套 DOM），<b>不是</b> <code>analysis_card</code>，也不是 <code>paper_compare_pick</code>。确认后 host 自行锁定并收起卡（<code>rev.locked</code>）。</p>
+      </section>
+      <section class="panel" id="v18">
+        <div class="panel-head">
+          <div>
+            <h2>V18 · 多题步进<span class="tag">ask_form</span></h2>
+            <p>来自 <code>askCard</code> onboard（<code>renderCard</code>）：<code>.pick-card</code> + <code>.steps</code> 圆点（<code>got / on</code>）+ <code>.choice</code> 选项 + <code>上一步 / 下一步 / 确认并生成</code>。墙内简化为 2 步（产品为 3 题）。</p>
+          </div><button type="button" class="mini" data-reset="v18">重置</button>
+        </div>
+        <div class="stage">
+          <div data-mount="v18"></div>
+        </div>
+        <p class="note">与 V15 同为「多题换题」语义，但 DOM 是 <code>.pick-card</code>（<code>conversations</code> 现行）而非天气 <code>.ask</code>。末步主按钮由「下一步」变「确认并生成」；首步「上一步」disabled。</p>
       </section>
     </main>
   </div>
@@ -1061,8 +1116,90 @@
         { label: "第 1/3 题 · host 只换 title / options", html: `<div class="ask"><div class="ask-head"><p class="ask-title">研究问题 <span style="color:var(--faint);font-weight:400">1/3</span></p></div><div class="ask-list"><button type="button" class="ask-opt"><span class="ask-num">1</span><span class="ask-label">AI 是否改变初级程序员的评审判断</span></button><button type="button" class="ask-opt is-on"><span class="ask-num" aria-hidden="true"><svg width="22" height="22" viewBox="0 0 22 22" fill="none"><path d="M6 11.2 9.2 14.4 16 7.6" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="ask-label">AI 是否降低评审成本</span></button></div><div class="ask-foot"><button type="button" class="ask-skip">跳过</button><button type="button" class="ask-next">下一题</button></div></div>` },
         { label: "第 2/3 题 · 同一壳", html: `<div class="ask"><div class="ask-head"><p class="ask-title">材料范围 <span style="color:var(--faint);font-weight:400">2/3</span></p></div><div class="ask-list"><button type="button" class="ask-opt"><span class="ask-num">1</span><span class="ask-label">公开论文和工具文档</span></button><button type="button" class="ask-opt"><span class="ask-num">2</span><span class="ask-label">只使用课程指定阅读</span></button></div><div class="ask-foot"><button type="button" class="ask-skip">跳过</button><button type="button" class="ask-next" disabled>下一题</button></div></div>` }
       ]),
-      v16: el => { el.innerHTML = ""; }
+      v16: el => { el.innerHTML = ""; },
+      v17: el => mountRevise(el),
+      v18: el => mountSteps(el)
     };
+    /* ---- V17 · renderRevise 同构（conversations.html REVISE_OPTIONS） ---- */
+    const REVISE_OPTIONS = ["研究问题和证据对不上", "文献综述太浅", "方法和数据对不上", "结构和篇幅不合适"];
+    function reviseHtml(rev) {
+      const choices = REVISE_OPTIONS.map(op => `<button class="choice${rev.choice === op ? " selected" : ""}" type="button" data-revise-choice="${esc(op)}"><i class="radio"></i><span>${esc(op)}</span></button>`).join("");
+      const customOn = rev.choice === "custom";
+      const ready = customOn ? !!rev.custom.trim() : !!rev.choice;
+      return `<div class="pick-card"><h3>对哪里不满意</h3>${choices}<button class="choice${customOn ? " selected" : ""}" type="button" data-revise-choice="custom"><i class="radio"></i><span>自定义</span></button><div class="custom-box${customOn ? " show" : ""}"><input data-revise-input value="${esc(rev.custom)}" placeholder="写下不满意的地方" /></div><div class="card-foot"><button class="primary" type="button" data-revise="confirm" ${ready ? "" : "disabled"}>确认并生成</button></div></div>`;
+    }
+    function mountRevise(el) {
+      el.innerHTML = "";
+      const defs = [
+        { label: "未选 · 确认 disabled（可点选）", init: { choice: "", custom: "" }, live: true },
+        { label: "选中预设：「文献综述太浅」", init: { choice: "文献综述太浅", custom: "" }, live: true },
+        { label: "自定义 · 输入框展开且已填写", init: { choice: "custom", custom: "摘要和结论不一致" }, live: true }
+      ];
+      defs.forEach(def => {
+        const p = document.createElement("p"); p.className = "lab"; p.textContent = def.label; el.appendChild(p);
+        const host = document.createElement("div"); el.appendChild(host);
+        let rev = { ...def.init };
+        const paint = (focus) => {
+          host.innerHTML = reviseHtml(rev);
+          host.querySelectorAll("[data-revise-choice]").forEach(btn => btn.addEventListener("click", () => {
+            rev.choice = btn.dataset.reviseChoice;
+            paint(rev.choice === "custom");
+          }));
+          const input = host.querySelector("[data-revise-input]");
+          input.addEventListener("input", () => {
+            rev.custom = input.value;
+            const ok = rev.choice === "custom" ? !!rev.custom.trim() : !!rev.choice;
+            host.querySelector("[data-revise=confirm]").disabled = !ok;
+          });
+          if (focus) { input.focus(); const n = input.value.length; input.setSelectionRange(n, n); }
+        };
+        host.__reset = () => { rev = { ...def.init }; paint(); };
+        paint();
+      });
+    }
+    /* ---- V18 · renderCard 同构（简化 2 步；产品 QUESTIONS 为 3 题） ---- */
+    const STEP_QUESTIONS = [
+      { key: "研究问题", options: ["AI 是否改变初级程序员的评审判断", "AI 是否降低评审成本", "AI 是否替代代码评审"] },
+      { key: "材料范围", options: ["公开论文和工具文档，不含内部数据", "只使用课程指定阅读", "公开论文加一份访谈"] }
+    ];
+    function stepsHtml(card) {
+      const step = card.step;
+      const q = STEP_QUESTIONS[step];
+      const dots = STEP_QUESTIONS.map((_, i) => `<i class="${i < step ? "got" : i === step ? "on" : ""}"></i>${i < STEP_QUESTIONS.length - 1 ? "<b></b>" : ""}`).join("");
+      const choices = q.options.map((op, i) => `<button class="choice${card.answers[step] === op ? " selected" : ""}" type="button" data-choice="${i}"><i class="radio"></i><span>${esc(op)}</span></button>`).join("");
+      const last = step === STEP_QUESTIONS.length - 1;
+      const ready = !!card.answers[step];
+      return `<div class="pick-card"><div class="steps">${dots}</div><h3>${q.key}</h3>${choices}<div class="card-foot"><button type="button" data-card="back" ${step === 0 ? "disabled" : ""}>上一步</button><button class="primary" type="button" data-card="${last ? "confirm" : "next"}" ${ready ? "" : "disabled"}>${last ? "确认并生成" : "下一步"}</button></div></div>`;
+    }
+    function mountSteps(el) {
+      el.innerHTML = "";
+      const defs = [
+        { label: "第 1/2 步 · 未选（下一步 disabled，上一步 disabled）", init: { step: 0, answers: [] }, live: true },
+        { label: "第 1/2 步 · 已选 → 下一步可点", init: { step: 0, answers: [STEP_QUESTIONS[0].options[1]] }, live: true },
+        { label: "第 2/2 步 · 末步：主按钮「确认并生成」；第 1 点 got、第 2 点 on", init: { step: 1, answers: [STEP_QUESTIONS[0].options[1], STEP_QUESTIONS[1].options[0]] }, live: true }
+      ];
+      defs.forEach(def => {
+        const p = document.createElement("p"); p.className = "lab"; p.textContent = def.label; el.appendChild(p);
+        const host = document.createElement("div"); el.appendChild(host);
+        let card = { step: def.init.step, answers: def.init.answers.slice() };
+        const paint = () => {
+          host.innerHTML = stepsHtml(card);
+          host.querySelectorAll("[data-choice]").forEach(btn => btn.addEventListener("click", () => {
+            card.answers[card.step] = STEP_QUESTIONS[card.step].options[Number(btn.dataset.choice)];
+            paint();
+          }));
+          host.querySelectorAll("[data-card]").forEach(btn => btn.addEventListener("click", () => {
+            const act = btn.dataset.card;
+            if (act === "back" && card.step > 0) card.step -= 1;
+            else if (act === "next" && card.answers[card.step] && card.step < STEP_QUESTIONS.length - 1) card.step += 1;
+            else if (act === "confirm" && card.answers[card.step]) { host.innerHTML = `<p class="ask-note">已提交：${card.answers.map(esc).join(" · ")}（墙内示意，点重置还原）</p>`; return; }
+            paint();
+          }));
+        };
+        host.__reset = () => { card = { step: def.init.step, answers: def.init.answers.slice() }; paint(); };
+        paint();
+      });
+    }
     document.querySelectorAll("[data-mount]").forEach(el => mounts[el.dataset.mount](el));
     document.querySelectorAll("[data-reset]").forEach(btn => {
       btn.onclick = () => document.querySelectorAll(`#${btn.dataset.reset} [data-mount] > div`).forEach(h => h.__reset && h.__reset());
