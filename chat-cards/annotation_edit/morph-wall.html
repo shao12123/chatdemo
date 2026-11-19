@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>card_id · annotation_edit · 形态墙</title>
+  <style>
+    :root {
+      --page: #f5f6f8; --ink: #000; --muted: rgba(0,0,0,.6); --faint: rgba(0,0,0,.4);
+      --line: #e3e4e7; --brand: #0a59f7; --chip: #fff; --chip-line: #e3e4e7;
+      --card: #fff; --card-line: #e5e8ec; --canvas: #fbfbfb; --bar: #fff; --soft: #eef0f3; --list-bg: #fff; --row-hover: rgba(9,11,14,.04);
+      --bubble: #f3f7ff; --shot-line: #eef0f3; --ph: rgba(107,114,126,.7);
+      --mark: #3370ff; --idx-bg: #b5cdfd; --idx-ink: #0a59f7;
+      --wb-bg: #fff; --wb-line: #eef1f6; --wb-soft: #f6f8fb; --wb-pill: #eaf0ff; --wb-t2: #667085; --wb-t3: #8b93a6; --wb-ink: #1f2329;
+      --c-mark: #3b6dff; --c-mark-soft: rgba(59,109,255,.14); --c-ok: #1f9d6a;
+      --err-card: #eef0f3; --err-text: #000; --err-text-2: rgba(0,0,0,.6); --err-icon: #e84026; --err-x-hover: rgba(0,0,0,.06);
+    }
+    html.theme-dark {
+      color-scheme: dark;
+      --page: #090b0e; --ink: #fff; --muted: rgba(255,255,255,.6); --faint: rgba(255,255,255,.4);
+      --line: #292b2e; --brand: #317af7; --chip: #191a1d; --chip-line: #434448;
+      --card: #111216; --card-line: #292b2e; --canvas: #15161a; --bar: #111216; --soft: #191a1d; --list-bg: #1a1b1f; --row-hover: rgba(255,255,255,.06);
+      --bubble: #0a1831; --shot-line: #292b2e; --ph: rgba(255,255,255,.4);
+      --wb-bg: #111216; --wb-line: #292b2e; --wb-soft: #191a1d; --wb-pill: #0a1831; --wb-t2: rgba(255,255,255,.6); --wb-t3: rgba(255,255,255,.4); --wb-ink: #fff;
+      --c-mark: #5b8aff; --c-mark-soft: rgba(91,138,255,.2); --c-ok: #3cc08a;
+      --err-card: #191a1d; --err-text: #fff; --err-text-2: rgba(255,255,255,.6); --err-x-hover: rgba(255,255,255,.08);
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: "PingFang SC", "Helvetica Neue", sans-serif; background: var(--page); color: var(--ink); }
+    .top {
+      position: sticky; top: 0; z-index: 40; display: flex; flex-wrap: wrap; gap: 12px; justify-content: space-between;
+      padding: 16px 24px; border-bottom: 1px solid var(--line);
+      background: color-mix(in srgb, var(--page) 92%, transparent); backdrop-filter: blur(8px);
+    }
+    .top h1 { margin: 0; font-size: 18px; line-height: 26px; }
+    .top p { margin: 4px 0 0; color: var(--muted); font-size: 13px; line-height: 20px; max-width: 52rem; }
+    .meta { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+    .meta code { padding: 4px 10px; border-radius: 8px; background: var(--chip); border: 1px solid var(--chip-line); font-size: 12px; line-height: 18px; }
+    .meta code b { color: var(--faint); font-weight: 600; }
+    .tools { display: flex; flex-wrap: wrap; gap: 8px; align-items: flex-start; }
+    .tools a, .tools button {
+      display: inline-flex; align-items: center; height: 32px; padding: 0 12px; border-radius: 8px;
+      border: 1px solid var(--chip-line); background: var(--chip); color: var(--ink); font-size: 13px;
+      text-decoration: none; cursor: pointer; font-family: inherit;
+    }
+    .layout { display: grid; grid-template-columns: 210px minmax(0,1fr); }
+    nav { padding: 16px 12px 32px 24px; border-right: 1px solid var(--line); position: sticky; top: 124px; align-self: start; max-height: calc(100vh - 124px); overflow: auto; }
+    nav h5 { margin: 12px 10px 4px; color: var(--faint); font-size: 11px; font-weight: 600; letter-spacing: .04em; }
+    nav a { display: block; padding: 7px 10px; border-radius: 8px; color: var(--muted); text-decoration: none; font-size: 13px; }
+    nav a:hover { background: var(--chip); color: var(--ink); }
+    nav a small { display: block; color: var(--faint); font-size: 11px; margin-top: 2px; }
+    main { padding: 20px 24px 64px; max-width: 840px; }
+    .group-title { margin: 8px 0 12px; font-size: 13px; color: var(--faint); font-weight: 600; letter-spacing: .04em; }
+    .panel { scroll-margin-top: 128px; margin: 0 0 24px; padding: 16px; border: 1px solid var(--line); border-radius: 16px; background: var(--chip); }
+    .panel-head h2 { margin: 0; font-size: 15px; }
+    .panel-head p { margin: 6px 0 12px; color: var(--muted); font-size: 12px; line-height: 18px; }
+    .tag { display: inline-block; margin-left: 8px; height: 20px; padding: 0 8px; border-radius: 99px; background: #f3f7ff; color: var(--brand); font-size: 11px; line-height: 20px; font-weight: 600; }
+    .tag.course { background: #eefaf4; color: #1f9d6a; }
+    html.theme-dark .tag { background: #0a1831; }
+    html.theme-dark .tag.course { background: #0d2a1f; color: #3cc08a; }
+    .stage { max-width: 736px; display: flex; flex-direction: column; gap: 12px; align-items: flex-start; }
+    .note { margin: 12px 0 0; padding: 10px 12px; border-radius: 10px; background: var(--page); color: var(--muted); font-size: 12px; line-height: 18px; }
+    .note a, .panel-head a { color: var(--brand); }
+    code { font-size: 11px; padding: 0 4px; border-radius: 4px; background: var(--page); }
+    .cap { margin: 0; color: var(--faint); font-size: 12px; line-height: 18px; }
+
+    /* ========== PPT preset：.oo 预览 + .anno-*（抄 标注修改.html） ========== */
+    .oo { width: 100%; max-width: 600px; border: 1px solid var(--card-line); border-radius: 12px; background: var(--card); overflow: hidden; }
+    .oo-bar { display: flex; align-items: center; gap: 8px; height: 40px; padding: 0 8px 0 14px; border-bottom: 1px solid var(--card-line); background: var(--bar); font-size: 13px; }
+    .oo-bar b { font-weight: 600; flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .oo-bar .gen { color: var(--faint); font-size: 12px; }
+    .btn-anno { display: inline-flex; align-items: center; gap: 6px; height: 28px; padding: 0 10px; border: 0; border-radius: 8px; background: transparent; color: rgba(0,0,0,.6); font: inherit; font-size: 13px; cursor: pointer; }
+    html.theme-dark .btn-anno { color: rgba(255,255,255,.6); }
+    .btn-anno.is-active { background: #f3f7ff; color: #0a59f7; }
+    html.theme-dark .btn-anno.is-active { background: #0a1831; color: #317af7; }
+    .oo-main { position: relative; height: 358px; background: var(--canvas); display: flex; align-items: center; justify-content: center; padding: 14px 18px; }
+    .oo-main.is-anno-on { box-shadow: inset 0 0 0 1px #548bf9; padding-top: 44px; }
+    .slide { position: relative; width: 100%; max-width: 500px; aspect-ratio: 16 / 9; border-radius: 8px; overflow: hidden; background: linear-gradient(135deg, #ffffff 0%, #f1f5ff 100%); color: #1f2329; box-shadow: 0 1px 3px rgba(0,0,0,.12); }
+    .slide h4 { position: absolute; left: 5%; top: 8%; margin: 0; font-size: 20px; line-height: 28px; font-weight: 700; }
+    .slide .sub { position: absolute; left: 5%; top: 21%; margin: 0; font-size: 11px; color: #8f959e; }
+    .slide ul { position: absolute; left: 5%; top: 38%; width: 56%; margin: 0; padding-left: 16px; font-size: 12px; line-height: 20px; color: #3a3d42; }
+    .slide .pic { position: absolute; right: 6%; top: 38%; width: 26%; height: 40%; border-radius: 8px; background: linear-gradient(145deg, #0f4c81 0%, #1f7a8c 45%, #bfdbf7 100%); }
+    .anno-layer { position: absolute; inset: 0; z-index: 4; }
+    .anno-mask { position: absolute; inset: 0; z-index: 1; overflow: hidden; pointer-events: none; }
+    .anno-mask i { position: absolute; border-radius: 12px; box-shadow: 0 0 0 9999px rgba(0,0,0,.6); }
+    .anno-box { position: absolute; z-index: 2; border: 1px solid var(--mark); border-radius: 12px; box-sizing: border-box; }
+    .anno-box.on { z-index: 5; }
+    .anno-box.is-rest { border-color: transparent; }
+    .anno-index { position: absolute; left: 0; top: 0; z-index: 1; width: 20px; height: 20px; border: 1px solid #fff; border-radius: 99px; background: var(--idx-bg); color: var(--idx-ink); font: 400 12px/16px "PingFang SC", sans-serif; display: grid; place-items: center; }
+    .anno-box.is-rest .anno-index { border-radius: 99px 99px 0 99px; transform: translate(-100%, -100%); }
+    .anno-box.on .anno-index { transform: translate(-9px, -9px); }
+    .anno-bar { position: absolute; left: 0; right: 0; top: 0; z-index: 30; display: flex; justify-content: center; pointer-events: none; }
+    .anno-store { display: flex; flex-direction: column; align-items: center; pointer-events: auto; }
+    .anno-batch { position: relative; width: 280px; height: 36px; padding: 0 6px; display: flex; align-items: center; gap: 8px; border: 1px solid #548bf9; border-top: 0; border-radius: 0 0 18px 18px; background: #548bf9; color: #fff; font-size: 14px; line-height: 22px; }
+    .anno-batch::before, .anno-batch::after { content: ""; position: absolute; top: 0; width: 12px; height: 12px; pointer-events: none; }
+    .anno-batch::before { left: -11px; background: radial-gradient(circle at 0 100%, transparent 11px, #548bf9 12px); }
+    .anno-batch::after { right: -11px; background: radial-gradient(circle at 100% 100%, transparent 11px, #548bf9 12px); }
+    .anno-batch-main { flex: 1; min-width: 0; display: flex; align-items: center; gap: 8px; border: 0; background: transparent; color: #fff; font: inherit; padding: 0; text-align: left; cursor: pointer; }
+    .anno-count-num { width: 24px; height: 24px; flex: none; border-radius: 99px; background: #c9dbfe; color: #0a59f7; font: 400 12px/20px "PingFang SC", sans-serif; display: grid; place-items: center; }
+    .anno-batch-main .chev { margin-left: auto; display: grid; color: #fff; }
+    .anno-batch-main.is-open .chev svg { transform: rotate(180deg); }
+    .anno-batch-main.is-dis .chev { opacity: .45; }
+    .anno-batch-split { width: 1px; height: 16px; flex: none; background: rgba(255,255,255,.45); }
+    .anno-batch-go { width: 24px; height: 24px; padding: 0; border: 0; border-radius: 99px; background: #fff; color: #0a59f7; display: grid; place-items: center; flex: none; cursor: pointer; }
+    .anno-batch-go svg { transform: rotate(90deg); }
+    .anno-batch-go:disabled { cursor: default; color: rgba(10,89,247,.35); }
+    .anno-store-list { width: 280px; margin-top: 8px; padding: 4px; max-height: 240px; overflow: hidden; border-radius: 12px; background: var(--list-bg); box-shadow: 0 4px 16px rgba(0,0,0,.08), 0 0 1px rgba(0,0,0,.12); display: flex; flex-direction: column; gap: 2px; }
+    .anno-store-item { position: relative; display: flex; align-items: center; gap: 8px; height: 32px; border-radius: 8px; padding: 0 8px; }
+    .anno-store-item.hover { background: var(--row-hover); }
+    .anno-store-item .n { flex: none; width: 20px; height: 20px; border: 1px solid #fff; border-radius: 99px; background: var(--idx-bg); color: var(--idx-ink); font: 400 12px/16px "PingFang SC", sans-serif; display: grid; place-items: center; }
+    .anno-store-item .req { min-width: 0; flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 13px; line-height: 20px; }
+    .anno-store-item .ops { position: absolute; right: 0; top: 0; height: 100%; display: flex; align-items: center; gap: 2px; padding: 0 8px 0 28px; border-radius: 0 8px 8px 0; background: linear-gradient(90deg, transparent, var(--list-bg) 28px); }
+    .anno-store-item.hover .ops { background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--list-bg) 94%, #888) 28px); }
+    .ops i { width: 24px; height: 24px; border-radius: 6px; display: grid; place-items: center; color: rgba(0,0,0,.45); font-style: normal; }
+    html.theme-dark .ops i { color: rgba(255,255,255,.5); }
+    .anno-pop { position: absolute; z-index: 6; width: 286px; }
+    .anno-item { background: var(--card); border: 1px solid var(--mark); border-radius: 12px; box-shadow: 0 2px 4px rgba(0,0,0,.02), 0 4px 16px rgba(0,0,0,.08); color: var(--ink); }
+    .anno-field { padding: 12px 12px 0; }
+    .anno-field .ta { min-height: 20px; font-size: 14px; line-height: 20px; }
+    .anno-field .ta.empty { color: var(--ph); }
+    .anno-actions { display: flex; align-items: center; justify-content: space-between; height: 48px; padding: 12px; }
+    .anno-upload { width: 24px; height: 24px; border: 0; border-radius: 6px; background: transparent; color: var(--muted); display: grid; place-items: center; padding: 0; }
+    .anno-mini { width: 24px; height: 24px; padding: 0; border: 1px solid #84acfb; border-radius: 99px; background: linear-gradient(180deg, #4a85ff 0%, #3370ff 100%); display: grid; place-items: center; }
+    .anno-mini:disabled { opacity: .3; }
+    /* chat 片段 */
+    .chat { width: min(560px, 100%); display: flex; flex-direction: column; gap: 10px; }
+    .u-row { align-self: flex-end; display: flex; flex-direction: column; align-items: flex-end; gap: 8px; max-width: 100%; }
+    .shots { display: flex; gap: 6px; }
+    .anno-shot { width: 54px; height: 54px; border-radius: 12px; border: 1px solid var(--shot-line); overflow: hidden; position: relative; background: #f1f5ff; color: #1f2329; font-size: 9px; line-height: 12px; padding: 8px 6px; font-weight: 600; }
+    .anno-shot.pic { background: linear-gradient(145deg, #0f4c81 0%, #1f7a8c 45%, #bfdbf7 100%); }
+    .bubble { background: var(--bubble); border-radius: 12px; padding: 10px 14px; font-size: 14px; line-height: 22px; max-width: 100%; }
+    .bubble ol { margin: 0; padding-left: 18px; }
+    .ai-head { display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 600; }
+    .ai-ava { width: 24px; height: 24px; border-radius: 50%; background: #dae6fe; color: #0a59f7; display: grid; place-items: center; font-size: 12px; font-weight: 700; }
+    .ai-text { font-size: 14px; line-height: 22px; margin: 0; }
+    /* error card（抄 error_card） */
+    .net-wrap { width: 100%; display: flex; flex-direction: column; gap: 8px; }
+    .net-card { display: flex; flex-direction: column; gap: 8px; padding: 12px 16px; border: 0; border-radius: 14px; background: var(--err-card); }
+    .net-main { margin: 0; display: flex; align-items: flex-start; gap: 8px; color: var(--err-text); font-size: 14px; line-height: 22px; }
+    .net-main .msg-tone { flex: none; color: var(--err-icon); display: inline-flex; }
+    .net-shots { display: flex; gap: 6px; padding-left: 24px; }
+    .net-actions { display: flex; justify-content: flex-end; align-items: center; gap: 8px; }
+    .net-x { width: 22px; height: 22px; border: 0; border-radius: 4px; background: transparent; color: var(--err-text-2); display: inline-flex; align-items: center; justify-content: center; }
+    .act-primary { display: inline-flex; align-items: center; justify-content: center; height: 30px; padding: 0 12px; border: 1px solid #84acfb; border-radius: 8px; background: linear-gradient(180deg, #4a85ff 0%, #3370ff 100%); color: #fff; font: inherit; font-size: 14px; line-height: 22px; }
+    .composer-hint { align-self: flex-end; display: inline-flex; align-items: center; gap: 6px; height: 32px; padding: 0 12px; border: 1px solid var(--card-line); border-radius: 16px; font-size: 12px; color: var(--muted); }
+
+    /* ========== course preset：.mark-dock / .mark / .is-marking（抄 conversations.html） ========== */
+    .wb { position: relative; width: 100%; max-width: 680px; height: 360px; display: flex; flex-direction: column; border: 1px solid var(--wb-line); border-radius: 24px; background: var(--wb-bg); color: var(--wb-ink); overflow: hidden; }
+    .wb-head { display: flex; align-items: center; gap: 8px; height: 44px; padding: 0 12px 0 16px; border-bottom: 1px solid var(--wb-line); flex: none; }
+    .wb-head .ttl { font-size: 14px; font-weight: 600; flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .wb-head .st { font-size: 12px; color: var(--wb-t2); }
+    .wb-head .st.live { color: var(--brand); }
+    .wb-body { display: flex; flex: 1; min-height: 0; }
+    .wb.is-marking .wb-main { cursor: crosshair; user-select: none; }
+    .wb-main { position: relative; flex: 1; min-width: 0; overflow: hidden; }
+    .doc-article { padding: 8px 28px 16px; font-size: 14px; line-height: 26px; }
+    .doc-article h3 { margin: 18px 0 6px; font-size: 16px; line-height: 24px; font-weight: 600; }
+    .doc-article p { margin: 0 0 10px; }
+    .marks-layer { position: absolute; inset: 0; z-index: 4; pointer-events: none; }
+    .mark { position: absolute; border: 2px solid var(--c-mark); background: var(--c-mark-soft); border-radius: 4px; }
+    .mark .n { position: absolute; top: -9px; left: -9px; width: 20px; height: 20px; border-radius: 50%; background: var(--c-mark); color: #fff; font-size: 11px; font-weight: 700; display: grid; place-items: center; }
+    .mark.on { box-shadow: 0 0 0 2px var(--wb-pill); }
+    .mark.sent { border-color: var(--c-ok); background: rgba(31,157,106,.12); }
+    .mark.sent .n { background: var(--c-ok); }
+    .mark-dock { width: 250px; flex: none; display: flex; flex-direction: column; gap: 8px; border-left: 1px solid var(--wb-line); background: var(--wb-soft); padding: 12px; overflow: hidden; }
+    .mark-dock h4 { margin: 0; font-size: 13px; }
+    .mark-dock .hint { margin: 0; color: var(--wb-t3); font-size: 12px; line-height: 18px; }
+    .mark-item { background: var(--wb-bg); border: 1px solid var(--wb-line); border-radius: 10px; padding: 8px; }
+    .mark-item.on { border-color: var(--c-mark); box-shadow: 0 0 0 2px var(--wb-pill); }
+    .mark-item .hd { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+    .mark-item .hd b { width: 20px; height: 20px; border-radius: 50%; background: var(--c-mark); color: #fff; font-size: 11px; display: grid; place-items: center; }
+    .mark-item.sent .hd b { background: var(--c-ok); }
+    .mark-item .ta { min-height: 44px; border: 1px solid var(--wb-line); border-radius: 8px; padding: 6px 8px; font-size: 12px; line-height: 18px; }
+    .mark-item .ta.empty { color: var(--wb-t3); }
+    .mark-item.sent .ta { background: var(--wb-soft); color: var(--wb-t2); }
+    .mark-item .hint-in { margin-top: 6px; color: var(--wb-t3); font-size: 12px; line-height: 18px; }
+    .mark-del { border: 0; background: transparent; color: var(--wb-t3); font: inherit; font-size: 12px; }
+    .mark-attach { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-top: 8px; }
+    .mark-attach span { border: 1px solid var(--wb-line); background: var(--wb-soft); border-radius: 8px; padding: 5px 4px; font-size: 12px; text-align: center; color: var(--wb-t2); }
+    .mark-attach.dis span { opacity: .45; }
+    .mark-send { height: 32px; border: 0; border-radius: 8px; background: var(--c-mark); color: #fff; font: inherit; font-size: 13px; }
+    .mark-send:disabled { opacity: .45; }
+    /* mini compare for V11 */
+    .cmp-board { display: grid; grid-template-columns: 56px 1fr 1fr; gap: 8px; padding: 14px 16px; font-size: 12px; line-height: 18px; }
+    .cmp-board .h { color: var(--wb-t3); font-weight: 600; }
+    .cmp-board .c { background: var(--wb-soft); border-radius: 10px; padding: 8px 10px; }
+    .cmp-board .c.alt { background: var(--wb-pill); }
+    .cmp-board .k { font-weight: 650; padding-top: 8px; }
+    .surf { width: 100%; border-collapse: collapse; font-size: 12px; line-height: 18px; border: 1px solid var(--line); }
+    .surf th { text-align: left; padding: 6px 10px; background: var(--page); color: var(--muted); }
+    .surf td { padding: 6px 10px; border-top: 1px solid var(--line); color: var(--muted); vertical-align: top; }
+    .surf td:first-child { color: var(--ink); font-weight: 600; white-space: nowrap; }
+
+    @media (max-width: 800px) {
+      .layout { grid-template-columns: 1fr; }
+      nav { position: static; max-height: none; display: flex; gap: 4px; overflow-x: auto; border-right: 0; border-bottom: 1px solid var(--line); }
+      nav a { white-space: nowrap; } nav a small, nav h5 { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <header class="top">
+    <div>
+      <h1>形态墙 · annotation_edit</h1>
+      <p>标注修改卡：先在预览 / 文档上框选并入队，再一次发给 Agent。双 preset：<b>ppt</b>（刘海 + 标注框，来自 标注修改.html）与 <b>course_doc</b>（右侧 mark-dock，来自 conversations）。</p>
+      <div class="meta">
+        <code><b>card_id</b> annotation_edit</code>
+        <code><b>tool</b> present_annotation_edit</code>
+        <code><b>section</b> A · 通用壳 · 有 Tool</code>
+        <code><b>preset</b> ppt | course_doc</code>
+        <code><b>source</b> 标注修改.html (.anno-bar/.anno-pop) · conversations (.mark-dock/.mark/.is-marking)</code>
+      </div>
+    </div>
+    <div class="tools">
+      <button type="button" id="themeBtn">深色</button>
+      <a href="../doc_entry/morph-wall.html">doc_entry</a>
+      <a href="../doc_summary/morph-wall.html">doc_summary</a>
+      <a href="../course_paper/morph-wall.html#v8">course_paper</a>
+      <a href="../paper_compare_pick/morph-wall.html">paper_compare_pick</a>
+      <a href="../error_card/morph-wall.html">error_card</a>
+      <a href="../tip_block/morph-wall.html">tip_block</a>
+      <a href="../../标注修改.html">PPT Demo</a>
+      <a href="../../标注修改-PRD.html">PRD</a>
+      <a href="../CARD_ID-NAMING.md">命名</a>
+    </div>
+  </header>
+
+  <div class="layout">
+    <nav>
+      <h5>PPT PRESET</h5>
+      <a href="#v1"><b>V1</b> 标注关闭<small>入口按钮未选中</small></a>
+      <a href="#v2"><b>V2</b> 开启 · 空闲<small>刘海 0 个标注</small></a>
+      <a href="#v3"><b>V3</b> 标注框 + pop<small>.anno-pop 写要求</small></a>
+      <a href="#v4"><b>V4</b> 队列 1–N<small>序号 + 刘海 3 个</small></a>
+      <a href="#v5"><b>V5</b> 展开队列<small>.anno-store-list</small></a>
+      <a href="#v6"><b>V6</b> 已发送 / 锁定<small>队列清空、截图入对话</small></a>
+      <a href="#v7"><b>V7</b> 失败<small>.net-card 重试</small></a>
+      <h5>COURSE PRESET</h5>
+      <a href="#v8"><b>V8</b> mark-dock 空<small>.is-marking 提示</small></a>
+      <a href="#v9"><b>V9</b> N 条草稿<small>mark + item</small></a>
+      <a href="#v10"><b>V10</b> item.on<small>焦点联动</small></a>
+      <a href="#v11"><b>V11</b> 已发送只读<small>.mark.sent</small></a>
+      <a href="#v12"><b>V12</b> 三种 surface<small>doc / task / compare</small></a>
+    </nav>
+    <main>
+      <p class="group-title">PPT · preset = ppt</p>
+
+      <section class="panel" id="v1">
+        <div class="panel-head"><h2>V1 · 标注关闭<span class="tag">ppt</span></h2>
+          <p>预览顶栏「标注修改」是唯一开关，此时未选中；幻灯片原样、演讲者备注可见。生成中此按钮禁用，文案「生成完成后再标注」。</p></div>
+        <div class="stage" data-mount="off"></div>
+      </section>
+
+      <section class="panel" id="v2">
+        <div class="panel-head"><h2>V2 · 开启 · 空闲<span class="tag">ppt</span></h2>
+          <p>进入标注：预览框描边 <code>#548BF9</code>；顶部刘海（280×36）显示「0 个标注」，箭头与「修改」均不可用；幻灯片内容下移 44px。</p></div>
+        <div class="stage" data-mount="idle"></div>
+      </section>
+
+      <section class="panel" id="v3">
+        <div class="panel-head"><h2>V3 · 标注框 + pop<span class="tag">ppt</span></h2>
+          <p>拉出选区后：框外压暗，框描边 <code>#3370FF</code>，旁出现 <code>.anno-pop</code>（286 宽）。填了要求，pop 右下发送圆钮可点——发送 = 入队，<b>不进对话</b>。</p></div>
+        <div class="stage" data-mount="pop"></div>
+      </section>
+
+      <section class="panel" id="v4">
+        <div class="panel-head"><h2>V4 · 队列 1–N<span class="tag">ppt</span></h2>
+          <p>三条已入队：页上序号圆标（贴框左上外沿，贴边可被裁），刘海「3 个标注」，右侧白底圆钮（朝右箭头，即「修改」）可用。序号整稿连续。</p></div>
+        <div class="stage" data-mount="queue"></div>
+      </section>
+
+      <section class="panel" id="v5">
+        <div class="panel-head"><h2>V5 · 展开队列<span class="tag">ppt</span></h2>
+          <p>点刘海箭头展开 <code>.anno-store-list</code>（宽 280）：序号 + 要求；悬停行出现编辑 / 删除，渐变盖住被挡文字。列表不再套卡。</p></div>
+        <div class="stage" data-mount="expanded"></div>
+      </section>
+
+      <section class="panel" id="v6">
+        <div class="panel-head"><h2>V6 · 已发送 / 锁定<span class="tag">ppt</span></h2>
+          <p>一次发送后：队列清空、页上序号去掉、刘海回「0 个标注」；对话新增一条用户消息——每条标注一张 54×54 圆角 12 截图 + 气泡写出要求。标注模式可保持开着，但队列为空。</p></div>
+        <div class="stage" data-mount="sent"></div>
+      </section>
+
+      <section class="panel" id="v7">
+        <div class="panel-head"><h2>V7 · 失败 → 错误卡片<span class="tag">ppt</span></h2>
+          <p>全部失败 / 部分失败都用全站 <a href="../error_card/morph-wall.html">error_card</a> 的 <code>.net-card</code>：浅灰无描边圆角 14 + 圆形叉号 +「重试」主按钮；<b>禁止</b>白底描边「重新生成」。部分失败卡片内放失败选区截图（54×54，不用页码标签）。重试不把标注画回预览，也不另开版本。</p></div>
+        <div class="stage" data-mount="fail"></div>
+        <p class="note">暂停：对话只写「修改已暂停。预览里不再保留这些标注。」，继续 / 暂停放输入框右侧（见右侧示意），不在对话里放按钮。</p>
+      </section>
+
+      <p class="group-title" style="margin-top:32px">COURSE · preset = course_doc</p>
+
+      <section class="panel" id="v8">
+        <div class="panel-head"><h2>V8 · mark-dock 空<span class="tag course">course_doc</span></h2>
+          <p>文档台 <code>.is-marking</code>：正文十字光标，右侧 dock 标题「文档标注」+ 提示「在图上拖一个框，写下要改的地方。可标多处，最后一次发送。」，无发送按钮。</p></div>
+        <div class="stage" data-mount="c-empty"></div>
+        <p class="note">宿主文档台全貌见 <a href="../course_paper/morph-wall.html#v8">course_paper V8</a>。</p>
+      </section>
+
+      <section class="panel" id="v9">
+        <div class="panel-head"><h2>V9 · N 条草稿<span class="tag course">course_doc</span></h2>
+          <p>正文两处 <code>.mark</code>（蓝框 + 序号）；dock 里两条 <code>.mark-item</code>：序号、删除、textarea、上传文件 / 上传图片。底部「发送 N 处修改」（N = 有内容的条数）。</p></div>
+        <div class="stage" data-mount="c-drafts"></div>
+      </section>
+
+      <section class="panel" id="v10">
+        <div class="panel-head"><h2>V10 · item.on<span class="tag course">course_doc</span></h2>
+          <p>点 dock 的某条或点正文的框：<code>.mark.on</code> + <code>.mark-item.on</code> 同步描边 / 外圈。</p></div>
+        <div class="stage" data-mount="c-on"></div>
+      </section>
+
+      <section class="panel" id="v11">
+        <div class="panel-head"><h2>V11 · 已发送只读<span class="tag course">course_doc</span></h2>
+          <p>发送后 <code>.mark.sent</code> 变绿，dock 里 textarea 禁用、顶部只显示「已发送」，底部「本页批注已发送，框保留为只读。」。以对比面为例（该 surface 发送后保留框）。</p></div>
+        <div class="stage" data-mount="c-sent"></div>
+      </section>
+
+      <section class="panel" id="v12">
+        <div class="panel-head"><h2>V12 · 三种 surface<span class="tag course">note</span></h2>
+          <p>同一 dock 套在文档 / 任务 / 对比三个面上，仅标题不同；发送后的框是否保留有差异。</p></div>
+        <table class="surf">
+          <thead><tr><th>surface</th><th>dock 标题</th><th>标注层</th><th>发送后</th></tr></thead>
+          <tbody>
+            <tr><td>doc</td><td>文档标注</td><td><code>#marksLayer</code> 覆盖 <code>.doc-article</code></td><td>框清空（回到未标注）</td></tr>
+            <tr><td>task</td><td>任务标注</td><td><code>#taskMarksLayer</code> 覆盖任务板</td><td>框清空</td></tr>
+            <tr><td>compare</td><td>对比标注</td><td><code>#compareMarksLayer</code> 覆盖结果板</td><td>框保留为只读（绿）</td></tr>
+          </tbody>
+        </table>
+        <p class="note">与 PPT preset 的区别：PPT 用顶部刘海收纳队列、pop 内联编辑；课程用右侧 dock 收纳草稿，发送按钮在 dock 底部。两者共用「先入队 / 草稿，再一次发送」语义。</p>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    const esc = s => String(s == null ? "" : s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+    const chev = `<svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><path d="M3.5 5.25 7 8.75l3.5-3.5" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+    const goArrow = `<svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><path fill="currentColor" d="M6.63 3.05a.58.58 0 0 1 .78.04l3.5 3.5a.58.58 0 0 1-.82.82L7.59 4.91V10.5a.58.58 0 1 1-1.17 0V4.9L3.91 7.41a.58.58 0 1 1-.82-.82l3.5-3.5z"/></svg>`;
+    const upIco = `<svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true" style="color:#fff"><path fill="currentColor" d="M6.63 3.05a.58.58 0 0 1 .78.04l3.5 3.5a.58.58 0 0 1-.82.82L7.59 4.91V10.5a.58.58 0 1 1-1.17 0V4.9L3.91 7.41a.58.58 0 1 1-.82-.82l3.5-3.5z"/></svg>`;
+    const clip = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.5 12.5 21a5 5 0 0 1-7-7l9-9a3.3 3.3 0 0 1 4.7 4.7l-9 9a1.7 1.7 0 0 1-2.4-2.4L15 8"/></svg>`;
+    const penIco = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 20h4l10-10-4-4L4 16v4z"/><path d="M14 6l4 4"/></svg>`;
+    const editIco = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 20h4L18 10l-4-4L4 16v4z"/></svg>`;
+    const delIco = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 7h14M10 7V5h4v2M7 7l1 12h8l1-12"/></svg>`;
+    const ERR = `<svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="7.33" fill="currentColor"/><path d="M5.2 5.2l5.6 5.6M10.8 5.2l-5.6 5.6" stroke="#fff" stroke-width="1.4" stroke-linecap="round"/></svg>`;
+    const X = `<svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true"><path d="M3 3l6 6M9 3L3 9" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>`;
+
+    /* ---------- PPT ---------- */
+    const REQS = ["标题改成「第三回 · 初入荣国府」", "第二条要点补上人物关系", "右侧配图换成大观园"];
+    const BOX = [
+      { x: 5, y: 7, w: 62, h: 17 },
+      { x: 5, y: 37, w: 56, h: 15 },
+      { x: 66, y: 37, w: 28, h: 42 }
+    ];
+    const slide = inner => `<div class="slide"><h4>第三回 · 黛玉进贾府</h4><p class="sub">红楼梦 · 人物关系</p><ul><li>黛玉初入荣国府</li><li>三春与宝玉初见</li><li>贾母的安排</li></ul><span class="pic"></span><div class="anno-layer">${inner || ""}</div></div>`;
+    function notch({ n = 0, open = false, list = "" }) {
+      return `<div class="anno-bar"><div class="anno-store"><div class="anno-batch"><button class="anno-batch-main${open ? " is-open" : ""}${n ? "" : " is-dis"}" type="button" aria-expanded="${open}"><span class="anno-count-num">${n}</span><span>${n} 个标注</span><span class="chev">${chev}</span></button><span class="anno-batch-split"></span><button class="anno-batch-go" type="button" aria-label="修改" ${n ? "" : "disabled"}>${goArrow}</button></div>${list}</div></div>`;
+    }
+    function ooFrame({ on = false, inner = "", store = "", barNote = "", sub = "" }) {
+      return `<div class="oo"><div class="oo-bar"><b>红楼梦.pptx</b>${barNote}<button class="btn-anno${on ? " is-active" : ""}" type="button">${penIco}标注修改</button></div><div class="oo-main${on ? " is-anno-on" : ""}">${on ? store : ""}${slide(inner)}</div></div>${sub}`;
+    }
+    const restBoxes = n => BOX.slice(0, n).map((b, i) => `<div class="anno-box is-rest" style="left:${b.x}%;top:${b.y}%;width:${b.w}%;height:${b.h}%"><span class="anno-index">${i + 1}</span></div>`).join("");
+    const shots = (arr, pic = -1) => arr.map((t, i) => `<span class="anno-shot${i === pic ? " pic" : ""}">${i === pic ? "" : esc(t)}</span>`).join("");
+    const SH = ["第三回 · 黛玉进贾府", "黛玉初入荣国府", ""];
+    const aiHead = `<div class="ai-head"><span class="ai-ava">M</span>MoreAI</div>`;
+    const userMsg = `<div class="u-row"><div class="shots">${shots(SH, 2)}</div><div class="bubble"><ol>${REQS.map(r => `<li>${esc(r)}</li>`).join("")}</ol></div></div>`;
+
+    function listHtml(hover = -1) {
+      return `<div class="anno-store-list">${REQS.map((r, i) => `<div class="anno-store-item${hover === i ? " hover" : ""}"><span class="n">${i + 1}</span><span class="req">${esc(r)}</span>${hover === i ? `<span class="ops"><i>${editIco}</i><i>${delIco}</i></span>` : ""}</div>`).join("")}</div>`;
+    }
+    const errCard = (text, thumbs) => `<div class="net-wrap"><div class="net-card"><p class="net-main"><i class="msg-tone">${ERR}</i><span>${text}</span></p>${thumbs ? `<div class="net-shots">${thumbs}</div>` : ""}<div class="net-actions"><button class="act-primary" type="button">重试</button><button class="net-x" type="button" aria-label="关闭">${X}</button></div></div></div>`;
+
+    /* ---------- course ---------- */
+    const ART = `<article class="doc-article"><h3>一、引言</h3><p>先交代问题背景与研究意义：智能工具进入课堂后，资源差异是被缩小还是被放大。</p><h3>二、文献综述</h3><p>国内研究多关注区域差异，国外研究更关注算法偏见与个性化学习的可得性。</p></article>`;
+    const markBox = (i, st, on, sent) => `<div class="mark${on ? " on" : ""}${sent ? " sent" : ""}" style="left:${st[0]}%;top:${st[1]}%;width:${st[2]}%;height:${st[3]}%"><span class="n">${i}</span></div>`;
+    const POS = [[6, 17, 84, 15], [6, 62, 70, 14]];
+    function item(i, text, { on = false, sent = false } = {}) {
+      return `<div class="mark-item${on ? " on" : ""}${sent ? " sent" : ""}"><div class="hd"><b>${i}</b>${sent ? '<span class="hint">已发送</span>' : '<button class="mark-del" type="button">删除</button>'}</div><div class="ta${text ? "" : " empty"}">${esc(text || "这一块要改什么")}</div><div class="mark-attach${sent ? " dis" : ""}"><span>上传文件</span><span>上传图片</span></div><div class="hint-in">${i === 1 ? "第 1 段 · 引言" : "第 2 段 · 文献综述"}</div></div>`;
+    }
+    function courseFrame({ title = "文档标注", body, marks = "", dock, st = "标注中" }) {
+      return `<div class="wb is-marking"><div class="wb-head"><span class="ttl">课程论文_初稿.md</span><span class="st live">${st}</span></div><div class="wb-body"><div class="wb-main">${body}<div class="marks-layer">${marks}</div></div><aside class="mark-dock"><h4>${title}</h4>${dock}</aside></div></div>`;
+    }
+    const cmpBody = `<div class="cmp-board"><span class="h"></span><span class="h">初稿</span><span class="h">修订</span><span class="k">研究问题</span><div class="c">智能工具是否缩小教育差距。</div><div class="c alt">智能工具是否缩小教育差距，限定义务教育阶段。</div><span class="k">方法</span><div class="c">这一份没有这项。</div><div class="c alt">三校对照，引入前后各一学期。</div><span class="k">结论</span><div class="c">总体上有帮助。</div><div class="c alt">有帮助，但需配套教师培训。</div></div>`;
+
+    const mounts = {
+      off: () => ooFrame({ on: false }),
+      idle: () => ooFrame({ on: true, store: notch({ n: 0 }) }),
+      pop: () => {
+        const b = BOX[0];
+        const mask = `<div class="anno-mask"><i style="left:${b.x}%;top:${b.y}%;width:${b.w}%;height:${b.h}%"></i></div>`;
+        const box = `<div class="anno-box on" style="left:${b.x}%;top:${b.y}%;width:${b.w}%;height:${b.h}%"></div>`;
+        const pop = `<div class="anno-pop" style="left:5%;top:27%"><div class="anno-item"><div class="anno-field"><div class="ta">标题改成「第三回 · 初入荣国府」</div></div><div class="anno-actions"><button class="anno-upload" type="button" aria-label="上传">${clip}</button><button class="anno-mini" type="button" aria-label="发送此标注">${upIco}</button></div></div></div>`;
+        return ooFrame({ on: true, inner: mask + box + pop, store: notch({ n: 0 }) }) + `<p class="cap">空内容时 <code>.anno-mini:disabled</code>（透明度 .3）；占位「这里需要改什么」。</p>`;
+      },
+      queue: () => ooFrame({ on: true, inner: restBoxes(3), store: notch({ n: 3 }) }),
+      expanded: () => ooFrame({ on: true, inner: restBoxes(3), store: notch({ n: 3, open: true, list: listHtml(1) }) }),
+      sent: () => ooFrame({ on: true, store: notch({ n: 0 }) }) + `<div class="chat">${userMsg}<div>${aiHead}<p class="ai-text" style="margin-top:6px">已收到 3 条标注，正在改写…</p></div></div>`,
+      fail: () => `<div class="chat">${userMsg}
+        <div>${aiHead}<p class="ai-text" style="margin:6px 0 8px">这次修改失败了。原来的文件还在，没有生成新版本。</p>${errCard("3 条标注都没有写入。", "")}</div>
+        <p class="cap">部分失败（后 2 条）：卡片内放失败选区截图</p>
+        <div>${aiHead}<p class="ai-text" style="margin:6px 0 8px">第 1 条已写入当前版本，后 2 条没有生成成功。</p>${errCard("2 条标注没有生成成功。", shots(SH.slice(1), 1))}</div>
+        <div class="composer-hint" title="输入框右侧">输入框右侧：暂停修改 → 继续修改</div></div>`,
+      "c-empty": () => courseFrame({ body: ART, dock: `<p class="hint">在图上拖一个框，写下要改的地方。可标多处，最后一次发送。</p>` }),
+      "c-drafts": () => courseFrame({
+        body: ART, marks: markBox(1, POS[0]) + markBox(2, POS[1]),
+        dock: item(1, "补一个具体数据来源") + item(2, "") + `<button class="mark-send" type="button">发送 1 处修改</button>`
+      }),
+      "c-on": () => courseFrame({
+        body: ART, marks: markBox(1, POS[0]) + markBox(2, POS[1], true),
+        dock: item(1, "补一个具体数据来源") + item(2, "改成「国内外对比」更清楚", { on: true }) + `<button class="mark-send" type="button">发送 2 处修改</button>`
+      }),
+      "c-sent": () => courseFrame({
+        title: "对比标注", body: cmpBody, marks: markBox(1, [20, 22, 70, 18], false, true), st: "已发送",
+        dock: item(1, "研究问题这行把「义务教育」加到初稿里", { sent: true }) + `<p class="hint">本页批注已发送，框保留为只读。</p>`
+      })
+    };
+    document.querySelectorAll("[data-mount]").forEach(el => { el.innerHTML = mounts[el.dataset.mount](); });
+    themeBtn.onclick = () => {
+      const on = document.documentElement.classList.toggle("theme-dark");
+      themeBtn.textContent = on ? "浅色" : "深色";
+    };
+  </script>
+</body>
+</html>

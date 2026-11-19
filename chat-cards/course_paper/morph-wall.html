@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>card_id · course_paper · 形态墙</title>
+  <style>
+    :root {
+      --page: #f5f6f8; --ink: #000; --muted: rgba(0,0,0,.6); --faint: rgba(0,0,0,.4);
+      --line: #e3e4e7; --brand: #0a59f7; --chip: #fff; --chip-line: #e3e4e7;
+      --wb-bg: #fff; --wb-chrome: #eef1f6; --wb-line: #eef1f6; --wb-soft: #f6f8fb; --wb-soft2: #eef3ff;
+      --wb-ink: #1f2329; --wb-ink2: #1c2330; --wb-t2: #667085; --wb-t3: #8b93a6; --wb-btn: #f2f3f5; --wb-seg: #f3f5f9;
+      --wb-pill: #eaf0ff; --wb-pill-ink: #245bdb; --mark: #3b6dff; --mark-soft: rgba(59,109,255,.14); --wb-ok: #1f9d6a;
+      --wb-ins: rgba(31,157,106,.14); --wb-del: rgba(232,64,38,.12);
+    }
+    html.theme-dark {
+      color-scheme: dark;
+      --page: #090b0e; --ink: #fff; --muted: rgba(255,255,255,.6); --faint: rgba(255,255,255,.4);
+      --line: #292b2e; --brand: #317af7; --chip: #191a1d; --chip-line: #434448;
+      --wb-bg: #111216; --wb-chrome: #191a1d; --wb-line: #292b2e; --wb-soft: #191a1d; --wb-soft2: #0a1831;
+      --wb-ink: #fff; --wb-ink2: #fff; --wb-t2: rgba(255,255,255,.6); --wb-t3: rgba(255,255,255,.4); --wb-btn: #25272b; --wb-seg: #191a1d;
+      --wb-pill: #0a1831; --wb-pill-ink: #7aa5ff; --mark: #5b8aff; --mark-soft: rgba(91,138,255,.2); --wb-ok: #3cc08a;
+      --wb-ins: rgba(60,192,138,.2); --wb-del: rgba(232,64,38,.2);
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: "PingFang SC", "Helvetica Neue", sans-serif; background: var(--page); color: var(--ink); }
+    .top {
+      position: sticky; top: 0; z-index: 20; display: flex; flex-wrap: wrap; gap: 12px; justify-content: space-between;
+      padding: 16px 24px; border-bottom: 1px solid var(--line);
+      background: color-mix(in srgb, var(--page) 92%, transparent); backdrop-filter: blur(8px);
+    }
+    .top h1 { margin: 0; font-size: 18px; line-height: 26px; }
+    .top p { margin: 4px 0 0; color: var(--muted); font-size: 13px; line-height: 20px; max-width: 48rem; }
+    .meta { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+    .meta code { padding: 4px 10px; border-radius: 8px; background: var(--chip); border: 1px solid var(--chip-line); font-size: 12px; line-height: 18px; }
+    .meta code b { color: var(--faint); font-weight: 600; }
+    .tools { display: flex; flex-wrap: wrap; gap: 8px; align-items: flex-start; }
+    .tools a, .tools button {
+      display: inline-flex; align-items: center; height: 32px; padding: 0 12px; border-radius: 8px;
+      border: 1px solid var(--chip-line); background: var(--chip); color: var(--ink); font-size: 13px;
+      text-decoration: none; cursor: pointer; font-family: inherit;
+    }
+    .layout { display: grid; grid-template-columns: 210px minmax(0,1fr); }
+    nav { padding: 16px 12px 32px 24px; border-right: 1px solid var(--line); position: sticky; top: 112px; align-self: start; max-height: calc(100vh - 112px); overflow: auto; }
+    nav a { display: block; padding: 8px 10px; border-radius: 8px; color: var(--muted); text-decoration: none; font-size: 13px; }
+    nav a:hover { background: var(--chip); color: var(--ink); }
+    nav a small { display: block; color: var(--faint); font-size: 11px; margin-top: 2px; }
+    main { padding: 20px 24px 64px; max-width: 820px; }
+    .panel { scroll-margin-top: 116px; margin: 0 0 24px; padding: 16px; border: 1px solid var(--line); border-radius: 16px; background: var(--chip); }
+    .panel-head h2 { margin: 0; font-size: 15px; }
+    .panel-head p { margin: 6px 0 12px; color: var(--muted); font-size: 12px; line-height: 18px; }
+    .tag { display: inline-block; margin-left: 8px; height: 20px; padding: 0 8px; border-radius: 99px; background: #f3f7ff; color: var(--brand); font-size: 11px; line-height: 20px; font-weight: 600; }
+    html.theme-dark .tag { background: #0a1831; }
+    .stage { max-width: 736px; display: flex; flex-direction: column; gap: 12px; align-items: flex-start; }
+    .note { margin: 12px 0 0; padding: 10px 12px; border-radius: 10px; background: var(--page); color: var(--muted); font-size: 12px; line-height: 18px; }
+    .note a, .panel-head a { color: var(--brand); }
+    code { font-size: 11px; padding: 0 4px; border-radius: 4px; background: var(--page); }
+    .cap { margin: 0; color: var(--faint); font-size: 12px; line-height: 18px; }
+
+    /* ========== 简化 workbench（抄 conversations #doc；非全量） ========== */
+    .wb { position: relative; width: 100%; max-width: 680px; height: 400px; display: flex; flex-direction: column; overflow: hidden; border: 1px solid var(--wb-line); border-radius: 24px; background: var(--wb-bg); color: var(--wb-ink); }
+    .wb.tall { height: 540px; }
+    .wb.short { height: 280px; }
+    .wb-chrome { display: flex; align-items: flex-end; gap: 8px; height: 44px; padding: 6px 8px 0; border-radius: 22px 22px 0 0; background: var(--wb-chrome); flex: none; }
+    .wb-tabs { display: flex; align-items: flex-end; flex: 1; min-width: 0; height: 100%; overflow: hidden; }
+    .wb-tab { display: inline-flex; align-items: center; gap: 6px; max-width: 200px; height: 34px; margin-right: 2px; padding: 0 8px; border-radius: 10px 10px 0 0; color: var(--wb-t2); font-size: 12px; line-height: 16px; }
+    .wb-tab .fav { width: 16px; height: 16px; flex: none; border-radius: 4px; background: var(--wb-bg); color: var(--brand); display: grid; place-items: center; font-size: 10px; font-weight: 700; }
+    .wb-tab .ttl { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .wb-tab .x { width: 16px; height: 16px; border-radius: 50%; display: grid; place-items: center; font-size: 11px; color: var(--wb-t3); }
+    .wb-tab.active { background: var(--wb-bg); color: var(--wb-ink); font-weight: 600; }
+    .wb-acts { display: flex; gap: 2px; margin: 0 0 7px 4px; flex: none; }
+    .ico { width: 30px; height: 30px; border: 0; border-radius: 8px; background: transparent; color: var(--wb-t2); display: grid; place-items: center; padding: 0; font: inherit; }
+    .ico:hover, .ico.on { background: var(--wb-pill); color: var(--brand); }
+    .ico:disabled { opacity: .35; }
+    .wb-head { display: flex; align-items: center; gap: 8px; height: 44px; padding: 0 8px 0 16px; flex: none; }
+    .wb-head .ttl { font-size: 14px; line-height: 22px; font-weight: 600; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .wb-head .st { font-size: 12px; line-height: 18px; color: var(--wb-t2); }
+    .wb-head .st.live { color: var(--brand); }
+    .wb-head .tl { margin-left: auto; display: flex; align-items: center; gap: 2px; }
+    .back-doc { display: inline-flex; align-items: center; gap: 4px; height: 32px; border: 0; background: transparent; padding: 0; color: var(--wb-ink); font: inherit; font-size: 14px; line-height: 22px; font-weight: 600; }
+    .wb-body { display: flex; flex: 1; min-height: 0; min-width: 0; position: relative; }
+    .wb-outline { width: 138px; flex: none; padding: 8px 8px 16px; display: flex; flex-direction: column; gap: 2px; overflow: hidden; }
+    .toc { border: 0; border-radius: 8px; background: transparent; text-align: left; padding: 6px 8px; font: inherit; font-size: 13px; line-height: 20px; color: var(--wb-t2); }
+    .toc.l2 { font-weight: 600; color: var(--wb-ink2); }
+    .toc.l3 { padding-left: 14px; }
+    .toc.l4 { padding-left: 22px; color: var(--wb-t3); }
+    .toc.on { background: var(--wb-soft); color: var(--mark); }
+    .wb-main { position: relative; flex: 1; min-width: 0; overflow: hidden; display: flex; flex-direction: column; }
+    .doc-article { padding: 8px 32px 24px; color: var(--wb-ink); overflow: hidden; }
+    .doc-article h2 { margin: 12px 0 6px; font-size: 20px; line-height: 28px; font-weight: 650; }
+    .doc-article h3 { margin: 20px 0 8px; font-size: 16px; line-height: 24px; font-weight: 600; }
+    .doc-article p { margin: 0 0 12px; font-size: 14px; line-height: 26px; }
+    .doc-article .by { color: var(--wb-t3); font-size: 12px; line-height: 18px; margin: 0 0 8px; }
+    .caret { display: inline-block; width: 2px; height: 16px; margin-left: 2px; vertical-align: -3px; background: var(--brand); animation: blink 1s steps(2) infinite; }
+    @keyframes blink { 50% { opacity: 0; } }
+    .sk { height: 10px; margin: 0 0 10px; border-radius: 5px; background: linear-gradient(90deg, var(--wb-soft) 25%, var(--wb-btn) 50%, var(--wb-soft) 75%); background-size: 200% 100%; animation: sh 1.4s linear infinite; }
+    @keyframes sh { to { background-position: -200% 0; } }
+    @media (prefers-reduced-motion: reduce) { .caret, .sk { animation: none; } }
+    .wb-empty { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 24px; text-align: center; }
+    .wb-empty h3 { margin: 16px 0 6px; font-size: 16px; line-height: 24px; font-weight: 600; }
+    .wb-empty p { margin: 0; max-width: 240px; font-size: 13px; line-height: 20px; color: var(--muted); }
+    /* stage-bar + task */
+    .stage-bar { display: flex; align-items: center; gap: 8px; padding: 8px 12px; min-height: 44px; flex: none; border-bottom: 1px solid var(--wb-line); }
+    .seg { display: inline-flex; gap: 4px; padding: 3px; border-radius: 10px; background: var(--wb-seg); }
+    .seg button { border: 0; border-radius: 8px; padding: 5px 10px; font: inherit; font-size: 13px; line-height: 18px; color: var(--wb-t2); background: transparent; }
+    .seg button.on { background: var(--wb-bg); color: var(--wb-ink2); font-weight: 650; }
+    .task-body { padding: 14px 18px 20px; overflow: hidden; }
+    .task-title { margin: 0 0 12px; font-size: 18px; line-height: 26px; font-weight: 650; }
+    .layer { border: 1px solid var(--wb-line); border-radius: 14px; background: var(--wb-bg); margin-bottom: 12px; overflow: hidden; }
+    .layer-hd { padding: 12px 14px 10px; }
+    .layer-hd .k { font-size: 12px; line-height: 18px; color: var(--wb-t3); }
+    .layer-hd b { display: block; margin-top: 2px; font-size: 15px; line-height: 22px; }
+    .layer.decision .layer-hd { background: var(--wb-pill); }
+    .layer.story .layer-hd { background: rgba(31,157,106,.1); }
+    .layer-body { padding: 12px; display: flex; flex-direction: column; gap: 8px; }
+    .layer-body.decide-row { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .decide { border-radius: 12px; padding: 10px 12px; background: var(--wb-soft); }
+    .decide.a { background: var(--wb-pill); }
+    .decide span { display: block; font-size: 12px; line-height: 18px; color: var(--wb-t2); }
+    .decide b { display: block; margin-top: 4px; font-size: 14px; line-height: 22px; }
+    .page-row { display: grid; grid-template-columns: 22px minmax(0, 1fr); gap: 10px; background: var(--wb-soft); border-radius: 12px; padding: 10px 12px; }
+    .page-row .n { width: 22px; height: 22px; margin-top: 1px; border-radius: 50%; background: var(--wb-bg); display: grid; place-items: center; font-size: 12px; font-weight: 650; }
+    .page-row b { display: block; font-size: 14px; line-height: 22px; }
+    .page-row small { display: block; margin-top: 2px; color: var(--wb-t2); font-size: 13px; line-height: 20px; }
+    /* compare */
+    .compare-body { padding: 14px 18px 20px; overflow: hidden; }
+    .cmp-switch { display: inline-flex; gap: 4px; padding: 3px; border-radius: 10px; background: var(--wb-seg); }
+    .cmp-switch button { height: 28px; border: 0; border-radius: 8px; background: transparent; color: var(--wb-t2); padding: 0 12px; font: inherit; font-size: 13px; }
+    .cmp-switch button.on { background: var(--wb-bg); color: var(--wb-ink2); font-weight: 650; }
+    .cmp-summary-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: 12px 0 0; }
+    .cmp-pill { height: 28px; display: inline-flex; align-items: center; padding: 0 10px; border-radius: 999px; background: var(--wb-pill); color: var(--wb-pill-ink); font-size: 12px; font-weight: 650; }
+    .cmp-verdict { margin: 8px 0 12px; color: var(--wb-t2); font-size: 13px; line-height: 20px; }
+    .cmp-board { display: grid; grid-template-columns: 76px repeat(2, minmax(0, 1fr)); column-gap: 10px; row-gap: 8px; }
+    .cmp-colhead { display: flex; align-items: center; gap: 8px; min-height: 32px; padding: 0 12px; }
+    .cmp-colhead b { font-size: 13px; line-height: 20px; font-weight: 650; color: var(--wb-ink2); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .cmp-colhead.item { padding-left: 0; font-size: 12px; font-weight: 600; color: var(--wb-t3); }
+    .cmp-dot { width: 8px; height: 8px; border-radius: 50%; background: #98a2b3; flex: none; }
+    .cmp-dot.alt { background: var(--mark); }
+    .cmp-item { padding: 12px 4px 0 0; font-size: 13px; line-height: 20px; font-weight: 650; color: var(--wb-ink2); }
+    .cmp-cell { background: var(--wb-soft); border-radius: 12px; padding: 10px 12px; min-width: 0; }
+    .cmp-cell.alt { background: var(--wb-soft2); }
+    .cmp-cell p { margin: 0; font-size: 13px; line-height: 20px; color: var(--wb-ink2); }
+    .cmp-cell .miss { color: var(--wb-t3); }
+    .cmp-same { margin-top: 6px; display: flex; flex-wrap: wrap; gap: 6px; align-items: center; color: var(--wb-t3); font-size: 12px; }
+    .cmp-same b { font-weight: 500; background: var(--wb-seg); color: var(--wb-t2); border-radius: 999px; padding: 2px 8px; }
+    /* compare-bar / history */
+    .compare-bar { display: grid; grid-template-columns: minmax(40px, 1fr) auto minmax(40px, 1fr); align-items: center; min-height: 48px; padding: 8px 8px 8px 12px; border-bottom: 1px solid var(--wb-line); background: color-mix(in srgb, var(--wb-bg) 96%, transparent); flex: none; }
+    .compare-center { display: flex; align-items: center; justify-content: center; gap: 8px; }
+    .compare-bar button { height: 28px; border-radius: 6px; border: 0; padding: 0 10px; font: inherit; font-size: 12px; line-height: 18px; background: var(--wb-btn); color: var(--wb-ink); }
+    .compare-bar .navbtn { background: var(--brand); color: #fff; }
+    .compare-bar .navbtn:disabled { opacity: .4; }
+    .compare-bar .rec { font-size: 12px; line-height: 18px; color: var(--wb-t2); }
+    .compare-side { justify-self: end; }
+    ins { background: var(--wb-ins); text-decoration: none; border-radius: 3px; }
+    del { background: var(--wb-del); border-radius: 3px; }
+    .ver-pop { width: 280px; padding: 8px 0 10px; background: var(--wb-bg); border: 1px solid var(--wb-line); border-radius: 12px; box-shadow: 0 8px 24px rgba(15,23,42,.12); }
+    .ver-pop .day { padding: 8px 16px 4px; font-size: 12px; line-height: 18px; color: var(--wb-t3); }
+    .ver-item { display: block; width: 100%; padding: 8px 16px 8px 13px; border-left: 3px solid transparent; font-size: 13px; line-height: 20px; }
+    .ver-item small { display: block; color: var(--wb-t3); font-size: 12px; line-height: 16px; }
+    .ver-item.on { border-left-color: var(--brand); background: var(--wb-soft2); }
+    /* marking */
+    .marks-layer { position: absolute; inset: 0; z-index: 4; pointer-events: none; }
+    .mark { position: absolute; border: 2px solid var(--mark); background: var(--mark-soft); border-radius: 4px; }
+    .mark .n { position: absolute; top: -9px; left: -9px; width: 20px; height: 20px; border-radius: 50%; background: var(--mark); color: #fff; font-size: 11px; font-weight: 700; display: grid; place-items: center; }
+    .mark.on { box-shadow: 0 0 0 2px var(--wb-pill); }
+    .mark.sent { border-color: var(--wb-ok); background: rgba(31,157,106,.12); }
+    .mark.sent .n { background: var(--wb-ok); }
+    .mark-dock { width: 240px; flex: none; display: flex; flex-direction: column; gap: 8px; border-left: 1px solid var(--wb-line); background: var(--wb-soft); padding: 12px; overflow: hidden; }
+    .mark-dock h4 { margin: 0; font-size: 13px; }
+    .mark-dock .hint { margin: 0; color: var(--wb-t3); font-size: 12px; line-height: 18px; }
+    .mark-item { background: var(--wb-bg); border: 1px solid var(--wb-line); border-radius: 10px; padding: 8px; }
+    .mark-item.on { border-color: var(--mark); box-shadow: 0 0 0 2px var(--wb-pill); }
+    .mark-item .hd { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+    .mark-item .hd b { width: 20px; height: 20px; border-radius: 50%; background: var(--mark); color: #fff; font-size: 11px; display: grid; place-items: center; }
+    .mark-item .ta { min-height: 40px; border: 1px solid var(--wb-line); border-radius: 8px; padding: 6px 8px; font-size: 12px; line-height: 18px; color: var(--wb-ink); }
+    .mark-item .ta.empty { color: var(--wb-t3); }
+    .mark-del { border: 0; background: transparent; color: var(--wb-t3); font: inherit; font-size: 12px; }
+    .mark-send { height: 32px; border: 0; border-radius: 8px; background: var(--mark); color: #fff; font: inherit; font-size: 13px; }
+    .mark-send:disabled { opacity: .45; }
+    .cmp-table { width: 100%; border-collapse: collapse; font-size: 12px; line-height: 18px; border: 1px solid var(--line); }
+    .cmp-table th { text-align: left; padding: 6px 10px; background: var(--page); color: var(--muted); }
+    .cmp-table td { padding: 6px 10px; border-top: 1px solid var(--line); color: var(--muted); vertical-align: top; }
+    .cmp-table td:first-child { color: var(--ink); font-weight: 600; white-space: nowrap; }
+
+    @media (max-width: 800px) {
+      .layout { grid-template-columns: 1fr; }
+      nav { position: static; max-height: none; display: flex; gap: 4px; overflow-x: auto; border-right: 0; border-bottom: 1px solid var(--line); }
+      nav a { white-space: nowrap; } nav a small { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <header class="top">
+    <div>
+      <h1>形态墙 · course_paper</h1>
+      <p>长文文档台：空态 / 写入中 / 多 Tab / 正文+目录 / 任务分层 / 对比结果板 / 历史 compare-bar / 标注中。以下为 <b>简化</b> workbench，不是整套右侧台。</p>
+      <div class="meta">
+        <code><b>card_id</b> course_paper</code>
+        <code><b>tool</b> present_course_paper（命名保留）</code>
+        <code><b>section</b> A · 通用壳</code>
+        <code><b>note</b> 本期 Demo 多为 host 文档台，Agent 侧以 payload / 打开文档为主</code>
+        <code><b>source</b> conversations.html · aside#doc</code>
+      </div>
+    </div>
+    <div class="tools">
+      <button type="button" id="themeBtn">深色</button>
+      <a href="../doc_entry/morph-wall.html">doc_entry</a>
+      <a href="../doc_summary/morph-wall.html">doc_summary</a>
+      <a href="../paper_compare_pick/morph-wall.html">paper_compare_pick</a>
+      <a href="../annotation_edit/morph-wall.html">annotation_edit</a>
+      <a href="../tip_block/morph-wall.html">tip_block</a>
+      <a href="../../conversations.html">Demo</a>
+      <a href="../CARD_ID-NAMING.md">命名</a>
+    </div>
+  </header>
+
+  <div class="layout">
+    <nav>
+      <a href="#v1"><b>V1</b> 空态<small>doc-empty</small></a>
+      <a href="#v2"><b>V2</b> 写入中<small>is-writing</small></a>
+      <a href="#v3"><b>V3</b> 多 Tab<small>has-tabs</small></a>
+      <a href="#v4"><b>V4</b> 正文 + 目录<small>outline strip</small></a>
+      <a href="#v5"><b>V5</b> 任务板分层<small>decision / story</small></a>
+      <a href="#v6"><b>V6</b> 对比结果板<small>show-compare</small></a>
+      <a href="#v7"><b>V7</b> 历史 / 对比条<small>compare-bar</small></a>
+      <a href="#v8"><b>V8</b> 标注中 peek<small>is-marking</small></a>
+      <a href="#v9"><b>V9</b> 与 doc_entry 分界<small>note</small></a>
+    </nav>
+    <main>
+      <section class="panel" id="v1">
+        <div class="panel-head"><h2>V1 · 空态<span class="tag">doc-empty</span></h2>
+          <p>未打开任何文档：中央插画 + 「文档会显示在这里」。<code>.doc.is-empty</code> 时隐藏正文、对比条、更改开关。</p></div>
+        <div class="stage" data-mount="empty"></div>
+      </section>
+
+      <section class="panel" id="v2">
+        <div class="panel-head"><h2>V2 · 写入中<span class="tag">is-writing</span></h2>
+          <p>头部状态用品牌色「正在写入…」；正文写到一半 + 光标 + 骨架行；工具按钮禁用。</p></div>
+        <div class="stage" data-mount="writing"></div>
+      </section>
+
+      <section class="panel" id="v3">
+        <div class="panel-head"><h2>V3 · 多 Tab<span class="tag">has-tabs</span></h2>
+          <p>打开 ≥2 份文档时出现 chrome 条（浏览器式标签）；<code>.doc.has-tabs .doc-head</code> 去圆角。无 Tab 时 chrome 与 stage-bar 隐藏。</p></div>
+        <div class="stage" data-mount="tabs"></div>
+      </section>
+
+      <section class="panel" id="v4">
+        <div class="panel-head"><h2>V4 · 正文 + 目录条<span class="tag">outline</span></h2>
+          <p>常规文档态：左侧 <code>.doc-outline</code>（l2 / l3 / l4）+ 右侧正文。简化为 3 级。</p></div>
+        <div class="stage" data-mount="doc"></div>
+      </section>
+
+      <section class="panel" id="v5">
+        <div class="panel-head"><h2>V5 · 任务板分层<span class="tag">show-task</span></h2>
+          <p>stage-bar 切到「任务」：<code>.layer.decision</code>（三决定）+ <code>.layer.story</code>（页面行）。层最多两级，强调靠字重。</p></div>
+        <div class="stage" data-mount="task"></div>
+      </section>
+
+      <section class="panel" id="v6">
+        <div class="panel-head"><h2>V6 · 对比结果板<span class="tag">show-compare</span></h2>
+          <p>两列对比：<code>cmp-switch</code>（全部 / 仅差异）· 差异药丸 · 行名列 + 左右 cell（右列 alt 蓝底）。需先经 <a href="../paper_compare_pick/morph-wall.html">paper_compare_pick</a> 确认两份。</p></div>
+        <div class="stage" data-mount="compare"></div>
+      </section>
+
+      <section class="panel" id="v7">
+        <div class="panel-head"><h2>V7 · 历史 / compare-bar</h2>
+          <p>左：版本列表浮层（<code>.ver-pop</code>）。右：历史态头部「返回」+ <code>compare-bar</code>（还原此版本 · 编辑记录 N/M · 上一项 / 下一项）+ 行内增删高亮。</p></div>
+        <div class="stage" data-mount="history"></div>
+      </section>
+
+      <section class="panel" id="v8">
+        <div class="panel-head"><h2>V8 · 标注中 peek<span class="tag">is-marking</span></h2>
+          <p>文档台进入标注：<code>.doc.is-marking</code> 出现框选层 + 右侧 <code>.mark-dock</code>。完整标注形态（PPT / 课程）见 <a href="../annotation_edit/morph-wall.html#v8">annotation_edit V8–V11</a>。</p></div>
+        <div class="stage" data-mount="marking"></div>
+      </section>
+
+      <section class="panel" id="v9">
+        <div class="panel-head"><h2>V9 · 与 doc_entry 分界<span class="tag">note</span></h2>
+          <p><b>对话里的 <code>.artifact</code> 文档入口条 = <a href="../doc_entry/morph-wall.html">doc_entry</a>，不是本卡。</b>本墙只画点击入口后在右侧展开的文档台（及其子面）。</p></div>
+        <table class="cmp-table">
+          <thead><tr><th></th><th>doc_entry</th><th>course_paper</th></tr></thead>
+          <tbody>
+            <tr><td>位置</td><td>对话 AI 回复内</td><td>右侧文档台（aside#doc）</td></tr>
+            <tr><td>形态</td><td>56px 条：缩略 + 文件名 + 悬停预览/下载</td><td>chrome / 正文 / 任务 / 对比 / 标注</td></tr>
+            <tr><td>Agent</td><td>host_only，无 Tool</td><td><code>present_course_paper</code>（命名预留）</td></tr>
+            <tr><td>本期</td><td>已落形态墙</td><td>Demo 多为 host 文档台，Tool 化后置</td></tr>
+          </tbody>
+        </table>
+        <p class="note">不要把 <code>.artifact</code> 画进 V1–V8；也不要把对比入口 <code>.artifact.cmp</code> 当成本卡 V6 结果板。</p>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    const I = {
+      doc: `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 3h7l5 5v13a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1z"/><path d="M14 3v6h6"/></svg>`,
+      pen: `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 20h4l10-10-4-4L4 16v4z"/><path d="M14 6l4 4"/></svg>`,
+      max: `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 3H3v6M15 3h6v6M9 21H3v-6M21 15v6h-6"/></svg>`,
+      fold: `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg>`,
+      list: `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 6h12M8 12h12M8 18h12M4 6h.01M4 12h.01M4 18h.01"/></svg>`,
+      ver: `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>`,
+      back: `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 6l-6 6 6 6"/></svg>`,
+      art: `<svg width="96" height="96" viewBox="0 0 96 96" fill="none" aria-hidden="true"><rect x="22" y="16" width="44" height="58" rx="6" fill="#f3f7ff" stroke="#b9d0ff" stroke-width="1.5"/><path d="M52 16v12a4 4 0 0 0 4 4h10" stroke="#b9d0ff" stroke-width="1.5"/><path d="M32 42h24M32 52h24M32 62h16" stroke="#8eb6ff" stroke-width="1.5" stroke-linecap="round"/></svg>`
+    };
+    const acts = (mark = false, dis = false) => `<div class="wb-acts"><button class="ico${mark ? " on" : ""}" type="button" ${dis ? "disabled" : ""} aria-label="标注修改">${I.pen}</button><button class="ico" type="button" aria-label="展开">${I.max}</button><button class="ico" type="button" aria-label="收起">${I.fold}</button></div>`;
+    const tools = (dis = false) => `<span class="tl"><button class="ico" type="button" ${dis ? "disabled" : ""} aria-label="目录">${I.list}</button><button class="ico" type="button" ${dis ? "disabled" : ""} aria-label="版本">${I.ver}</button></span>`;
+    const head = (title, st, live = false, dis = false) => `<div class="wb-head"><span class="ttl">${title}</span><span class="st${live ? " live" : ""}">${st}</span>${tools(dis)}</div>`;
+    const chrome = (tabs, markOn = false) => `<div class="wb-chrome"><div class="wb-tabs">${tabs.map(t => `<span class="wb-tab${t.on ? " active" : ""}"><i class="fav">${t.f || "文"}</i><span class="ttl">${t.t}</span><i class="x">×</i></span>`).join("")}</div>${acts(markOn)}</div>`;
+    const tocs = `<nav class="wb-outline" aria-label="目录"><button class="toc l2 on">一、引言</button><button class="toc l3">1.1 研究背景</button><button class="toc l3">1.2 研究意义</button><button class="toc l2">二、文献综述</button><button class="toc l4">国内研究</button><button class="toc l4">国外研究</button><button class="toc l2">三、方法与案例</button><button class="toc l2">四、结论</button></nav>`;
+    const article = (extra = "") => `<article class="doc-article"><h2>人工智能与教育公平</h2><p class="by">课程论文 · 初稿 · 3,420 字</p><h3>一、引言</h3><p>先交代问题背景与研究意义：智能工具进入课堂后，资源差异是被缩小还是被放大。</p><h3>二、文献综述</h3><p>国内研究多关注区域差异，国外研究更关注算法偏见与个性化学习的可得性。</p>${extra}</article>`;
+
+    const mounts = {
+      empty: () => `<div class="wb is-empty short"><div class="wb-body"><div class="wb-empty">${I.art}<h3>文档会显示在这里</h3><p>生成完成后，在对话里打开对应文档。</p></div></div></div>`,
+      writing: () => `<div class="wb is-writing">${head("人工智能与教育公平.md", "正在写入…", true, true)}<div class="wb-body"><div class="wb-main"><article class="doc-article"><h2>人工智能与教育公平</h2><h3>一、引言</h3><p>先交代问题背景与研究意义：智能工具进入课堂后，资源差异是被缩小还是被放大<span class="caret"></span></p><div class="sk" style="width:92%"></div><div class="sk" style="width:76%"></div><div class="sk" style="width:84%"></div></article></div></div></div>`,
+      tabs: () => `<div class="wb has-tabs">${chrome([{ t: "课程论文_初稿.md", on: true }, { t: "开题报告_修订版.md" }, { t: "方案对比 · 初稿 vs 修订", f: "比" }])}${head("课程论文_初稿.md", "已保存")}<div class="wb-body"><div class="wb-main">${article()}</div></div></div><p class="cap">无 Tab 时 chrome 隐藏，仅保留 doc-head（见 V4）。</p>`,
+      doc: () => `<div class="wb">${head("课程论文_初稿.md", "已保存")}<div class="wb-body">${tocs}<div class="wb-main">${article("<h3>三、方法与案例</h3><p>选取三所不同资源水平的学校，对比引入智能辅导前后的差异。</p>")}</div></div></div>`,
+      task: () => `<div class="wb tall">${chrome([{ t: "课程论文_初稿.md" }, { t: "任务板", on: true, f: "务" }])}<div class="stage-bar"><div class="seg"><button>文档</button><button class="on">任务</button></div></div><div class="wb-body"><div class="wb-main"><div class="task-body"><h3 class="task-title">课程论文 · 三个决定</h3>
+        <div class="layer decision"><div class="layer-hd"><div class="k">先定</div><b>写作立场与范围</b></div><div class="layer-body decide-row"><div class="decide a"><span>立场</span><b>公平优先</b></div><div class="decide"><span>范围</span><b>义务教育</b></div><div class="decide"><span>篇幅</span><b>3000–4000 字</b></div></div></div>
+        <div class="layer story"><div class="layer-hd"><div class="k">再写</div><b>四个部分</b></div><div class="layer-body"><div class="page-row"><i class="n">1</i><div><b>引言</b><small>问题背景与研究意义</small></div></div><div class="page-row"><i class="n">2</i><div><b>文献综述</b><small>国内外两条线，各 3 篇代表文献</small></div></div></div></div></div></div></div></div>`,
+      compare: () => `<div class="wb tall">${chrome([{ t: "课程论文_初稿.md" }, { t: "方案对比", on: true, f: "比" }])}<div class="wb-body"><div class="wb-main"><div class="compare-body">
+        <div class="cmp-switch"><button class="on">全部</button><button>仅差异</button></div>
+        <div class="cmp-summary-row"><span class="cmp-pill">3 处不同</span></div>
+        <p class="cmp-verdict">两版结构一致，修订版补了方法部分，并改了结论措辞。</p>
+        <div class="cmp-board">
+          <div class="cmp-colhead item">项目</div><div class="cmp-colhead"><i class="cmp-dot"></i><b>初稿</b></div><div class="cmp-colhead"><i class="cmp-dot alt"></i><b>修订</b></div>
+          <div class="cmp-item">研究问题</div><div class="cmp-cell"><p>智能工具是否缩小教育差距。</p></div><div class="cmp-cell alt"><p>智能工具是否缩小教育差距，限定义务教育阶段。</p></div>
+          <div class="cmp-item">方法</div><div class="cmp-cell"><p class="miss">这一份没有这项。</p></div><div class="cmp-cell alt"><p>三校对照，引入前后各一学期。</p></div>
+          <div class="cmp-item">结论</div><div class="cmp-cell"><p>总体上有帮助。</p></div><div class="cmp-cell alt"><p>有帮助，但需配套教师培训。</p></div>
+        </div><div class="cmp-same"><span>相同：</span><b>引言</b><b>文献综述</b></div></div></div></div></div>`,
+      history: () => `<div class="ver-pop"><div class="day">今天</div><div class="ver-item on">修订版<small>14:20 · 按标注改写</small></div><div class="ver-item">初稿<small>13:05 · 首次生成</small></div><div class="day">昨天</div><div class="ver-item">提纲<small>20:11</small></div></div>
+        <div class="wb">${chrome([{ t: "课程论文_初稿.md", on: true }])}<div class="wb-head"><button class="back-doc" type="button">${I.back}返回文档</button><span class="st">历史版本 · 修订版</span></div>
+        <div class="compare-bar"><span></span><div class="compare-center"><button type="button">还原此版本</button><span class="rec">编辑记录 2/5</span><button class="navbtn" type="button">上一项</button><button class="navbtn" type="button">下一项</button></div><div class="compare-side"></div></div>
+        <div class="wb-body"><div class="wb-main"><article class="doc-article"><h3>一、引言</h3><p>先交代问题背景与研究意义：智能工具进入课堂后，资源差异是<del>被缩小</del><ins>否被缩小还是被放大</ins>。</p><h3>三、方法与案例</h3><p><ins>选取三所不同资源水平的学校，对比引入智能辅导前后的差异。</ins></p></article></div></div></div>`,
+      marking: () => `<div class="wb is-marking">${chrome([{ t: "课程论文_初稿.md", on: true }], true)}${head("课程论文_初稿.md", "标注中")}<div class="wb-body"><div class="wb-main">${article()}<div class="marks-layer"><div class="mark on" style="left:6%;top:48%;width:70%;height:12%"><span class="n">1</span></div><div class="mark" style="left:6%;top:70%;width:58%;height:10%"><span class="n">2</span></div></div></div>
+        <aside class="mark-dock"><h4>文档标注</h4><div class="mark-item on"><div class="hd"><b>1</b><button class="mark-del" type="button">删除</button></div><div class="ta">这里补一个具体数据来源</div></div><div class="mark-item"><div class="hd"><b>2</b><button class="mark-del" type="button">删除</button></div><div class="ta empty">这一块要改什么</div></div><button class="mark-send" type="button">发送 1 处修改</button></aside></div></div>
+        <p class="cap">细则（dock 空 / N 条 / item.on / 已发送只读）见 annotation_edit。</p>`
+    };
+    document.querySelectorAll("[data-mount]").forEach(el => { el.innerHTML = mounts[el.dataset.mount](); });
+    themeBtn.onclick = () => {
+      const on = document.documentElement.classList.toggle("theme-dark");
+      themeBtn.textContent = on ? "浅色" : "深色";
+    };
+  </script>
+</body>
+</html>

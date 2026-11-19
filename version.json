@@ -1,5 +1,5 @@
 {
-  "version": "2026.11.19-15",
-  "updatedAt": "2026-11-19 17:08",
-  "note": "ask_form 收口：多选/多题/分步属本卡；路线旧 .ask 不另开卡；命名 v1.5"
+  "version": "2026.11.19-16",
+  "updatedAt": "2026-11-19 17:20",
+  "note": "文档四卡形态墙：doc_summary / course_paper / paper_compare_pick / annotation_edit；命名 v1.6"
 }

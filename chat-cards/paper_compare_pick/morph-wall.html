@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>card_id · paper_compare_pick · 形态墙</title>
+  <style>
+    :root {
+      --page: #f5f6f8; --ink: #000; --muted: rgba(0,0,0,.6); --faint: rgba(0,0,0,.4);
+      --line: #e3e4e7; --brand: #0a59f7; --chip: #fff; --chip-line: #e3e4e7;
+      --pk-bg: #fff; --pk-line: #f0f0f0; --pk-field: #eceff3; --pk-sel-bg: #f3f7ff; --pk-sel-line: #b9d0ff; --pk-hover: #eaf0ff;
+      --pk-t3: #98a2b3; --pk-t2: #667085; --pk-hint: #8b93a6; --pk-menu-line: #eef1f6; --pk-dis-bg: #d7e4ff; --pk-dis-ink: #c5c8ce;
+      --err-card: #eef0f3; --err-text: #000; --err-text-2: rgba(0,0,0,.6); --err-icon: #e84026; --err-x-hover: rgba(0,0,0,.06);
+    }
+    html.theme-dark {
+      color-scheme: dark;
+      --page: #090b0e; --ink: #fff; --muted: rgba(255,255,255,.6); --faint: rgba(255,255,255,.4);
+      --line: #292b2e; --brand: #317af7; --chip: #191a1d; --chip-line: #434448;
+      --pk-bg: #111216; --pk-line: #292b2e; --pk-field: #434448; --pk-sel-bg: #0a1831; --pk-sel-line: #1f4aa8; --pk-hover: #0a1831;
+      --pk-t3: rgba(255,255,255,.4); --pk-t2: rgba(255,255,255,.6); --pk-hint: rgba(255,255,255,.4); --pk-menu-line: #292b2e; --pk-dis-bg: #1b2d52; --pk-dis-ink: rgba(255,255,255,.3);
+      --err-card: #191a1d; --err-text: #fff; --err-text-2: rgba(255,255,255,.6); --err-x-hover: rgba(255,255,255,.08);
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: "PingFang SC", "Helvetica Neue", sans-serif; background: var(--page); color: var(--ink); }
+    .top {
+      position: sticky; top: 0; z-index: 20; display: flex; flex-wrap: wrap; gap: 12px; justify-content: space-between;
+      padding: 16px 24px; border-bottom: 1px solid var(--line);
+      background: color-mix(in srgb, var(--page) 92%, transparent); backdrop-filter: blur(8px);
+    }
+    .top h1 { margin: 0; font-size: 18px; line-height: 26px; }
+    .top p { margin: 4px 0 0; color: var(--muted); font-size: 13px; line-height: 20px; max-width: 48rem; }
+    .meta { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+    .meta code { padding: 4px 10px; border-radius: 8px; background: var(--chip); border: 1px solid var(--chip-line); font-size: 12px; line-height: 18px; }
+    .meta code b { color: var(--faint); font-weight: 600; }
+    .tools { display: flex; flex-wrap: wrap; gap: 8px; align-items: flex-start; }
+    .tools a, .tools button {
+      display: inline-flex; align-items: center; height: 32px; padding: 0 12px; border-radius: 8px;
+      border: 1px solid var(--chip-line); background: var(--chip); color: var(--ink); font-size: 13px;
+      text-decoration: none; cursor: pointer; font-family: inherit;
+    }
+    .layout { display: grid; grid-template-columns: 210px minmax(0,1fr); }
+    nav { padding: 16px 12px 32px 24px; border-right: 1px solid var(--line); position: sticky; top: 112px; align-self: start; max-height: calc(100vh - 112px); overflow: auto; }
+    nav a { display: block; padding: 8px 10px; border-radius: 8px; color: var(--muted); text-decoration: none; font-size: 13px; }
+    nav a:hover { background: var(--chip); color: var(--ink); }
+    nav a small { display: block; color: var(--faint); font-size: 11px; margin-top: 2px; }
+    main { padding: 20px 24px 64px; max-width: 780px; }
+    .panel { scroll-margin-top: 116px; margin: 0 0 24px; padding: 16px; border: 1px solid var(--line); border-radius: 16px; background: var(--chip); }
+    .panel-head h2 { margin: 0; font-size: 15px; }
+    .panel-head p { margin: 6px 0 12px; color: var(--muted); font-size: 12px; line-height: 18px; }
+    .tag { display: inline-block; margin-left: 8px; height: 20px; padding: 0 8px; border-radius: 99px; background: #f3f7ff; color: var(--brand); font-size: 11px; line-height: 20px; font-weight: 600; }
+    html.theme-dark .tag { background: #0a1831; }
+    .stage { max-width: 736px; display: flex; flex-direction: column; gap: 10px; align-items: flex-start; }
+    .stage.menu-room { min-height: 400px; }
+    .note { margin: 12px 0 0; padding: 10px 12px; border-radius: 10px; background: var(--page); color: var(--muted); font-size: 12px; line-height: 18px; }
+    .note a, .panel-head a { color: var(--brand); }
+    code { font-size: 11px; padding: 0 4px; border-radius: 4px; background: var(--page); }
+    .cap { margin: 0; color: var(--faint); font-size: 12px; line-height: 18px; }
+
+    /* ========== .pick-card + .cmp-*（抄 conversations.html） ========== */
+    .pick-card { position: relative; align-self: flex-start; width: min(440px, 100%); border: 1px solid var(--pk-line); border-radius: 16px; background: var(--pk-bg); box-shadow: 0 2px 8px rgba(0,0,0,.04); padding: 14px; color: var(--ink); }
+    .pick-card h3 { margin: 0 0 10px; font-size: 14px; line-height: 22px; font-weight: 600; }
+    .cmp-field { margin-bottom: 8px; }
+    .cmp-field-hd { display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px; }
+    .cmp-field-hd span { color: var(--pk-t2); font-size: 12px; line-height: 18px; }
+    .cmp-remove { border: 0; background: transparent; padding: 0; color: var(--pk-t3); font: inherit; font-size: 12px; line-height: 18px; cursor: pointer; }
+    .cmp-remove:hover { color: #d92d20; }
+    .cmp-add { width: 100%; height: 36px; margin: 2px 0 8px; border: 1px dashed var(--pk-field); border-radius: 8px; background: transparent; color: var(--brand); font: inherit; font-size: 13px; line-height: 20px; cursor: pointer; }
+    .cmp-add:hover { background: var(--pk-sel-bg); }
+    .cmp-drop { position: relative; }
+    .cmp-trigger { width: 100%; height: 36px; border: 1px solid var(--pk-field); border-radius: 8px; background: transparent; color: var(--ink); padding: 0 10px; display: flex; align-items: center; justify-content: space-between; font: inherit; font-size: 14px; text-align: left; cursor: pointer; }
+    .cmp-trigger > span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .cmp-trigger.placeholder { color: var(--pk-t3); }
+    .cmp-trigger svg { flex: none; color: var(--pk-t3); }
+    .cmp-drop.open .cmp-trigger { border-color: var(--pk-sel-line); }
+    .cmp-menu { display: none; position: absolute; left: 0; right: 0; top: calc(100% + 4px); z-index: 20; padding: 4px; border: 1px solid var(--pk-menu-line); border-radius: 10px; background: var(--pk-bg); box-shadow: 0 8px 24px rgba(15,23,42,.12); }
+    .cmp-drop.open .cmp-menu { display: block; }
+    .cmp-doc, .cmp-upload-row { width: 100%; min-height: 36px; border: 0; border-radius: 8px; background: transparent; color: var(--ink); display: flex; align-items: center; gap: 8px; padding: 0 8px; text-align: left; font: inherit; font-size: 13px; cursor: pointer; }
+    .cmp-doc:hover, .cmp-doc.on { background: var(--pk-hover); color: var(--brand); }
+    .cmp-doc > span { flex: 1 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .cmp-doc-meta { flex: none; color: var(--pk-t3); font-size: 12px; line-height: 18px; }
+    .cmp-empty { padding: 18px 8px 12px; text-align: center; color: var(--pk-t3); font-size: 13px; line-height: 20px; }
+    .cmp-empty b { display: block; color: var(--pk-t2); font-weight: 600; }
+    .cmp-upload-row { margin-top: 4px; border-top: 1px solid var(--pk-menu-line); border-radius: 0 0 8px 8px; color: var(--brand); }
+    .cmp-hint { margin: 0 0 8px; color: var(--pk-hint); font-size: 12px; line-height: 18px; }
+    .card-foot { display: flex; justify-content: flex-end; gap: 8px; margin-top: 8px; }
+    .card-foot button { height: 32px; border-radius: 8px; border: 0; background: transparent; color: var(--muted); padding: 0 12px; font: inherit; font-size: 14px; cursor: pointer; }
+    .card-foot button.primary { background: var(--brand); color: #fff; }
+    .card-foot button.primary:disabled { background: var(--pk-dis-bg); color: #fff; opacity: 1; cursor: default; }
+    .locked-row { display: flex; justify-content: space-between; gap: 12px; min-height: 32px; align-items: center; font-size: 13px; line-height: 20px; }
+    .locked-row span { color: var(--muted); }
+    .locked-row b { font-weight: 600; }
+    .pick-card.locked { padding-right: 36px; }
+    .lock-mark { position: absolute; top: 12px; right: 12px; width: 18px; height: 18px; border-radius: 50%; background: var(--brand); color: #fff; display: grid; place-items: center; }
+    /* 错误卡片（抄 error_card .net-card） */
+    .net-wrap { width: min(440px, 100%); display: flex; flex-direction: column; gap: 8px; }
+    .net-card { display: flex; flex-direction: column; gap: 8px; padding: 12px 16px; border: 0; border-radius: 14px; background: var(--err-card); }
+    .net-main { margin: 0; display: flex; align-items: flex-start; gap: 8px; color: var(--err-text); font-size: 14px; line-height: 22px; }
+    .net-main .msg-tone { flex: none; color: var(--err-icon); display: inline-flex; }
+    .net-actions { display: flex; justify-content: flex-end; align-items: center; gap: 8px; }
+    .net-x { width: 22px; height: 22px; border: 0; border-radius: 4px; background: transparent; color: var(--err-text-2); display: inline-flex; align-items: center; justify-content: center; cursor: pointer; }
+    .net-x:hover { background: var(--err-x-hover); color: var(--err-text); }
+    .act-primary { display: inline-flex; align-items: center; justify-content: center; height: 30px; padding: 0 12px; border: 1px solid #84acfb; border-radius: 8px; background: linear-gradient(180deg, #4a85ff 0%, #3370ff 100%); color: #fff; font: inherit; font-size: 14px; line-height: 22px; cursor: pointer; }
+    .copy-table { width: min(440px, 100%); border-collapse: collapse; font-size: 12px; line-height: 18px; border: 1px solid var(--line); }
+    .copy-table th { text-align: left; padding: 6px 10px; background: var(--page); color: var(--muted); }
+    .copy-table td { padding: 6px 10px; border-top: 1px solid var(--line); color: var(--muted); vertical-align: top; }
+    .copy-table td:first-child { color: var(--ink); white-space: nowrap; }
+
+    @media (max-width: 800px) {
+      .layout { grid-template-columns: 1fr; }
+      nav { position: static; max-height: none; display: flex; gap: 4px; overflow-x: auto; border-right: 0; border-bottom: 1px solid var(--line); }
+      nav a { white-space: nowrap; } nav a small { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <header class="top">
+    <div>
+      <h1>形态墙 · paper_compare_pick</h1>
+      <p>对比选择卡：选两份至多三份文件后确认，进入对比结果板。仅「对比哪些文件」一种；对哪里不满意 / 补问等走 ask_form 语义，不在本墙。</p>
+      <div class="meta">
+        <code><b>card_id</b> paper_compare_pick</code>
+        <code><b>tool</b> present_paper_compare_pick</code>
+        <code><b>section</b> A · 通用壳 · 有 Tool</code>
+        <code><b>title</b> 对比哪些文件</code>
+        <code><b>COMPARE_MAX</b> 3</code>
+        <code><b>source</b> conversations.html · comparePickHtml / .pick-card</code>
+      </div>
+    </div>
+    <div class="tools">
+      <button type="button" id="themeBtn">深色</button>
+      <a href="../doc_entry/morph-wall.html">doc_entry</a>
+      <a href="../doc_summary/morph-wall.html">doc_summary</a>
+      <a href="../course_paper/morph-wall.html#v6">course_paper</a>
+      <a href="../annotation_edit/morph-wall.html">annotation_edit</a>
+      <a href="../tip_block/morph-wall.html">tip_block</a>
+      <a href="../error_card/morph-wall.html">error_card</a>
+      <a href="../../conversations.html">Demo</a>
+      <a href="../CARD_ID-NAMING.md">命名</a>
+    </div>
+  </header>
+
+  <div class="layout">
+    <nav>
+      <a href="#v1"><b>V1</b> 两空槽<small>初始</small></a>
+      <a href="#v2"><b>V2</b> 部分已选<small>确认禁用</small></a>
+      <a href="#v3"><b>V3</b> 就绪<small>确认并对比 on</small></a>
+      <a href="#v4"><b>V4</b> 三槽 + 添加<small>移除 / 上限</small></a>
+      <a href="#v5"><b>V5</b> 下拉展开<small>.cmp-drop.open</small></a>
+      <a href="#v6"><b>V6</b> 预填两份<small>payload.slots</small></a>
+      <a href="#v7"><b>V7</b> 锁定<small>locked</small></a>
+      <a href="#v8"><b>V8</b> 提示 / 异常文案<small>hint · empty · net-card</small></a>
+    </nav>
+    <main>
+      <section class="panel" id="v1">
+        <div class="panel-head"><h2>V1 · 两个空槽<span class="tag">canonical</span></h2>
+          <p>默认两槽「文件一 / 文件二」，占位「选择文件」；底部提示「至少选两份不同的文件。」，主按钮禁用。</p></div>
+        <div class="stage" data-mount="empty"></div>
+      </section>
+      <section class="panel" id="v2">
+        <div class="panel-head"><h2>V2 · 部分已选</h2>
+          <p>只选了一份：确认仍禁用，提示仍在。</p></div>
+        <div class="stage" data-mount="partial"></div>
+      </section>
+      <section class="panel" id="v3">
+        <div class="panel-head"><h2>V3 · 就绪</h2>
+          <p>两份不同文件：提示消失，主按钮「确认并对比」可点（一张卡一个主按钮）。</p></div>
+        <div class="stage" data-mount="ready"></div>
+      </section>
+      <section class="panel" id="v4">
+        <div class="panel-head"><h2>V4 · 三槽 + 添加文件</h2>
+          <p><code>COMPARE_MAX = 3</code>。两槽时底部有「添加文件」虚线条；点一下长出第 3 槽（带「移除」），此时达上限：添加条消失，提示「最多对比 3 份文件。」。</p></div>
+        <div class="stage" data-mount="three"></div>
+      </section>
+      <section class="panel" id="v5">
+        <div class="panel-head"><h2>V5 · 下拉展开<span class="tag">menu</span></h2>
+          <p>点开某槽：列表里已被其它槽占用的文件不出现；当前槽已选项高亮；末行「上传文件」。</p></div>
+        <div class="stage menu-room" data-mount="menu"></div>
+      </section>
+      <section class="panel" id="v6">
+        <div class="panel-head"><h2>V6 · 预填两份<span class="tag">payload.slots</span></h2>
+          <p>Agent 调 <code>present_paper_compare_pick</code> 时带 <code>slots</code>：两槽已填，用户只需确认或改选。</p></div>
+        <div class="stage" data-mount="prefilled"></div>
+        <p class="note">入口多来自 <a href="../doc_entry/morph-wall.html">doc_entry</a> 的对比产物或用户说「对比初稿和修订」。确认后进入 <a href="../course_paper/morph-wall.html#v6">course_paper V6</a>。</p>
+      </section>
+      <section class="panel" id="v7">
+        <div class="panel-head"><h2>V7 · 锁定<span class="tag">locked</span></h2>
+          <p>确认后卡片只读：每行「文件一 / 文件二」+ 文件名，右上品牌色对勾，无按钮。</p></div>
+        <div class="stage" data-mount="locked"></div>
+      </section>
+      <section class="panel" id="v8">
+        <div class="panel-head"><h2>V8 · 提示与异常文案</h2>
+          <p>同一张卡只会出现一条提示；上传失败走全站错误卡片，不在卡内另造红字。</p></div>
+        <table class="copy-table">
+          <thead><tr><th>场景</th><th>文案</th></tr></thead>
+          <tbody>
+            <tr><td>未选够两份</td><td>至少选两份不同的文件。</td></tr>
+            <tr><td>已满上限</td><td>最多对比 3 份文件。</td></tr>
+            <tr><td>无可选文档</td><td>暂无文档 · 上传一份后再选择</td></tr>
+            <tr><td>上传 / 读取失败</td><td>错误卡片 + 「重试」</td></tr>
+          </tbody>
+        </table>
+        <div class="stage" data-mount="copy" style="margin-top:12px"></div>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    const esc = s => String(s == null ? "" : s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+    const MAX = 3;
+    const NO = ["一", "二", "三", "四", "五"];
+    const fileNo = i => "文件" + (NO[i] || (i + 1));
+    const chev = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>`;
+    const docIco = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 3h7l5 5v13a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1z"/><path d="M14 3v6h6"/></svg>`;
+    const check = `<svg width="10" height="10" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 6.2 4.6 9 10 3"/></svg>`;
+    const ERR = `<svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="7.33" fill="currentColor"/><path d="M5.2 5.2l5.6 5.6M10.8 5.2l-5.6 5.6" stroke="#fff" stroke-width="1.4" stroke-linecap="round"/></svg>`;
+    const X = `<svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true"><path d="M3 3l6 6M9 3L3 9" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>`;
+
+    const FILES = [
+      { id: "a", name: "课程论文_初稿.md", source: "对话", time: "今天 13:05" },
+      { id: "b", name: "课程论文_修订版.md", source: "对话", time: "今天 14:20" },
+      { id: "c", name: "开题报告.docx", source: "上传", time: "昨天" },
+      { id: "d", name: "实验记录.pdf", source: "上传", time: "" }
+    ];
+    const nameOf = id => (FILES.find(f => f.id === id) || {}).name || "";
+
+    function menu(index, slots, selected) {
+      const blocked = new Set(slots.filter((id, i) => i !== index && id));
+      const list = FILES.filter(f => !blocked.has(f.id));
+      const rows = list.length
+        ? list.map(f => `<button class="cmp-doc${f.id === selected ? " on" : ""}" type="button">${docIco}<span>${esc(f.name)}</span><small class="cmp-doc-meta">${esc(f.source)}${f.time ? " · " + esc(f.time) : ""}</small></button>`).join("")
+        : `<div class="cmp-empty"><b>暂无文档</b>上传一份后再选择</div>`;
+      return `<div class="cmp-menu">${rows}<button class="cmp-upload-row" type="button"><span>上传文件</span></button></div>`;
+    }
+    function pickCard({ slots, open = -1, hint, forceHint } = {}) {
+      const chosen = [...new Set(slots.filter(Boolean))];
+      const ready = chosen.length >= 2;
+      const autoHint = !ready ? "至少选两份不同的文件。" : slots.length >= MAX ? `最多对比 ${MAX} 份文件。` : "";
+      const h = forceHint !== undefined ? forceHint : (hint !== undefined ? hint : autoHint);
+      const fields = slots.map((id, i) => {
+        const remove = i > 1 ? `<button class="cmp-remove" type="button">移除</button>` : "";
+        const label = nameOf(id);
+        return `<div class="cmp-field"><div class="cmp-field-hd"><span>${fileNo(i)}</span>${remove}</div><div class="cmp-drop${open === i ? " open" : ""}"><button class="cmp-trigger${label ? "" : " placeholder"}" type="button"><span>${esc(label || "选择文件")}</span>${chev}</button>${open === i ? menu(i, slots, id) : ""}</div></div>`;
+      }).join("");
+      const add = slots.length >= MAX ? "" : `<button class="cmp-add" type="button">添加文件</button>`;
+      return `<div class="pick-card"><h3>对比哪些文件</h3>${fields}${add}${h ? `<p class="cmp-hint">${esc(h)}</p>` : ""}<div class="card-foot"><button class="primary" type="button" ${ready ? "" : "disabled"}>确认并对比</button></div></div>`;
+    }
+    function lockedCard(ids) {
+      return `<div class="pick-card locked">${ids.map((id, i) => `<div class="locked-row"><span>${fileNo(i)}</span><b>${esc(nameOf(id))}</b></div>`).join("")}<span class="lock-mark">${check}</span></div>`;
+    }
+
+    const mounts = {
+      empty: () => pickCard({ slots: ["", ""] }),
+      partial: () => pickCard({ slots: ["a", ""] }),
+      ready: () => pickCard({ slots: ["a", "b"] }),
+      three: () => `<p class="cap">① 两槽已选 + 「添加文件」</p>${pickCard({ slots: ["a", "b"] })}<p class="cap">② 点添加后：第 3 槽（可移除），达上限无添加条</p>${pickCard({ slots: ["a", "b", ""] })}<p class="cap">③ 三槽都选满</p>${pickCard({ slots: ["a", "b", "c"] })}`,
+      menu: () => pickCard({ slots: ["a", ""], open: 1 }),
+      prefilled: () => pickCard({ slots: ["a", "b"] }),
+      locked: () => lockedCard(["a", "b"]),
+      copy: () => `<p class="cap">已满上限提示</p>${pickCard({ slots: ["a", "b", "d"] })}
+        <p class="cap">无可选文档（下拉空态）</p><div class="pick-card"><h3>对比哪些文件</h3><div class="cmp-field"><div class="cmp-field-hd"><span>文件一</span></div><div class="cmp-drop open"><button class="cmp-trigger placeholder" type="button"><span>选择文件</span>${chev}</button><div class="cmp-menu" style="position:static;margin-top:4px;box-shadow:none"><div class="cmp-empty"><b>暂无文档</b>上传一份后再选择</div><button class="cmp-upload-row" type="button"><span>上传文件</span></button></div></div></div></div>
+        <p class="cap">上传 / 读取失败（错误卡片，复用 error_card）</p><div class="net-wrap"><div class="net-card"><p class="net-main"><i class="msg-tone">${ERR}</i><span>这份文件没读出来，换一份或重试。</span></p><div class="net-actions"><button class="act-primary" type="button">重试</button><button class="net-x" type="button" aria-label="关闭">${X}</button></div></div></div>`
+    };
+    document.querySelectorAll("[data-mount]").forEach(el => { el.innerHTML = mounts[el.dataset.mount](); });
+    themeBtn.onclick = () => {
+      const on = document.documentElement.classList.toggle("theme-dark");
+      themeBtn.textContent = on ? "浅色" : "深色";
+    };
+  </script>
+</body>
+</html>
