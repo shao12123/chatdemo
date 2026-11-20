@@ -69,8 +69,15 @@
   font-style: normal;
   unicode-range: U+3000-303F, U+3400-4DBF, U+4E00-9FFF, U+F900-FAFF, U+FF00-FFEF;
 }
-/* 中文档位。同一档比英文小 2px，行高与英文相同。 */
+/* 中文档位。同一档比英文小 2px，行高与英文相同。
+   展示、标题、标记用 Medium；正文、链接用 Regular。 */
 :root {
+  --fs-display-large: 62px;
+  --lh-display-large: 72px;
+  --fs-display-medium: 46px;
+  --lh-display-medium: 56px;
+  --fs-headline-large: 34px;
+  --lh-headline-large: 44px;
   --fs-headline-medium: 26px;
   --lh-headline-medium: 36px;
   --fs-headline-small: 22px;
@@ -87,6 +94,20 @@
   --lh-body-medium: 22px;
   --fs-body-small: 10px;
   --lh-body-small: 20px;
+  --fs-mark-medium: 12px;
+  --lh-mark-medium: 22px;
+  --fs-mark-small: 10px;
+  --lh-mark-small: 20px;
+  --fs-link-large: 14px;
+  --lh-link-large: 24px;
+  --fs-link-medium: 12px;
+  --lh-link-medium: 22px;
+  --fs-link-small: 10px;
+  --lh-link-small: 20px;
+  --fw-title: 500;
+  --fw-body: 400;
+  --fw-mark: 500;
+  --fw-link: 400;
 }
 html {
   font-size: var(--fs-body-large);

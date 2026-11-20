@@ -106,6 +106,14 @@
       "kind": "demo"
     },
     {
+      "id": "send-mail",
+      "title": "发送邮件场景",
+      "file": "发送邮件场景.html",
+      "owner": "张宏尧",
+      "summary": "问候邮件：草稿确认、已发送、关掉确认窗口、发送失败；已发送只留描边卡片，浅色深色与标注",
+      "kind": "demo"
+    },
+    {
       "id": "plan-list",
       "title": "生成计划清单",
       "file": "计划清单-PRD.html",
