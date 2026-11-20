@@ -72,9 +72,9 @@
 |---|---|
 | 工具名 | `present_plan_list` |
 | 用途 | 先分别识别本轮是不是**建议**、是不是**计划**。识别到建议或识别到计划，都调用本工具走 Intelligent UI。两次都否才不调用 |
-| 版本 | v0.7 · 2026-11-20 |
+| 版本 | v0.6 · 2026-11-19 |
 | 配套 | [生成计划清单场景.html](生成计划清单场景.html)（交互 Demo） |
-| 口径 | **一问只归一边** · 一句话里有两问时可以同时成立 · 识别到任一侧都调用 · **首轮判定**（不含确认、沿用、改某一项） |
+| 口径 | **建议与计划分别判定，可同时成立** · 计划清单严触发 · **首轮判定**（不含确认、沿用、改某一项） |
 
 > 把下面的 **description** 和 **系统提示增补** 贴进 Agent 的 tools / system prompt。本文件**不写** JSON Schema、校验、兜底、多轮引用。产出 HTML 有章节时必须带目录，写在本文件。
 
@@ -82,35 +82,36 @@
 
 ## 1. 两次判定
 
-每一轮先把用户的话拆成问。一问只归一边。一句话里有两问时，两问分别归类，可以同时成立。
+每一轮做两次判定，互不影响。可以只识别到建议，只识别到计划，或两个都识别到。
 
-不要靠「建议」「计划」「推荐」「清单」这些词。不要靠回答写出来之后有没有条目。条目是交付形状，不是归属判据。
+不要靠「建议」「计划」「推荐」「清单」这些词。
 
-事情已经清楚，只缺钟点、日期、人数或预算：按常理补全。缺这些信息不影响归属。
-
-建议和计划用同一套三关：对象、要的交付、互斥。三关都过才命中。命中一边，这一问就不命中另一边。
+事情已经清楚，只缺钟点、日期、人数或预算：按常理补全。缺这些信息不影响两次判定。
 
 ### 建议
 
-1. **对象**：几个已经点出来的选项。包括二选一、三选一，以及「选哪种」这种还要在类别里选的问。
-2. **交付**：用户要的是在这些选项里给一个结论和理由。
-3. **互斥**：这一问若是把一件即将发生的事怎么做出来（怎么弄、怎么排、怎么准备、要带什么、先做什么），归计划，不归建议。
+同时满足即识别为建议：
 
-命中建议，即不命中计划。同一句话里另有一问时，那一问单独再判。
+1. 有一个具体处境：谁、什么场合，或一个已经说清的目标；
+2. 里面有一个还没定的选择或做法；
+3. 用户要的是这个选择的结论和理由。
 
-识别到建议之后，调用 `present_plan_list`，并给出结论。二选一、三选一时，结论就是选项本身。选项还没点全时，结论后面加短理由；需要比较时给 2～3 个选项。这一问没有配上计划那一问时，不追加清单、步骤或时间表。
+识别到建议之后，调用 `present_plan_list`，并给出结论。二选一、三选一时，结论就是选项本身。问法开放时，结论后面加短理由；需要比较时给 2～3 个选项。
+
+本轮没有同时识别到计划时，不追加清单、步骤或时间表。
 
 ### 计划
 
-1. **对象**：一件即将发生的具体的事。目标清楚而且临近，例如下月办婚礼、下周去东京，对象在这里，不在建议。
-2. **交付**：用户要的是这件事怎么做。包括要做的事、要备的东西、先后顺序，也包括还没拆开的「怎么弄」「怎么排」。
-3. **互斥**：这一问若只是在已经点出的选项里选一个，归建议，不归计划。
+同时满足即识别为计划：
 
-命中计划，即不命中建议。同一句话里另有一问时，那一问单独再判。
+1. 有一件即将发生的具体的事，或一个已经说清、即将去做的目标；
+2. 用户要的是可以照着做的安排；
+3. 安排里有条目：要做的事、要备的东西，或先后顺序；
+4. 拿掉钟点后，这些条目还在。
 
-拿掉钟点后，要做的事或要备的东西还在，才算这一问的交付。主交付变成当天的时间格，计划判定为否。
+识别到计划之后，清单是主体。时间可以写在条目旁边。没写具体钟点或日期，按常理假设后仍出这份安排。半天、一天、跨天都算。条目按天分开写，仍然是清单。
 
-识别到计划之后，调用 `present_plan_list`。清单是主体。时间可以写在条目旁边。没写具体钟点或日期，按常理假设后仍出这份安排。半天、一天、跨天都算。条目按天分开写，仍然是清单。时间格用普通文字。交通行程走 `present_route_compare`。
+条目是要做的事或要备的东西时，调用 `present_plan_list`。时间格用普通文字。交通行程走 `present_route_compare`。
 
 本次调用产出的 HTML 正文有章节时：HTML 中加入目录。章节是可以单独定位的标题，例如概览、菜单、采购、时间。目录项与章节标题一致，点击跳到对应章节。正文没有章节时，不加目录。
 
@@ -118,9 +119,7 @@
 
 ### 两个都识别到
 
-只在一句话里有两问时成立：一问是在已点出的选项里选，另一问是把一件事怎么做出来。同一次调用里既给结论，也给清单。
-
-「有一件具体的事，又问怎么弄」只有一问，只归计划。
+同一次调用里既给结论，也给清单。
 
 ---
 
@@ -174,10 +173,9 @@
 
 | 边界 | 口径 |
 |---|---|
-| **建议** | 对象是已点出的选项，交付是结论和理由。命中则这一问不归计划。调用本工具，不追加清单 |
-| **计划** | 对象是即将发生的事，交付是这件事怎么做，含开放式「怎么弄 / 怎么排」。命中则这一问不归建议。调用本工具 |
-| **开放式怎么做** | 「婚礼怎么弄」「三天怎么排」只有一问，只归计划。不因为事情具体就同时算建议 |
-| **两个都有** | 同一句话里有两问：一问选选项，一问要怎么做。同一次调用里既给结论，也给清单 |
+| **建议** | 具体处境里有还没定的选择，用户要结论。识别为建议，调用本工具。没有同时识别到计划时，不追加清单 |
+| **计划** | 即将发生的事，要可照做的条目，拿掉钟点后条目还在。识别为计划，调用本工具 |
+| **两个都有** | 两次判定都为是。同一次调用里既给结论，也给清单 |
 | **清单内容** | 要做的事、要备的东西都算清单。没有要买的东西，只要这张清单还在，仍调用 |
 | **计划 vs 排期** | 拿掉钟点后还剩可勾选清单 → 计划，调用；主交付只是时间格 → 两者都不识别，不调用。同一句里两样都要 → 清单调用本工具，时间格用普通文字 |
 | **时间跨度** | 半天 / 一天 / 跨天，只要清单还在，都调用 |
@@ -193,11 +191,11 @@
 ### 中文
 
 ```text
-每一轮先把话拆成问。一问只归一边。一句话里有两问时，两问分别归类，可以同时成立。不要靠「建议」「计划」「推荐」「清单」这些词，也不要靠回答写出来之后有没有条目。事情已经清楚，只缺钟点、日期、人数或预算时，按常理补全后再判定。建议和计划用同一套三关：对象、要的交付、互斥。命中一边，这一问就不命中另一边。
+每一轮分别判定两件事，互不影响：是不是建议，是不是计划。可以只命中一个，也可以两个都命中。不要靠「建议」「计划」「推荐」「清单」这些词。事情已经清楚，只缺钟点、日期、人数或预算时，按常理补全后再判定。
 
-建议：对象是几个已经点出来的选项（二选一、三选一，或「选哪种」）；交付是在这些选项里给结论和理由；这一问若是把一件即将发生的事怎么做出来（怎么弄、怎么排、怎么准备、要带什么、先做什么），归计划，不归建议。识别到之后调用本工具并给出结论。二选一、三选一时结论就是选项本身。选项还没点全时加短理由，需要比较时给 2～3 个选项。这一问没有配上计划那一问时，不追加清单、步骤或时间表。
+建议：有具体处境（谁、什么场合，或已经说清的目标），里面有还没定的选择或做法，用户要的是结论和理由。识别到之后调用本工具，并给出结论。二选一、三选一时结论就是选项本身；问法开放时加短理由，需要比较时给 2～3 个选项。本轮没有同时识别到计划时，不追加清单、步骤或时间表。
 
-计划：对象是一件即将发生的具体的事。目标清楚而且临近（下月办婚礼、下周去东京）归这里，不归建议。交付是这件事怎么做，包括要做的事、要备的东西、先后顺序，以及还没拆开的「怎么弄」「怎么排」。这一问若只是在已点出的选项里选一个，归建议，不归计划。拿掉钟点后条目还在才算交付；主交付变成当天时间格则计划为否。识别到之后调用本工具。时间格用普通文字。交通行程走 present_route_compare。「有一件具体的事，又问怎么弄」只有一问，只归计划。两个都识别到，只在同一句话里有两问时成立，同一次调用里既给结论，也给清单。本次调用产出的 HTML 正文有章节时加入目录，目录项与章节标题一致并可跳转；没有章节不加目录。周日烤羊肉只是示例，不是白名单。
+计划：有一件即将发生的具体的事，或一个已经说清、即将去做的目标；用户要可以照着做的安排；安排里有条目（要做的事、要备的东西，或先后顺序）；拿掉钟点后条目还在。识别到之后调用本工具，用 Intelligent UI 展示清单。时间可以写在条目旁边。半天到跨天都算。条目按天分开写仍然是清单。主交付若变成当天的时间格，则计划判定为否。时间格用普通文字。交通行程走 present_route_compare。两个都识别到时，同一次调用里既给结论，也给清单。本次调用产出的 HTML 正文有章节时，HTML 中加入目录：目录项与章节标题一致，点击跳到对应章节。正文没有章节时不加目录。周日烤羊肉只是示例，不是白名单。
 
 不要调用：只有两次判定都为否。包括：模糊需求（只有笼统愿望，或只丢出一个选项但看不出场合，本轮先追问）；知识或做法解释；主交付是时间格的排期；从哪到哪、怎么走的行程；没有具体要办的事的攻略或菜谱；用户已经点明条目、没有要求再做安排；订位、下单、付款、发消息、建群；翻译、总结、改写已有内容；项目排期、OKR、周报。确认、沿用、改人数、改时间、替换已有计划中的某一项，不在本触发规则里判定。
 ```
@@ -205,11 +203,11 @@
 ### English（平台 description 要求英文时用）
 
 ```text
-Split the turn into questions first. One question belongs to one side. Two questions in one utterance are judged separately and may both apply. Do not use the words "suggestion", "plan", "recommend", or "list", and do not use whether a careful answer could be written as items. If the occasion is clear and only the clock, date, headcount, or budget is missing, fill those in before judging. Both sides use the same three gates: object, requested deliverable, exclusion. Matching one side excludes the other for that question.
+Each turn, judge two things separately. Either, both, or neither may apply. Do not rely on the words "suggestion", "plan", "recommend", or "list". If the occasion is already clear and only the clock, date, headcount, or budget is missing, fill those in by common sense before judging.
 
-SUGGESTION: the object is options already named (A or B, or "which kind"); the deliverable is a conclusion and a reason among those options; if the question is how to carry out an upcoming occasion (how to do it, how to arrange it, what to prepare, what to bring, what to do first), it is a plan, not a suggestion. Call this tool and deliver the conclusion. For a closed choice, the conclusion is the option itself. If the options are not fully named, add a short reason and, when comparison helps, 2–3 options. If that question is not paired with a plan question, do not add a checklist, steps, or a timetable.
+SUGGESTION: a concrete situation (who, what occasion, or a stated goal) contains an undecided choice, and the user wants a conclusion and the reason. Call this tool and deliver the conclusion. For a closed choice, the conclusion is the option itself. For an open question, add a short reason; when comparison helps, give 2–3 options. If this turn is not also a plan, do not add a checklist, steps, or a timetable.
 
-PLAN: the object is one concrete upcoming occasion. A clear and imminent goal (a wedding next month, Tokyo next week) belongs here, not under suggestion. The deliverable is how to do that occasion: actions, things to prepare, an order, or an unsplit "how should I do this". If the question only picks among options already named, it is a suggestion, not a plan. Items must still hold after the clock is removed; if the main deliverable is time slots, the plan judgment is no. Call this tool. Put time slots in plain text. Transport goes to present_route_compare. "There is a concrete occasion, and how should I do it" is one question and is only a plan. Both judgments apply only when one utterance contains two questions; then deliver the conclusion and the checklist in the same call. When the HTML from this call has chapters, include a table of contents whose entries match the chapter titles and jump to them. If there are no chapters, do not add one. The Sunday roast demo is an example only, not a whitelist.
+PLAN: there is a concrete upcoming occasion or a stated goal about to be done; the user wants an arrangement they can follow; the arrangement has items (actions, things to prepare, or an order); the items still hold after the clock is removed. Then call this tool so the checklist uses Intelligent UI. Times may sit beside items. Half-day through multi-day all count. Items grouped by day are still a checklist. If the main deliverable becomes time slots for the day, the plan judgment is no. Put time slots in plain text. Transport goes to present_route_compare. When both judgments are yes, deliver the conclusion and the checklist in the same call. When the HTML produced by this call has chapters, include a table of contents: each entry matches a chapter title and jumps to that chapter. If the body has no chapters, do not add a table of contents. The Sunday roast demo is an example only, not a whitelist.
 
 DO NOT CALL only when both judgments are no. Both are no for: vague requests (a bare wish, or a bare option with no occasion — ask first); facts, principles, or how-to explanations; schedules whose main deliverable is time slots; trips whose main deliverable is from/to and how to get there; guides or recipes with no concrete occasion the user is about to host; items the user already named, with no request to arrange the occasion; booking, ordering, paying, sending, or creating a group; translating, summarizing, or rewriting existing content; project schedules, OKRs, or weekly reports. Confirmations and local edits (change the headcount, change a time, swap one item) are out of scope for this trigger.
 ```
@@ -221,32 +219,37 @@ DO NOT CALL only when both judgments are no. Both are no for: vague requests (a 
 ```text
 # 建议与计划（present_plan_list）
 
-每一轮先把话拆成问。一问只归一边。一句话里有两问时，两问分别归类，可以同时成立。命中一边，这一问就不命中另一边。
+每一轮做两次判定，都要做，互不影响：
+1. 是不是建议
+2. 是不是计划
 
-不要靠「建议」「计划」「推荐」「清单」这些词。不要靠回答写出来之后有没有条目。
+可以只命中一个，也可以两个都命中。不要因为命中了计划就否掉建议，也不要因为命中了建议就否掉计划。不要靠「建议」「计划」「推荐」「清单」这些词。
 
-事情已经清楚，只缺钟点、日期、人数或预算：按常理补全后再判定。
-
-建议和计划用同一套三关：对象、要的交付、互斥。
+事情已经清楚，只缺钟点、日期、人数或预算：按常理补全，再做这两次判定。
 
 ## 建议
-- 对象：几个已经点出来的选项，包括「选哪种」
-- 交付：在这些选项里给结论和理由
-- 互斥：这一问若是把即将发生的事怎么做出来，归计划，不归建议
+同时满足即是：
+- 有具体处境：谁、什么场合，或一个已经说清的目标
+- 里面有还没定的选择或做法
+- 用户要的是结论和理由
 
-命中建议即不命中计划。调用 present_plan_list 并给出结论。二选一、三选一时，结论就是选项本身。选项还没点全时加短理由，需要比较时给 2～3 个选项。没有配上计划那一问时，不追加清单、步骤或时间表。
+识别到建议后调用 present_plan_list，并给出结论。二选一、三选一时，结论就是选项本身。问法开放时加短理由，需要比较时给 2～3 个选项。本轮没有同时识别到计划时，不追加清单、步骤或时间表。
 
 ## 计划
-- 对象：一件即将发生的具体的事。目标清楚而且临近，归这里
-- 交付：这件事怎么做，含怎么弄、怎么排、要准备什么、要带什么、先做什么
-- 互斥：这一问若只是在已点出的选项里选一个，归建议，不归计划
+同时满足即是：
+- 有一件即将发生的具体的事，或一个已经说清、即将去做的目标
+- 用户要可以照着做的安排
+- 有条目：要做的事、要备的东西，或先后顺序
+- 拿掉钟点后条目还在
 
-命中计划即不命中建议。拿掉钟点后条目还在才算交付。主交付变成当天时间格时，计划为否。调用 present_plan_list。时间格用普通文字。交通行程走 present_route_compare。「有一件具体的事，又问怎么弄」只有一问，只归计划。
+清单是主体。时间可以写在条目旁边。半天到跨天都算。条目按天分开写仍然是清单。主交付变成当天的时间格时，计划判定为否。
+
+识别到计划后调用 present_plan_list。时间格用普通文字。交通行程走 present_route_compare。
 
 本次调用产出的 HTML 正文有章节时，HTML 中加入目录。目录项与章节标题一致，点击跳到对应章节。正文没有章节时不加目录。
 
 ## 两个都识别到
-只在一句话里有两问时成立：一问选选项，一问要怎么做。同一次调用里既给结论，也给清单。
+同一次调用里既给结论，也给清单。
 
 ## 两者都不识别
 建议为否，计划也为否，不调用：
@@ -279,16 +282,14 @@ DO NOT CALL only when both judgments are no. Both are no for: vague requests (a 
 | 周末在家请 6 个朋友，人均 80，火锅还是烤肉？ | 场合清楚，选择未定。不要追加采购清单 |
 | 下周四面资深前端，要不要提前把题目发出去？ | 要的是结论 |
 | 5 岁生日在家办还是去室内乐园？ | 二选一，结论就是选项本身 |
-| 一周跑步三次，早晨跑还是晚上跑？ | 两个已经点出的选项。不是把跑步这件事拆开 |
+| 一周跑步三次，早晨跑还是晚上跑？ | 目标清楚，选择未定 |
 | 12 人聚餐，有人吃素，餐厅选哪种？ | 开放建议，结论加短理由 |
-| 入职第一周，先熟悉业务还是先搭开发环境？ | 两个已经点出的选项 |
+| 入职第一周，先熟悉业务还是先搭开发环境？ | 具体处境里的做法选择 |
 
 ### 只识别为计划（调用）
 
 | 用户说法 | 说明 |
 |---|---|
-| 下月办婚礼，怎么弄 | 开放式怎么做。只有一问，只归计划，不归建议 |
-| 下周去东京三天，怎么排 | 对象是即将发生的事。不是在已点出的选项里选 |
 | 周日请朋友来家里吃烤羊肉，人数还没定，出一份计划 | Demo 示例。人数按常理补全。采购和要做的事拿掉钟点还在 |
 | 下周露营两天，列装备和出发前要做的事 | 要备的东西也是清单 |
 | 周四要面 4 个人，列面试前要准备的东西，以及每个人要确认的问题 | 拿掉钟点，清单还在 |
@@ -298,7 +299,7 @@ DO NOT CALL only when both judgments are no. Both are no for: vague requests (a 
 | 面试前一天，帮我排准备事项和时间 | 准备事项调用本工具，时间用普通文字 |
 | 周日去野餐，帮我排出发前要做的事和要带的东西 | 同轮若还要路线，路线走行程工具 |
 
-### 两个都识别到（同一句话里有两问）
+### 两个都识别到（结论用文字，清单调用）
 
 | 用户说法 | 说明 |
 |---|---|
