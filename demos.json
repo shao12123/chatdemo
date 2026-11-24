@@ -114,6 +114,14 @@
       "kind": "demo"
     },
     {
+      "id": "fuzzy-demand",
+      "title": "模糊需求场景",
+      "file": "模糊需求场景.html",
+      "owner": "张宏尧",
+      "summary": "只说生成报告：追问体裁、部分、主题、时间和语气；整组跳过先不生成；没写的题不进总结",
+      "kind": "demo"
+    },
+    {
       "id": "plan-list",
       "title": "生成计划清单",
       "file": "计划清单-PRD.html",
