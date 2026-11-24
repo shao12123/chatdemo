@@ -5,7 +5,7 @@
       "title": "课程论文对话",
       "file": "课程论文-PRD.html",
       "owner": "共同维护",
-      "summary": "PRD：课程论文首稿/停止续写/异常/修订/对比/标注；顶部可打开 conversations.html Demo，可复制 Markdown 给 AGENT",
+      "summary": "PRD：课程论文功能/交互/UI；开发据 Demo+本文；可打开 conversations.html",
       "kind": "demo"
     },
     {
@@ -13,7 +13,7 @@
       "title": "对话目录",
       "file": "对话目录-PRD.html",
       "owner": "共同维护",
-      "summary": "PRD：提问/消息/文档目录同一控件；很多条边缘平移+鱼眼、展开 peek、右侧互斥；顶部可打开 Demo",
+      "summary": "PRD：提问/消息/文档目录同一控件（交互/UI）；很多条边缘平移+鱼眼；可打开 Demo",
       "kind": "demo"
     },
     {
@@ -30,7 +30,7 @@
       "title": "标注修改",
       "file": "标注修改-PRD.html",
       "owner": "张宏尧",
-      "summary": "PRD：PPT 标注入队、一次发送、成功另存新版、失败与暂停不留预览标注；顶部可打开交互 Demo，可复制 Markdown 给 AGENT",
+      "summary": "PRD：PPT 标注入队、一次发送、成功另存新版、失败与暂停规则；可打开 Demo",
       "kind": "demo"
     },
     {
@@ -38,7 +38,7 @@
       "title": "行程对比方案",
       "file": "三个路线方案-PRD.html",
       "owner": "共同维护",
-      "summary": "PRD + Agent TOOL（可下载 Demo.html / TOOL.md / PRD.md）：行程规划触发判定与边界清单；前端职责、数据契约、验收；可打开交互 Demo",
+      "summary": "PRD+TOOL：行程对比功能/交互/UI 与触发判定；可下载 Demo/TOOL/PRD，可打开 Demo",
       "kind": "demo"
     },
     {
@@ -46,7 +46,7 @@
       "title": "生成异常与恢复",
       "file": "生成异常与恢复-PRD.html",
       "owner": "共同维护",
-      "summary": "PRD：异常分级与恢复规则、全站错误卡片、断线续传事件与接口、前后端职责与验收；顶部可打开交互 Demo（12 个场景 + 故障模拟面板），可复制 Markdown 给 AGENT",
+      "summary": "PRD：异常分级与恢复、全站错误卡片、断线续传等产品规则；12 场景 Demo + 故障模拟",
       "kind": "demo"
     },
     {
@@ -54,7 +54,7 @@
       "title": "文档分析与总结",
       "file": "文档分析与总结-PRD.html",
       "owner": "共同维护",
-      "summary": "PRD：总结壳族与模块闸门、信号映射、数据契约与验收；顶部可打开交互 Demo（8 个 case），可复制 Markdown 给 AGENT",
+      "summary": "PRD：总结壳族与模块闸门、信号映射、验收；可打开 Demo（8 case）",
       "kind": "demo"
     },
     {
@@ -118,7 +118,7 @@
       "title": "生成计划清单",
       "file": "计划清单-PRD.html",
       "owner": "张宏尧",
-      "summary": "PRD + Agent TOOL：计划清单触发判定；顶部可打开交互 Demo，可下载 Demo.html / TOOL.md，可复制 TOOL",
+      "summary": "Agent TOOL：计划清单触发判定；可打开 Demo，可下载 Demo.html / TOOL.md，可复制 TOOL",
       "kind": "demo"
     },
     {

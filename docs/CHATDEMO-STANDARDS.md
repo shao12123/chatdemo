@@ -198,6 +198,6 @@ Figma：[MoreAI 任务排队 · node 163-759](https://www.figma.com/design/dazbZ
 ## 9. 交付习惯
 
 - 先讨论、用户说「修改」再改
-- 需要给 AGENT 开发时：PRD MD + HTML（可复制 MD、下载、新开 Demo）
+- 需要给开发 / AGENT 落地时：PRD MD + HTML（可复制 MD、下载、新开 Demo）。**PRD 只写功能、产品逻辑、交互、UI**；不写接口、前后端分工、埋点、实现任务拆分。触发判定可另附 TOOL 文档
 - 上传：用户明确要求后再 commit / push；先 `git pull --ff-only`；同步 origin / codeup / cursor
 - 版本：改 Demo 后更新 `version.json`

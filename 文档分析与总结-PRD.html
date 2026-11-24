@@ -68,12 +68,13 @@
 
 | 项目 | 内容 |
 |---|---|
-| 文档状态 | 待开发 · 第 12 节问题已全部确认 |
-| 版本 | v0.1 · 2026-11-16 |
-| 交互 Demo | [大模型代码评审.html](大模型代码评审.html)（入口标题「文档分析与总结」）：左侧 8 个 case 覆盖不同材料信号与壳族；右上角「说明」可看逐项标注 |
-| 适用读者 | 前端、后端、测试，以及接手开发的 AGENT |
+| 文档状态 | 产品定稿 · 第 8 节问题已全部确认 |
+| 版本 | v0.2 · 2026-11-24（PRD 只保留产品功能 / 逻辑 / 交互 / UI） |
+| 交互 Demo | [大模型代码评审.html](大模型代码评审.html)：左侧 8 个 case；右上角「说明」 |
+| 适用读者 | 产品、设计、开发、测试 |
+| 本文写什么 | **功能、产品逻辑、交互、UI**。不写接口、前后端分工、埋点、实现任务拆分 |
 
-> 给 AGENT：请按「第 5 节壳族与模块 → 第 6 节数据契约 → 第 7 节后端 → 第 8 节前端 → 第 11 节验收」的顺序实现。第 12 节已确认的按结论开发；写「沿用线上」的不改现有逻辑。**内容与推荐逻辑不变**：总结文案沿用线上模型输出，本期只改呈现。Demo 中的逐块流式出现仅作演示，**流式本期不做**（整条回复一次渲染）。
+> 开发依据：**Demo + 本文**。**内容与推荐逻辑不变**，本期只改呈现。流式本期不做，整条一次出现。第 8 节已确认按结论。
 
 ---
 
@@ -256,218 +257,95 @@ Demo / 验收里的 8 个 case **只是信号样例**，用来覆盖壳族与模
 
 ---
 
-## 6. 数据契约
+## 6. 产品规则与边界
 
-### 6.1 顶层
-```ts
-type SummaryReply = {
-  think: { t: string; n: string }[];  // 3 步；最后一步含「按推荐组织报告卡…」
-  lead: string;
-  card: SummaryCard;
-  // 可选：右侧原文
-  doc?: {
-    title: string;
-    meta?: string;
-    heading: string;
-    by?: string;
-    sections: { id: string; title: string; paras: string[] }[];
-  };
-};
+### 6.1 模块闸门
+- 第 5 节各模块：**有数据才渲染**，去掉任一模块数据后界面不留空壳。
+- 至少要有总判断、文件卡或要点之一，否则整段回退 Markdown。
+- 壳（shell）按材料信号映射，不绑死某个 Demo case；非法壳按要点样式降级，不阻断呈现。
+- 思考固定 3 步；最后一步含「按推荐组织报告卡…」。
 
-type SummaryCard = {
-  title?: string;           // 默认「总结报告」
-  shell?: SummaryShell;
-  split?: "points";         // 要点拆多外框
-  verdict?: { tag?: string; text: string };
-  thumbs?: string[];
-  facts?: FactCell[];
-  metrics?: { kicker?: string; items: FactCell[] };
-  points?: PointItem[];
-  fields?: { label: string; text: string }[];
-  quotes?: string[];
-  kicker?: string;
-  sections?: { title: string; bullets: string[] }[];
-  table?: { kicker?: string; headers: string[]; rows: string[][] };
-  conclusion?: { label?: string; text: string; note?: string };
-  chapters?: { id: string; name: string; title: string; text?: string; paras?: string[] }[];
-  fileCards?: FileCard[];
-  tip?: { title?: string; items: (string | [string, string])[] };
-};
+### 6.2 多附件与壳
+- 多附件：按文件（或按页）**各一张**「总结报告」外框；可先有总判断。
+- 单文件：默认可单卡，不必强行拆文件卡。
+- 报告卡与导语同宽。
+- 用户侧附件展示文件名、体积类型等元信息；图片可有预览，Demo 可用色块占位。
 
-type SummaryShell =
-  | "metric" | "points" | "material" | "spec"
-  | "ledger" | "catalog" | "notes";
+### 6.3 消息目录锚点（产品）
+长回复且右侧关闭时，消息目录可跳到：
 
-type FactCell = { label: string; value: string; note?: string };
-type PointItem = { tag?: string; title: string; text: string };
-type FileCard = {
-  file?: string; title: string; kind?: string;
-  thumb?: number | string; thumbLabel?: string;
-  tags?: string[]; core?: string;
-  compare?: {
-    mid?: string;
-    left: { label: string; items: string[] };
-    right: { label: string; items: string[] };
-  };
-  bullets?: string[];
-  table?: SummaryCard["table"];
-  sectionKicker?: string;
-};
-```
+| 块 | 目录标题 |
+|---|---|
+| 用户问 | 用户提问 |
+| 导语 | 导语 |
+| 单卡报告 | 总结报告 |
+| 多文件总判断 | 总判断 |
+| 各文件卡 | 文件 / 页标题 |
+| 拆要点各卡 | 要点标题 |
+| 提示块 | 提示 |
 
-### 6.2 校验
-- `think.length === 3`（可配置，但 Demo / 本期固定 3）。
-- 至少有 `verdict` 或 `fileCards` 或 `points` 之一，否则整卡失败 → 回退 Markdown。
-- `table.headers.length` 与每行 `rows[i].length` 一致。
-- `shell` 非法时按 `points` 降级样式，不阻断渲染。
+### 6.4 触发与互斥
+- 用户消息含附件或可解析引用，且意图为内容总结 → 走本结构化回复。
+- 与行程规划互斥：行程走行程对比场景。
+- Tip、错误卡、异常恢复：全站公共，本 PRD 不重定义。
 
-### 6.3 用户侧附件
-```ts
-type AttachFile = {
-  name: string;
-  meta: string;   // 如 "PNG · 186 KB"
-  kind: "img" | "pdf" | "docx" | "xlsx" | "md" | "html" | string;
-  // img 可带预览 URL；Demo 用色块占位
-};
-```
-
----
-
-## 7. 后端
-
-### 7.1 触发
-- 用户消息含附件或可解析引用，且意图为内容总结（见第 3 节），则走本结构化回复。
-- 与行程对比互斥：行程规划走 `present_route_compare`；本场景不走行程卡。
-
-### 7.2 生成步骤
-1. 读取 / OCR / 解析附件（失败文案与恢复见《生成异常与恢复》）。
-2. 模型产出总结文案（口径与线上一致）。
-3. **结构化装填**：按 5.5 选 `shell`，只填有依据的模块；多文件优先 `fileCards`。
-4. 一次返回完整 `SummaryReply`（流式本期不做）。
-
-### 7.3 失败
-- 结构化校验失败：返回 Markdown 全文 + 可选 `fallback: true`。
-- 部分文件失败：成功文件照常总结；失败文件按异常规范逐条提示，不画空报告卡。
-
----
-
-## 8. 前端
-
-### 8.1 渲染
-- 模块函数一一对应 5.2；入口判空。
-- `briefCardHtml`（或等价）：按 `fileCards` / `split` 决定单卡或多外框；设置 `data-shell`、`data-sum-sec`。
-- 思考过程必须复用路线 `routeThinkHtml` 族，禁止灰胶囊 think-tag。
-
-### 8.2 消息目录
-| 条件 | `data-sum-sec` | 目录标题 |
-|---|---|---|
-| 用户问 | `ask` | 用户提问 |
-| 导语 | `lead` | 导语 |
-| 单卡 | `report` | 总结报告 |
-| 多文件总判断 | `report-lead` | 总判断 |
-| 文件卡 i | `report-{i}` | 文件 / 页标题 |
-| 拆要点 i | `report-point-{i}` | 要点标题 |
-| tip | `tip` | 提示 |
-
-### 8.3 职责边界
-- 文案与壳选择：后端 / 模型侧产出；前端不因「好看」补空 facts。
-- Tip Block、错误卡、悬停气泡：全站公共组件。
-- 异常恢复：公共层，不在本 PRD 重定义。
-
----
-
-## 9. 边界与异常
+### 6.5 边界
 | 情况 | 处理 |
 |---|---|
-| 无附件纯口头「总结一下刚才」 | 若上下文有材料，仍可走本场景；否则普通 Markdown |
-| 只有 1 个文件 | 默认可单卡；不必强行 `fileCards` |
-| 表格过大 | 只传样例行（如前 4 行）+ 在 sections 说明全量规模 |
-| 图片无法预览 | 材料卡无缩略图，保留文件名与要点 |
+| 无附件纯口头「总结一下刚才」 | 上下文有材料仍可走；否则普通 Markdown |
+| 表格过大 | 只展示样例行 + 说明全量规模 |
+| 图片无法预览 | 无缩略图，保留文件名与要点 |
 | 结构化失败 | 整段 Markdown 回退 |
-| 与异常恢复叠加 | 中断 / 重试规则完全遵循《生成异常与恢复》 |
+| 部分文件失败 | 成功文件照常总结；失败按异常规范提示，不画空报告卡 |
+| 与异常叠加 | 完全遵循《生成异常与恢复》 |
 
 ---
 
-## 10. 埋点（建议）
-| 事件 | 属性 |
-|---|---|
-| `summary_render` | `shell`、模块是否出现的布尔位图、`file_card_count`、`split` |
-| `summary_fallback` | 原因码 |
-| `summary_outline_jump` | 目标 `data-sum-sec` |
-| `summary_file_open` | 文件 kind |
+## 7. 验收标准
 
----
-
-## 11. 验收标准
-
-### 11.1 功能
+### 7.1 功能
 - [ ] Demo 左侧 8 个 case 壳族与模块组合与第 3 节表一致。
-- [ ] 模块闸门：去掉任一模块数据后，界面不留空壳。
-- [ ] bundle / aicode：多张「总结报告」外框，与导语同宽；图卡含缩略图、标签、核心主题；合作场景有对照块。
-- [ ] templates：可见 facts + table；notes：无指标格，要点拆卡 + 摘录。
-- [ ] 思考 3 步，最后一步含「按推荐组织报告卡…」。
-- [ ] 有 tip 才出提示块；位置在报告后、操作栏前。
-- [ ] 长回复且右侧关闭时，消息目录可跳到各报告块。
-- [ ] 结构化失败回退 Markdown（可用 fixture 测）。
+- [ ] 模块闸门：无数据不留空壳。
+- [ ] 多文件：多张总结报告外框，与导语同宽；材料卡含缩略图 / 标签 / 核心主题等约定块。
+- [ ] 思考 3 步，最后一步含约定文案。
+- [ ] 有 tip 才出提示块；在报告后、操作栏前。
+- [ ] 长回复且右侧关闭时，消息目录可跳各报告块。
+- [ ] 结构化失败回退 Markdown。
 
-### 11.2 视觉
-- [ ] 最多两层卡；次要容器与品牌色符合全站 token。
-- [ ] 各 `data-shell` 样式可区分，但不靠彩色字叠彩色底强调。
-- [ ] 思考过程为路线绿勾时间线，不是灰胶囊列表。
-- [ ] 与 Demo 并排对比，字号、间距、圆角、同宽策略一致。
+### 7.2 视觉
+- [ ] 最多两层卡；token 对齐全站。
+- [ ] 各壳可区分，不靠彩色字叠彩色底。
+- [ ] 思考为路线绿勾时间线，非灰胶囊。
+- [ ] 与 Demo 并排对比一致。
 
-### 11.3 测试用例
-| # | 操作 | 预期 |
-|---|---|---|
-| 1 | 打开「大模型代码评审」发送 | metric：facts + metrics + 章节 Tab |
-| 2 | 「骨架类型正确」 | points：5 条要点卡 + 收束 |
-| 3 | 「AICode 合作提案」 | 总判断 + 3 张材料报告；第一张含对照 |
-| 4 | 「家用机器人规范」 | spec：fields + 左边线章节 |
-| 5 | 「付费模版库」 | ledger：3 事实格 + 样例表 + 章节 |
-| 6 | 「研究学习环境课件」 | catalog：facts + 五类技能章节 |
-| 7 | 「帮我总结下这些文件…」 | 每文件一张总结报告；未读文件可用表 |
-| 8 | 「杂乱会议笔记」 | notes 拆卡；有 quotes；无 metrics/facts |
-| 9 | 去掉 templates.table 数据 | 无表区域、无空白占位 |
-| 10 | 右侧打开原文时 | 消息目录隐藏或按全站规则不抢焦点 |
+### 7.3 测试用例
+沿用原 8 个 case +「去掉表数据无空壳」「右侧打开时目录规则」等（见 Demo 说明）。
 
 ---
 
-## 12. 模拟开发走查：问题与待确认
+## 8. 已确认决策
 
-| # | 问题 | 为什么会卡住开发 | 结论 | 状态 |
-|---|---|---|---|---|
-| Q1 | 总结文案是否可改写？ | 影响是否「只改 UI」 | 内容与线上一致，不增不减口径；本期只改呈现与结构化 | 已确认 |
-| Q2 | 多附件合并成一张还是拆多张？ | 布局与目录 | 按文件（或按页）拆多张「总结报告」外框；可先有总判断卡 | 已确认 |
-| Q3 | 报告卡是否与导语同宽？ | 样式 | 同宽（Demo 560） | 已确认 |
-| Q4 | 壳是否绑死 case？ | 扩展性 | 否；按材料信号映射，Demo case 仅作样例 | 已确认 |
-| Q5 | 无结构材料能否出指标格？ | 误导用户 | 否；用 points / quotes / 拆卡 | 已确认 |
-| Q6 | tip 是否可自拟？ | 文案风险 | 有线上依据才出；无则不出（Demo 已清自拟 tip） | 已确认 |
-| Q7 | 流式？ | 工期 | 本期不做；整条一次渲染 | 已确认 |
-| Q8 | 思考最后一步文案 | 与少选择原则 | 「按推荐组织报告卡。需要换看法时，写完后再说。」 | 已确认 |
-| Q9 | 章节原文放哪 | 右侧 vs 卡内 | 卡内 Tab 为主；右侧仅文件入口可选打开 | 已确认 |
-| Q10 | 与异常恢复关系 | 重复定义 | 完全复用《生成异常与恢复》，本 PRD 不另定恢复按钮 | 已确认 |
+| # | 问题 | 产品结论 | 状态 |
+|---|---|---|---|
+| Q1 | 总结文案是否可改写 | 与线上一致，本期只改呈现 | 已确认 |
+| Q2 | 多附件一张还是多张 | 按文件 / 页拆多张；可先有总判断 | 已确认 |
+| Q3 | 报告与导语同宽 | 同宽 | 已确认 |
+| Q4 | 壳是否绑死 case | 否；按材料信号映射 | 已确认 |
+| Q5 | 无结构材料出指标格 | 否；用要点 / 摘录 / 拆卡 | 已确认 |
+| Q6 | tip 是否可自拟 | 有依据才出 | 已确认 |
+| Q7 | 流式 | 本期不做 | 已确认 |
+| Q8 | 思考最后一步文案 | 「按推荐组织报告卡。需要换看法时，写完后再说。」 | 已确认 |
+| Q9 | 章节原文位置 | 卡内 Tab 为主；右侧仅可选打开 | 已确认 |
+| Q10 | 与异常恢复 | 完全复用，不另定恢复按钮 | 已确认 |
 
 ---
 
-## 13. 给 AGENT 的开发指引
+## 9. 参考
 
-### 13.1 任务拆分（建议顺序）
-1. **数据契约**：按第 6 节补 TypeScript / JSON Schema；为 8 个壳各备一份 fixture（可从 Demo `SUMMARY_CASES` 导出）。
-2. **公共模块渲染**：闸门函数 + `data-shell` 样式；多外框与消息目录。
-3. **后端装填**：信号 → shell；模块只填有据字段；多文件 `fileCards`。
-4. **接入异常恢复**与 Markdown 回退。
-5. **验收**：对照 Demo 与第 11 节；视觉用说明模式锚点。
-
-### 13.2 实现约束
-- 不新增色板；强调用字重。
-- 前端不补空 `facts` / `metrics` 凑版面。
-- 思考过程禁止旧灰胶囊实现。
-- Demo 与本文不一致时以本文为准；已知差异：Demo 含流式演示、部分缩略图为色块占位。
-
-### 13.3 参考
-- 交互 Demo：[大模型代码评审.html](大模型代码评审.html)
-- 全站规范：[docs/CHATDEMO-STANDARDS.md](docs/CHATDEMO-STANDARDS.md)
-- 提示块 / 错误卡：[三个路线方案-PRD.md](三个路线方案-PRD.md)、[生成异常与恢复-PRD.md](生成异常与恢复-PRD.md)
+- Demo：[大模型代码评审.html](大模型代码评审.html)
+- 全站：`docs/CHATDEMO-STANDARDS.md`
+- 提示块 / 错误卡：行程对比 PRD、生成异常与恢复 PRD
+- Demo 与本文不一致时以本文为准；已知：Demo 含流式演示、部分缩略图为色块
 </script>
   <script>
     const source = document.getElementById("prdSource").textContent.replace(/^\n/, "");
