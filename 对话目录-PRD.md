@@ -2,14 +2,28 @@
 
 | 项目 | 内容 |
 |---|---|
-| 文档状态 | 产品稿 · 第 8 节含本期范围变更（文档目录不上右侧） |
-| 版本 | v0.9 · 2026-11-24（右侧打开只藏对话列目录；文档目录改到云文档侧，本期不做） |
-| 交互 Demo | [对话目录.html](对话目录.html)（提问 / 消息 / 文档 / 右侧互斥 / 不足两条 / **很多条**；「文档目录」case 仅演示控件形态，**非本期上线范围**） |
-| Agent TOOL | **不需要**（导航控件，不改触发） |
-| 适用读者 | 产品、设计、开发、测试 |
-| 本文写什么 | **功能、产品逻辑、交互、UI**。不写接口、模块拆分、埋点、实现任务拆分 |
+| 文档状态 | 工程可落地 · 颜色对齐 moreai-electron 现网 token |
+| 版本 | v1.0 · 2026-11-24（token 表 = 现网浅/深；Demo 可切换验色） |
+| 交互 Demo | [对话目录.html](对话目录.html)（含**浅色/深色**开关；提问 / 消息 / 文档形态 / 右侧互斥 / 不足两条 / **很多条**） |
+| Agent TOOL | **不需要** |
+| 适用读者 | **开发优先**，产品 / 设计 / 测试 |
+| 本文写什么 | 行为契约 + **可直接抄的 token / 结构 / API**。业务只声明锚点。 |
 
-> 开发依据：**Demo + 本文**。业务 PRD **只声明本场景挂哪些锚点**，控件行为以本文为准。第 8 节「默认方案 / 已确认」按结论。
+> **开发依据：Demo + 本文 §5。** 颜色只引用现网 CSS 变量（见下表），禁止飞书灰 hex。`moreai-electron` 接入说明可对照产品仓 `docs/对话目录-工程接入说明.md`。
+
+### 工程 30 秒对照
+
+| 控件用途 | 抄这个变量 | Tailwind（现网） | Light | Dark |
+|---|---|---|---|---|
+| 当前横线 / 当前字 / hover 字 | `--text-color-primary` | `text-text-primary` | `#000000` | `#FFFFFF` |
+| 默认行字 | `--text-color-secondary` | `text-text-secondary` | `#66686C` | `#C5C8CE` |
+| 默认横线 / peek 副文 | `--text-color-placeholder` | `text-text-placeholder` | `#8B8E93` | `#C5C8CE` |
+| 展开卡底 | `--bg-color-container` / `--card` | `bg-bg-container` / `bg-card` | `#FFFFFF` | `#111216` |
+| peek 行底 | `--bg-color-secondarycontainer` | `bg-bg-secondary` | `#EEF0F3` | `#191A1D` |
+| 卡边 | `--component-border` / `--border` | `border-border` | `#DCDCDC` | `#2A2D33` |
+| flash | `--brand-color` @ 16% | — | `#0A59F7` | `color-mix(#317AF7 85%, white)` |
+
+主题开关：产品 `<html class="dark">`；本 Demo 用 `html.theme-dark`，取值与上表一致。
 
 ---
 
@@ -39,7 +53,7 @@
 1. 统一控件：收起轨（短横线）+ 展开卡（列表）+ 当前态 + 跳转高亮。
 2. **对话列**两种适配：提问（peek 开）、消息（peek 按业务）。
 3. 出现 / 隐藏规则：与右侧展示区互斥——**右侧一打开，对话列目录隐藏**。
-4. 深浅色：横线与文字用中性色；高亮闪用品牌色透明度（见 5.4）。
+4. 深浅色：横线与文字用规范 text token；卡底/边用容器 token；高亮闪用品牌色透明度（见 5.3）。
 5. 无障碍：列表行为按钮、`aria-label`；键盘 focus 可展开。
 
 ### 2.2 Demo 与工程
@@ -86,7 +100,7 @@
 ### 4.2 收起态（轨）
 - 位置：宿主右缘，竖直居中（`top: 50%` + translate）。
 - 一条锚点一条短横线；间距固定 **10px**（`OUTLINE_PITCH`）。
-- **当前项**：横线更长（约 16px）、颜色更深（`#1f2329`）；其余约 8px、`#c9cdd4`。
+- **当前项**：横线更长（约 16px）、色走 `--text-color-primary`；其余约 8px、`--text-color-placeholder`（见 5.3）。
 - 滚动宿主内容时，当前项随视口同步，轨平滑平移。
 
 ### 4.2.1 条数特别多时（强制 · 对齐 Cursor 轨手感）
@@ -138,25 +152,85 @@ nav.qnav[.show][.open][.no-peek]
                  i.qnav-dash
 ```
 
-### 5.2 尺寸与视觉（浅色）
+### 5.2 尺寸
+
 | 项 | 值 |
 |---|---|
 | 轨容器宽 | 28px；右偏移约 14px |
-| 横线 | 默认 8×2，当前 16×2；圆角 1；间距 10 |
-| 卡片 | 宽 280；圆角 12；白底；边 `#eceef2`；双层浅影；**最大高度约 12 行** |
+| 横线 | 默认 8×2，当前 16×2；圆角 1；间距 10（线高 2 + gap 8） |
+| 卡片 | 宽 280；圆角 12；`box-shadow` 用 `--shadow-card`；**最大高度约 12 行** |
 | 短横线窗口 | 最多 **18** 条，再受宿主高度限制 |
-| 行 | 字 12/20；默认右对齐；当前字重 600、色 `#1f2329`；默认字色 `#646a73` |
-| peek 底 | `#f5f6f7`；副文 `#8f959e` |
-| flash | 品牌色约 16% 透明光晕 1s |
+| 行 | 字 12/20；默认右对齐；当前字重 600 |
 
-深色：横线 / 字色改走全站 text token；卡片底与边对齐深色容器规范，工程实现时 token 化，禁止业务写死多套。
+### 5.3 颜色 token（= moreai-electron 现网，可直接用）
 
-### 5.3 文案规则
+来源：`moreai-electron` → `src/styles/tokens/colors-semantic.css`（经 `theme.css` / `index.css` 注册）。  
+Demo 顶部「浅色 / 深色」与产品 `html.dark` **同一套取值**。  
+**规则：组件只写 `var(--…)` / 语义 Tailwind 类，禁止业务 hex。**
+
+| 用途 | CSS 变量 | Tailwind | Light（现网） | Dark（现网） |
+|---|---|---|---|---|
+| 当前横线、当前行字、hover 字、当前 dash | `--text-color-primary` | `text-text-primary` | `#000000` | `#FFFFFF` |
+| 默认行字 | `--text-color-secondary` | `text-text-secondary` | `#66686C` | `#C5C8CE` |
+| 默认横线、peek 副文、默认 dash | `--text-color-placeholder` | `text-text-placeholder` | `#8B8E93` | `#C5C8CE` |
+| 展开卡底 | `--bg-color-container` / `--card` | `bg-bg-container` / `bg-card` | `#FFFFFF` | `#111216`（gray-13） |
+| peek 行底、提示条等次要底 | `--bg-color-secondarycontainer` | `bg-bg-secondary` | `#EEF0F3`（gray-1） | `#191A1D`（gray-12） |
+| 卡边 | `--component-border` / `--border` | `border-border` | `#DCDCDC` | `#2A2D33` |
+| 跳转 flash 光晕 | `--brand-color` 约 16% 透明 | — | `#0A59F7` | `color-mix(in srgb, #317AF7 85%, #fff)` |
+
+深浅对应关系（工程验收用）：
+
+| 语义 | Light → Dark |
+|---|---|
+| 主字 / 当前横线 | 黑 → 白 |
+| 次字 / 占位 / 默认横线 | `#66686C` / `#8B8E93` → **同一** `#C5C8CE`（现网深色层级已合并） |
+| 卡底 | 白 → `#111216` |
+| peek / 次要容器 | `#EEF0F3` → `#191A1D` |
+| 描边 | `#DCDCDC` → `#2A2D33` |
+| 品牌 | `#0A59F7` → 提亮后的 brand-dark |
+
+与 Figma「黑白 60%/40% alpha」原文的差异：现网为对比度改为**实色**；深色次要容器按**色阶名 Gray12 = `#191A1D`**（不以规则表误写的 `#292B2E` 为准）。Demo / 本文跟现网，不跟误写 hex。
+
+**禁止**：`#1f2329`、`#646a73`、`#c9cdd4`、`#eceef2`、`#f5f6f7`、`#8f959e`。
+
+### 5.4 样式绑定（对照 Demo 类名）
+
+| 选择器 | 属性 | Token |
+|---|---|---|
+| `.qnav-rail i` / `.qnav-dash` | `background` | `--text-color-placeholder` |
+| `.qnav-rail i.is-current` / `.is-current .qnav-dash` / hover dash | `background` | `--text-color-primary` |
+| `.qnav-row` | `color` | `--text-color-secondary` |
+| `.qnav-row.is-current` / `:hover` | `color` | `--text-color-primary` |
+| `.qnav-row.is-peek` | `background` | `--bg-color-secondarycontainer` |
+| `.qnav-a span` | `color` | `--text-color-placeholder` |
+| `.qnav-card` | `background` / `border-color` | `--card` / `--border` |
+| `.qnav-flash` | `box-shadow` | `brand-color` @ 16% |
+
+### 5.5 控件 API（工程接口）
+
+```ts
+type OutlineItem = { key: string | number; title: string; answer?: string };
+
+type OutlineConfig = {
+  host: HTMLElement;           // position:relative 的对话列宿主
+  scroller: HTMLElement;       // 滚动容器
+  items: OutlineItem[];        // ≥2 才显示
+  peek?: boolean;              // 提问目录 true；文档形态 false
+  denseRail?: boolean;         // 很多条
+  visible?: boolean;           // 右侧打开时 false
+  offset?: number;             // 跳转留白，对话约 24
+  nodeFor: (key: OutlineItem['key']) => HTMLElement | null;
+};
+```
+
+常量：`OUTLINE_MIN=2`，`OUTLINE_MAX=18`，`OUTLINE_PITCH=10`，卡内约 12 行。逻辑以 Demo `createOutline` 为准。
+
+### 5.6 文案规则
 - 提问标题：用户首行；空则文件名 / 引用 /「（空消息）」。
 - 副文：对应回复纯文本首句；截断由 CSS line-clamp。
 - 消息目录标题：由业务 PRD 映射表决定（如总结块标题）。
 
-### 5.4 与悬停气泡
+### 5.7 与悬停气泡
 目录行**不使用**全站 `data-tip` 气泡；展开卡即说明。
 
 ---
@@ -233,7 +307,7 @@ nav.qnav[.show][.open][.no-peek]
 |---|---|---|---|
 | Q1 | 提问与消息目录同时 | 同一会话优先提问目录；长单答用消息目录；不同时两套轨 | 默认方案 |
 | Q2 | 展开是否延迟 | 普通立即开；很多条模式约 240ms 再开 | 已确认 |
-| Q3 | 深色 token | 复用全站，不另开色表 | 默认方案 |
+| Q3 | 深色 token | 复用全站 `@text-color-*` / 容器 token（见 5.3），不另开色表；次要容器深色取 Gray12 `#191A1D` | 已确认 |
 | Q4 | 触控无 hover | 本期点击轨切换开合；窄屏专项另案 | 默认方案 |
 | Q5 | 右侧打开后是否出文档目录 | **本期不做**。只隐藏对话列提问 / 消息目录；右侧文档区也不挂目录。**原因**：云文档即将上线，文档大纲在云文档侧做，避免 Chat 右侧与云文档重复 | 已确认 |
 
