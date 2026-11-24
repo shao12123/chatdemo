@@ -1,5 +1,5 @@
 {
-  "version": "2026.11.24-13",
-  "updatedAt": "2026-11-24 19:20",
-  "note": "B0：shared/moreai-tokens.css 公共浅深 token；对话目录金样改 link；STANDARDS §5 强制约定"
+  "version": "2026.11.24-14",
+  "updatedAt": "2026-11-24 19:30",
+  "note": "B1：7 个场景壳挂 moreai-tokens；--gc-* / 壳色改现网，清飞书灰"
 }

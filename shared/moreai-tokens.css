@@ -43,6 +43,7 @@
   /* —— Demo 常用别名（指向语义，勿另赋飞书灰） —— */
   --page: var(--bg-color-page);
   --card: var(--bg-color-container);
+  /* 对话目录等：--secondary = 次要容器底；场景壳若把 secondary 当文字色，须在页面内覆盖为 text-color-secondary */
   --secondary: var(--bg-color-secondarycontainer);
   --ink: var(--text-color-primary);
   --sub: var(--text-color-secondary);
@@ -50,6 +51,38 @@
   --line: var(--component-stroke);
   --border: var(--component-border);
   --brand: var(--brand-color);
+
+  /* 场景壳别名（建群 / 邮件 / 天气…） */
+  --card-line: var(--component-border);
+  --nav: var(--text-color-secondary);
+  --label: var(--text-color-placeholder);
+  --placeholder: var(--text-color-placeholder);
+  --chip: color-mix(in srgb, var(--text-color-primary) 4%, transparent);
+  --chip-line: var(--component-border);
+  --hover: var(--brand-color-soft);
+  --brand-soft: var(--brand-color-soft);
+  --brand-deep: var(--brand-color);
+  --brand-hover: var(--brand-color-hover);
+  --brand-active: var(--brand-color);
+  --send: var(--brand-color);
+  --stage: var(--page);
+  --shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+
+  /* 建群/邮件等卡片局部 --gc-*（旧飞书灰 → 现网语义） */
+  --gc-bg: var(--bg-color-container);
+  --gc-ink: var(--text-color-primary);
+  --gc-muted: var(--text-color-secondary);
+  --gc-faint: var(--text-color-placeholder);
+  --gc-placeholder: var(--text-color-disabled);
+  --gc-line: var(--component-border);
+  --gc-line-soft: var(--bg-color-secondarycontainer);
+  --gc-input: var(--bg-color-container);
+  --gc-hover: var(--bg-color-page);
+  --gc-check: var(--bg-color-container);
+  --gc-avatar: var(--brand-color-soft);
+  --gc-avatar-ink: var(--brand-color);
+  --gc-pop: var(--bg-color-container);
+  --gc-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
 
   --font: "HarmonyOS Sans SC", "HarmonyOS Sans", "PingFang SC", "Noto Sans SC", -apple-system,
     BlinkMacSystemFont, sans-serif;
@@ -82,4 +115,19 @@ html.theme-dark {
   --error-color: #d94838;
 
   --shadow-card: 0 8px 28px rgba(0, 0, 0, 0.35), 0 1px 3px rgba(0, 0, 0, 0.25);
+
+  /* 场景壳 / --gc-* 深色跟随语义（勿再写飞书灰或白透明度字面量） */
+  --chip: rgba(255, 255, 255, 0.06);
+  --hover: var(--bg-color-secondarycontainer);
+  --shadow: none;
+
+  --gc-bg: var(--bg-color-secondarycontainer);
+  --gc-line-soft: var(--component-border);
+  --gc-input: var(--bg-color-container);
+  --gc-hover: rgba(255, 255, 255, 0.06);
+  --gc-check: var(--bg-color-container);
+  --gc-avatar: #1c2140;
+  --gc-avatar-ink: #b7c0ff;
+  --gc-pop: var(--bg-color-secondarycontainer);
+  --gc-shadow: none;
 }

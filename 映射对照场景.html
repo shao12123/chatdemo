@@ -4,63 +4,35 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>映射对照场景</title>
+  <link rel="stylesheet" href="shared/moreai-tokens.css" />
   <style>
     :root {
-      --page: #eef0f3;
-      --card: #ffffff;
-      --card-line: #e3e4e7;
-      --brand: #0a59f7;
-      --brand-deep: #165dff;
-      --brand-hover: #1e61ea;
-      --brand-active: #0e4ed9;
-      --ink: #000000;
-      --nav: rgba(0, 0, 0, .6);
-      --secondary: rgba(0, 0, 0, .6);
-      --muted: rgba(0, 0, 0, .4);
-      --label: rgba(0, 0, 0, .4);
-      --placeholder: rgba(0, 0, 0, .4);
-      --line: #e3e4e7;
-      --chip: rgba(9, 11, 14, 0.04);
-      --chip-line: #e3e4e7;
-      --hover: #f3f7ff;
-      --brand-soft: #f3f7ff;
-      --bubble: #f3f7ff;
-      --map-zh: #eef0f3;
-      --map-en: #f3f7ff;
-      --map-line: #e3e4e7;
+      /* 色：shared/moreai-tokens.css；本块只留映射卡别名与壳 */
+      --secondary: var(--text-color-secondary);
+      --nav: var(--text-color-secondary);
+      --label: var(--text-color-placeholder);
+      --placeholder: var(--text-color-placeholder);
+      --bubble: var(--brand-color-soft);
+      --map-zh: var(--bg-color-secondarycontainer);
+      --map-en: var(--brand-color-soft);
+      --map-line: var(--component-border);
       --map-pair: #d6e4ff;
-      --send: #165dff;
       --sidebar: linear-gradient(180deg, rgba(248,250,255,.8) 0%, rgba(234,242,255,.8) 54%, rgba(234,242,255,.8) 61%, rgba(243,243,255,.8) 100%);
-      --stage: var(--page);
-      --shadow: 0 1px 2px rgba(0,0,0,.05);
       --font: Inter, "PingFang SC", -apple-system, BlinkMacSystemFont, "Helvetica Neue", sans-serif;
     }
     html.theme-dark {
       color-scheme: dark;
-      --page: #090b0e;
-      --card: #111216;
-      --card-line: #292b2e;
-      --brand: #317af7;
-      --brand-deep: #317af7;
-      --brand-hover: #2762c6;
-      --brand-active: #317af7;
-      --ink: #ffffff;
-      --nav: rgba(255, 255, 255, .6);
-      --secondary: rgba(255, 255, 255, .6);
-      --muted: rgba(255, 255, 255, .4);
-      --label: rgba(255, 255, 255, .4);
-      --placeholder: rgba(255, 255, 255, .4);
-      --line: #292b2e;
-      --chip: rgba(255, 255, 255, .06);
-      --chip-line: #292b2e;
-      --hover: #292b2e;
-      --brand-soft: #0a1831;
-      --bubble: #0a1831;
-      --map-zh: #191a1d;
-      --map-en: #0a1831;
-      --map-line: #292b2e;
-      --map-pair: rgba(49, 122, 247, .32);
-      --send: #317af7;
+      --secondary: var(--text-color-secondary);
+      --nav: var(--text-color-secondary);
+      --label: var(--text-color-placeholder);
+      --placeholder: var(--text-color-placeholder);
+      --bubble: var(--brand-color-soft);
+      --map-zh: var(--bg-color-secondarycontainer);
+      --map-en: var(--brand-color-soft);
+      --map-line: var(--component-border);
+      --map-pair: color-mix(in srgb, var(--brand-color) 32%, transparent);
+      --sidebar: var(--bg-color-container);
+      --stage: var(--bg-color-page);
     }
     * { box-sizing: border-box; }
     html, body { height: 100%; margin: 0; }
@@ -127,8 +99,8 @@
     .artifact { position: relative; align-self: flex-start; display: flex; align-items: center; width: 300px; max-width: 100%; height: 56px; border: 1px solid #eef0f3; border-radius: 12px; background: #fff; overflow: hidden; }
     .artifact-open { display: flex; align-items: center; gap: 12px; min-width: 0; flex: 1; height: 100%; padding: 9px; border: 0; background: transparent; color: inherit; font: inherit; text-align: left; }
     .artifact-thumb { position: relative; width: 68px; height: 38px; flex: none; overflow: hidden; border-radius: 6px; border: 1px solid #eef0f3; background: #fff; }
-    .artifact-sheet { position: absolute; left: 0; top: 0; width: 272px; padding: 10px 12px 0; transform: scale(0.25); transform-origin: top left; color: #1f2329; pointer-events: none; }
-    .artifact-sheet em { display: block; color: #8f959e; font-size: 12px; line-height: 16px; font-style: normal; }
+    .artifact-sheet { position: absolute; left: 0; top: 0; width: 272px; padding: 10px 12px 0; transform: scale(0.25); transform-origin: top left; color: var(--ink); pointer-events: none; }
+    .artifact-sheet em { display: block; color: var(--muted); font-size: 12px; line-height: 16px; font-style: normal; }
     .artifact-sheet strong { display: block; margin: 2px 0 6px; font-size: 18px; line-height: 24px; font-weight: 650; }
     .artifact-sheet span { display: block; margin: 0 0 4px; color: #3a3d42; font-size: 12px; line-height: 18px; }
     .artifact-copy { min-width: 0; flex: 1; overflow: hidden; }
@@ -236,7 +208,7 @@
     .toast.show { opacity: 1; }
     .toast img { width: 16px; height: 16px; flex: none; }
     .toast span { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-    .hover-tip { position: fixed; z-index: 90; display: none; max-width: 220px; padding: 4px 8px; border-radius: 6px; background: #1f2329; color: #fff; font-size: 12px; line-height: 18px; pointer-events: none; white-space: nowrap; }
+    .hover-tip { position: fixed; z-index: 90; display: none; max-width: 220px; padding: 4px 8px; border-radius: 6px; background: var(--text-color-primary); color: var(--bg-color-container); font-size: 12px; line-height: 18px; pointer-events: none; white-space: nowrap; }
     .hover-tip.show { display: block; }
     .stage {
       height: 100%; height: 100vh; height: 100dvh; min-height: 640px; display: grid;

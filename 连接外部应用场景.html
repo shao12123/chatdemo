@@ -4,31 +4,16 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>连接外部应用场景</title>
+  <link rel="stylesheet" href="shared/moreai-tokens.css" />
   <style>
     :root {
-      --page: #f6f7fb;
-      --card: #ffffff;
-      --card-line: #f1f5f9;
-      --brand: #0a59f7;
-      --brand-deep: #165dff;
-      --brand-hover: #1e61ea;
-      --brand-active: #0e4ed9;
-      --ink: #1e293b;
-      --nav: #5e6063;
-      --secondary: #5e6063;
-      --muted: #858e9c;
-      --label: #858e9c;
-      --placeholder: #828a99;
-      --line: #f1f5f9;
-      --chip: rgba(9, 11, 14, 0.04);
-      --chip-line: #e9ebee;
-      --hover: #f3f7ff;
-      --brand-soft: #f3f7ff;
-      --send: #165dff;
+      /* 色：shared/moreai-tokens.css；本块只留壳布局别名与 sidebar */
+      --secondary: var(--text-color-secondary); /* 场景壳：文字色（覆盖公共「次要底」） */
+      --nav: var(--text-color-secondary);
+      --label: var(--text-color-placeholder);
+      --placeholder: var(--text-color-placeholder);
       --sidebar: linear-gradient(180deg, rgba(248,250,255,.8) 0%, rgba(234,242,255,.8) 54%, rgba(234,242,255,.8) 61%, rgba(243,243,255,.8) 100%);
-      --stage: var(--page);
-      --shadow: 0 1px 2px rgba(0,0,0,.05);
-      --font: Inter, "PingFang SC", sans-serif;
+      --font: Inter, "PingFang SC", -apple-system, BlinkMacSystemFont, "Helvetica Neue", sans-serif;
     }
     * { box-sizing: border-box; }
     html, body { height: 100%; margin: 0; }
@@ -95,8 +80,8 @@
     .artifact { position: relative; align-self: flex-start; display: flex; align-items: center; width: 300px; max-width: 100%; height: 56px; border: 1px solid #eef0f3; border-radius: 12px; background: #fff; overflow: hidden; }
     .artifact-open { display: flex; align-items: center; gap: 12px; min-width: 0; flex: 1; height: 100%; padding: 9px; border: 0; background: transparent; color: inherit; font: inherit; text-align: left; }
     .artifact-thumb { position: relative; width: 68px; height: 38px; flex: none; overflow: hidden; border-radius: 6px; border: 1px solid #eef0f3; background: #fff; }
-    .artifact-sheet { position: absolute; left: 0; top: 0; width: 272px; padding: 10px 12px 0; transform: scale(0.25); transform-origin: top left; color: #1f2329; pointer-events: none; }
-    .artifact-sheet em { display: block; color: #8f959e; font-size: 12px; line-height: 16px; font-style: normal; }
+    .artifact-sheet { position: absolute; left: 0; top: 0; width: 272px; padding: 10px 12px 0; transform: scale(0.25); transform-origin: top left; color: var(--ink); pointer-events: none; }
+    .artifact-sheet em { display: block; color: var(--muted); font-size: 12px; line-height: 16px; font-style: normal; }
     .artifact-sheet strong { display: block; margin: 2px 0 6px; font-size: 18px; line-height: 24px; font-weight: 650; }
     .artifact-sheet span { display: block; margin: 0 0 4px; color: #3a3d42; font-size: 12px; line-height: 18px; }
     .artifact-copy { min-width: 0; flex: 1; overflow: hidden; }
@@ -204,7 +189,7 @@
     .toast.show { opacity: 1; }
     .toast img { width: 16px; height: 16px; flex: none; }
     .toast span { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-    .hover-tip { position: fixed; z-index: 90; display: none; max-width: 220px; padding: 4px 8px; border-radius: 6px; background: #1f2329; color: #fff; font-size: 12px; line-height: 22px; pointer-events: none; white-space: nowrap; }
+    .hover-tip { position: fixed; z-index: 90; display: none; max-width: 220px; padding: 4px 8px; border-radius: 6px; background: var(--text-color-primary); color: var(--bg-color-container); font-size: 12px; line-height: 22px; pointer-events: none; white-space: nowrap; }
     .hover-tip.show { display: block; }
     .stage {
       height: 100%; height: 100vh; height: 100dvh; min-height: 640px; display: grid;
@@ -811,39 +796,6 @@
 
     .lead { margin: 0 0 12px; font-size: 14px; line-height: 24px; font-weight: 400; }
     #stage .msg.assistant .lead { margin: 0 0 12px; }
-
-    :root {
-      --gc-bg: #ffffff;
-      --gc-ink: #1f2329;
-      --gc-muted: #646a73;
-      --gc-faint: #8f959e;
-      --gc-placeholder: #bbbfc4;
-      --gc-line: #e5e6eb;
-      --gc-line-soft: #eef0f3;
-      --gc-input: #ffffff;
-      --gc-hover: #f5f6f7;
-      --gc-check: #ffffff;
-      --gc-avatar: #eef0ff;
-      --gc-avatar-ink: #7b83ff;
-      --gc-pop: #ffffff;
-      --gc-shadow: 0 8px 20px rgba(31, 35, 41, .12);
-    }
-    html.theme-dark {
-      --gc-bg: #191a1d;
-      --gc-ink: #ffffff;
-      --gc-muted: rgba(255, 255, 255, .62);
-      --gc-faint: rgba(255, 255, 255, .45);
-      --gc-placeholder: rgba(255, 255, 255, .35);
-      --gc-line: #434448;
-      --gc-line-soft: #292b2e;
-      --gc-input: #111216;
-      --gc-hover: rgba(255, 255, 255, .06);
-      --gc-check: #111216;
-      --gc-avatar: #1c2140;
-      --gc-avatar-ink: #b7c0ff;
-      --gc-pop: #191a1d;
-      --gc-shadow: none;
-    }
     #stage .msg.assistant:has(> .gc:not(.gc-result)) { width: min(520px, 100%); }
     #stage .msg.assistant:has(> .gc.gc-result) { width: min(436px, 100%); }
     .gc {
@@ -1131,30 +1083,14 @@
 
     html.theme-dark {
       color-scheme: dark;
-      --page: #090b0e;
-      --card: #111216;
-      --card-line: #292b2e;
-      --ink: #ffffff;
-      --nav: rgba(255, 255, 255, .6);
-      --secondary: rgba(255, 255, 255, .6);
-      --muted: rgba(255, 255, 255, .6);
-      --label: rgba(255, 255, 255, .4);
-      --placeholder: rgba(255, 255, 255, .4);
-      --line: #292b2e;
-      --chip: rgba(255, 255, 255, .06);
-      --chip-line: #292b2e;
-      --hover: #292b2e;
-      --brand: #317af7;
-      --brand-deep: #317af7;
-      --brand-hover: #2762c6;
-      --brand-active: #2762c6;
-      --brand-soft: #0a1831;
-      --send: #317af7;
-      --sidebar: #111216;
-      --stage: #090b0e;
-      --shadow: none;
+      --secondary: var(--text-color-secondary);
+      --nav: var(--text-color-secondary);
+      --label: var(--text-color-placeholder);
+      --placeholder: var(--text-color-placeholder);
+      --sidebar: var(--bg-color-container);
+      --stage: var(--bg-color-page);
     }
-    html.theme-dark body,
+html.theme-dark body,
     html.theme-dark #stage.stage { background: var(--page); color: var(--ink); }
     html.theme-dark #stage > .rail {
       background: #111216;

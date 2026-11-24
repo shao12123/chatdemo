@@ -105,6 +105,7 @@
 | 写法 | 组件只写 `var(--text-color-*)` / `var(--bg-color-*)` / `var(--component-border)` / `var(--brand-color)` 等；**禁止**业务写死飞书灰（`#1f2329` `#646a73` `#8f959e` `#c9cdd4` `#eceef2` `#f5f6f7`）或品牌 `#165dff` |
 | 深色 | Demo 用 `html.theme-dark`；与产品 `html.dark` **取值相同**（见该 CSS） |
 | 金样 | [`对话目录.html`](../对话目录.html) + [对话目录 PRD §5.3](../对话目录-PRD.md) |
+| 场景壳（B1） | 建群 / 邮件 / 外链 / 时间 / 模糊需求 / 天气 / 映射对照：已 `link` 公共 CSS；`--gc-*` 在 token 文件内映射现网 |
 | 说明 | [`shared/README.md`](../shared/README.md) |
 
 ### 5.1 现网语义对照（工程 / Demo 共用）
