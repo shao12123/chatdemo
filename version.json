@@ -1,5 +1,5 @@
 {
-  "version": "2026.11.24-12",
-  "updatedAt": "2026-11-24 18:43",
-  "note": "计划清单深色：文档顶部分割线和收起按钮跟上深色"
+  "version": "2026.11.24-13",
+  "updatedAt": "2026-11-24 19:20",
+  "note": "B0：shared/moreai-tokens.css 公共浅深 token；对话目录金样改 link；STANDARDS §5 强制约定"
 }

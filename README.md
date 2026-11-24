@@ -41,13 +41,25 @@ python3 -m http.server 8765 --bind 127.0.0.1
 
 打开 `http://127.0.0.1:8765/`（不要用 `file://`）。
 
+## 颜色（Demo / 卡片库）
+
+业务 Demo、卡片库必须使用现网语义色，**不要写飞书灰 hex**：
+
+- 公共 CSS：[`shared/moreai-tokens.css`](shared/moreai-tokens.css)（浅/深 = `moreai-electron` 现网）
+- 约定与对照表：[docs/CHATDEMO-STANDARDS.md §5](docs/CHATDEMO-STANDARDS.md)
+- 金样：[对话目录.html](对话目录.html)（已引入公共 token + 浅深切换）
+
+后续场景 / 形态墙改造：先 `link` 该 CSS，再删本地 `--gc-*` / 飞书色。
+
 ## 目录
 
 - `index.html` — 团队唯一入口
-- `demos.json` — demo 列表
+- `demos.json` — demo 列表（`kind: demo` 业务 / `card` 卡片库）
+- `shared/moreai-tokens.css` — 公共浅深 token（B0）
 - `version.json` — 版本戳（每次发布必改）
 - `conversations.html` — 主对话 demo
-- `.github/workflows/pages.yml` — 推送 `main` 后自动发布 Pages
+- `chat-cards/` — 卡片形态墙
+- `.github/workflows/pages.yml` — 推送 `main` 后自动发布 Pages`
 
 ## 远程
 

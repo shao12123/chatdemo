@@ -4,55 +4,9 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>对话目录</title>
+  <link rel="stylesheet" href="shared/moreai-tokens.css" />
   <style>
-    /*
-     * 颜色 = moreai-electron 现网语义 token（colors-semantic.css）
-     * 工程直接抄同名 CSS 变量 / Tailwind：text-text-*、bg-bg-*、border-border、brand
-     * 禁止业务再写 #1f2329 / #646a73 等飞书灰
-     */
-    :root {
-      --text-color-primary: #000000;
-      --text-color-secondary: #66686c;
-      --text-color-placeholder: #8b8e93;
-      --text-color-disabled: #b0b3b8;
-      --bg-color-page: #e9ebee; /* gray-2 */
-      --bg-color-container: #ffffff;
-      --bg-color-secondarycontainer: #eef0f3; /* gray-1 */
-      --component-border: #dcdcdc; /* gray-4-border，现网 */
-      --component-stroke: #dcdcdc;
-      --border: var(--component-border);
-      --card: var(--bg-color-container);
-      --brand-color: #0a59f7;
-      --brand-color-soft: #f3f7ff; /* brand-12 */
-      --brand-color-hover-line: #b5cdfd; /* brand-8 */
-      --shadow-card: 0 8px 28px rgba(0, 0, 0, 0.08), 0 1px 3px rgba(0, 0, 0, 0.06);
-      --page: var(--bg-color-page);
-      --ink: var(--text-color-primary);
-      --sub: var(--text-color-secondary);
-      --muted: var(--text-color-placeholder);
-      --line: var(--component-stroke);
-      --brand: var(--brand-color);
-      --secondary: var(--bg-color-secondarycontainer);
-      --font: "HarmonyOS Sans SC", "PingFang SC", -apple-system, BlinkMacSystemFont, sans-serif;
-    }
-    /* 与 html.dark / next-themes 一致：本 Demo 用 html.theme-dark */
-    html.theme-dark {
-      --text-color-primary: #ffffff;
-      /* 现网深色 secondary / placeholder / disabled 合并为同一 muted */
-      --text-color-secondary: #c5c8ce;
-      --text-color-placeholder: #c5c8ce;
-      --text-color-disabled: #c5c8ce;
-      --bg-color-page: #090b0e; /* gray-14 */
-      --bg-color-container: #111216; /* gray-13 */
-      --bg-color-secondarycontainer: #191a1d; /* gray-12 */
-      --component-border: #2a2d33; /* 现网 dark border */
-      --component-stroke: #2a2d33;
-      /* 现网：brand-dark-1 #317af7 再提亮约 15% */
-      --brand-color: color-mix(in srgb, #317af7 85%, #ffffff);
-      --brand-color-soft: #0a1831; /* brand-dark-9 */
-      --brand-color-hover-line: #2762c6; /* brand-dark-3 */
-      --shadow-card: 0 8px 28px rgba(0, 0, 0, 0.35), 0 1px 3px rgba(0, 0, 0, 0.25);
-    }
+    /* 颜色：shared/moreai-tokens.css（现网语义）；本文件只写布局与组件 */
     * { box-sizing: border-box; }
     html, body { margin: 0; height: 100%; }
     body { height: 100%; background: var(--page); color: var(--ink); font: 14px/1.6 var(--font); overflow: hidden; }

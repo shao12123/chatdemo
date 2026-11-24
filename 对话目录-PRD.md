@@ -165,6 +165,7 @@ nav.qnav[.show][.open][.no-peek]
 ### 5.3 颜色 token（= moreai-electron 现网，可直接用）
 
 来源：`moreai-electron` → `src/styles/tokens/colors-semantic.css`（经 `theme.css` / `index.css` 注册）。  
+Demo / 卡片库公共文件：[`shared/moreai-tokens.css`](shared/moreai-tokens.css)（金样 [`对话目录.html`](对话目录.html) 已 `link`；深色开关 `html.theme-dark`）。  
 Demo 顶部「浅色 / 深色」与产品 `html.dark` **同一套取值**。  
 **规则：组件只写 `var(--…)` / 语义 Tailwind 类，禁止业务 hex。**
 

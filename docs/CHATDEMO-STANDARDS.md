@@ -92,32 +92,45 @@
 
 ---
 
-## 5. 颜色与文字（Figma《华为项目-规范》）
+## 5. 颜色与文字
 
-来源：[Figma 规范](https://www.figma.com/design/yqXDOTr2jDco9DVso8EVXs/?node-id=0-1)。组件不写死色值，引用 token；跟随产品浅/深色。
+来源：[Figma《华为项目-规范》色彩规则](https://www.figma.com/design/yqXDOTr2jDco9DVso8EVXs/?node-id=895-1243)。  
+**落地权威**：`moreai-electron` 现网语义层（`colors-semantic.css`），不是 Figma 原文里的黑白 alpha 字面量。
 
-### 5.1 文字四级
+### 5.0 Demo / 卡片库强制约定（B0）
 
-| 级 | 透明度 | 用途 |
+| 项 | 要求 |
+|---|---|
+| 公共文件 | 业务 Demo、卡片库形态墙 **必须** 引入 [`shared/moreai-tokens.css`](../shared/moreai-tokens.css) |
+| 写法 | 组件只写 `var(--text-color-*)` / `var(--bg-color-*)` / `var(--component-border)` / `var(--brand-color)` 等；**禁止**业务写死飞书灰（`#1f2329` `#646a73` `#8f959e` `#c9cdd4` `#eceef2` `#f5f6f7`）或品牌 `#165dff` |
+| 深色 | Demo 用 `html.theme-dark`；与产品 `html.dark` **取值相同**（见该 CSS） |
+| 金样 | [`对话目录.html`](../对话目录.html) + [对话目录 PRD §5.3](../对话目录-PRD.md) |
+| 说明 | [`shared/README.md`](../shared/README.md) |
+
+### 5.1 现网语义对照（工程 / Demo 共用）
+
+| 用途 | CSS 变量 | Light | Dark |
+|---|---|---|---|
+| 主文字 | `--text-color-primary` | `#000000` | `#FFFFFF` |
+| 次文字 | `--text-color-secondary` | `#66686C` | `#C5C8CE` |
+| 占位 / 弱横线 | `--text-color-placeholder` | `#8B8E93` | `#C5C8CE` |
+| 页面底 | `--bg-color-page` | `#E9EBEE` | `#090B0E` |
+| 容器底 | `--bg-color-container` | `#FFFFFF` | `#111216` |
+| 次要容器 | `--bg-color-secondarycontainer` | `#EEF0F3` | `#191A1D` |
+| 描边 | `--component-border` | `#DCDCDC` | `#2A2D33` |
+| 品牌 | `--brand-color` | `#0A59F7` | `color-mix(#317AF7 85%, white)` |
+| 成功 / 警示 / 错误 | `--success-color` 等 | 见 `moreai-tokens.css` | 见同文件 |
+
+说明：Figma 文字规则写的是黑/白 100/60/40/20% alpha；**现网为实色**（深色次/占位/禁用合并为 `#C5C8CE`）。深色次要容器按色阶名 Gray12=`#191A1D`（不以规则表误写 `#292B2E` 为准）。
+
+### 5.2 Figma 文字四级（设计意图；落地用 5.1）
+
+| 级 | 设计意图 | 现网落地 |
 |---|---|---|
-| 主要 | 100%（浅 #000 / 深 #FFF） | 标题、结论、正文 |
-| 次要 | 60% | 副标题、说明、表头、标签（表头等靠字号字重与正文区分） |
-| 占位 | 40% | 圆点、弱提示、placeholder |
-| 禁用 | 20% | 禁用态 |
-
-### 5.2 常用底与功能色（浅 / 深）
-
-| 用途 | 浅色 | 深色 |
-|---|---|---|
-| 次要容器（提示块、错误卡、对比卡外层） | #EEF0F3 | #191A1D |
-| 容器（块、方案块） | #FFFFFF | #111216 |
-| 描边 / 弱分割 | #D8D9DD / #E3E4E7 | #434448 / #292B2E |
-| 品牌 | #0A59F7 | #317AF7 |
-| 成功 | #64BB5C（标签底 #E9F5E7） | #5BA854 |
-| 警示 | #ED6F21 | #DB6B42 |
-| 错误图标 | #E84026 | #E84026 |
-
-规范冲突时以色阶名为准（详见行程对比 PRD 5.6）。
+| 主要 | 100% 黑 / 白 | `--text-color-primary` |
+| 次要 | 60% | `--text-color-secondary` |
+| 占位 | 40% | `--text-color-placeholder` |
+| 禁用 | 20% | `--text-color-disabled` |
 
 ### 5.3 字体
 
