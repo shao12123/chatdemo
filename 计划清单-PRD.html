@@ -72,7 +72,7 @@
 |---|---|
 | 工具名 | `present_plan_list` |
 | 用途 | 先分别识别本轮是不是**建议**、是不是**计划**。识别到建议或识别到计划，都调用本工具走 Intelligent UI。两次都否才不调用 |
-| 版本 | v0.9 · 2026-11-24 |
+| 版本 | v0.10 · 2026-11-24 |
 | 配套 | [生成计划清单场景.html](生成计划清单场景.html)（交互 Demo）· 交叉优先级见与 `present_route_compare` 一节 |
 | 口径 | **建议与计划分别判定，可同时成立** · 计划清单严触发 · **首轮判定**（不含确认、沿用、改某一项）· **与行程工具同轮可双开** |
 
@@ -90,13 +90,13 @@
 
 ### 建议
 
-同时满足即识别为建议：
+用户要一个可以直接采用的结论，即识别为建议。不要求有一件即将要办的事，也不要求先说清谁和场合。结论是下面任一种：
 
-1. 有一个具体处境：谁、什么场合，或一个已经说清的目标；
-2. 里面有一个还没定的选择或做法；
-3. 用户要的是这个选择的结论和理由。
+1. 具体处境里还没定的选择：谁、什么场合，或一个已经说清的目标；
+2. **推荐**：景点、美食、玩法。没有即将要办的事也算；
+3. **知识或做法**：事实、原理，或怎么做才达到某个效果。不要求他先摆出一个选项。
 
-识别到建议之后，调用 `present_plan_list`，并给出结论。二选一、三选一时，结论就是选项本身。问法开放时，结论后面加短理由；需要比较时给 2～3 个选项。
+识别到建议之后，调用 `present_plan_list`，并给出结论。二选一、三选一时，结论就是选项本身。问法开放时，结论后面加短理由；需要比较时给 2～3 个选项。推荐、知识、做法也只给结论和短理由。
 
 本轮没有同时识别到计划时，不追加清单、步骤或时间表。
 
@@ -110,6 +110,8 @@
 2. 用户要的是可以照着做的安排；
 3. 安排里有条目：要做的事、要备的东西，或先后顺序；
 4. 拿掉钟点后，这些条目还在。
+
+只要推荐、知识或做法，用户没有要一份可照做的安排，就不识别为计划。计划的四条不放宽。
 
 识别到计划之后，清单是主体。时间可以写在条目旁边。没写具体钟点或日期，按常理假设后仍出这份安排。半天、一天、跨天都算。条目按天分开写，仍然是清单。
 
@@ -149,11 +151,9 @@
 
 建议判定为否，计划判定也为否：
 
-- **模糊需求**：只有笼统愿望，看不出具体处境、待定的选择，或即将要办的事。只丢出一个选项，看不出这个选择发生在什么场合，同样算。本轮先追问，不交付结论，也不交付清单。
-- **知识或做法**：要的是事实、原理、做法解释，没有要他做选择，也没有一件要办的事。
+- **模糊需求**：只有笼统愿望，看不出要什么结论。只丢出一个选项，看不出这个选择发生在什么场合，同样算。本轮先追问，不交付结论，也不交付清单。
 - **排期**：主交付是时间格。拿掉钟点，内容就不成立。
 - **行程**：主交付是从哪到哪、怎么走（含会交付 legs 的出行方式对比）。有序交通行程段走 `present_route_compare`；不要当建议。缺起终点只追问时，不要改判成本工具。
-- **攻略或菜谱**：推荐景点、美食、玩法，或写做法，没有一件他即将要办的具体的事。
 - **已给出的条目**：用户已经点明要买什么、做什么，没有要求为这件事再做安排。
 - **执行**：订位、下单、付款、发消息、建群，以及其他替他完成动作的请求。
 - **加工已有内容**：翻译、总结、改写、换格式。对象是已经存在的计划或文本。
@@ -186,14 +186,14 @@
 
 | 边界 | 口径 |
 |---|---|
-| **建议** | 具体处境里有还没定的选择，用户要结论。识别为建议，调用本工具。没有同时识别到计划时，不追加清单。若主答案将是带 legs 的出行方案对比 → 建议为否，走行程工具 |
-| **计划** | 即将发生的事，要可照做的条目，拿掉钟点后条目还在。识别为计划，调用本工具 |
+| **建议** | 用户要结论。具体处境里的选择、推荐景点美食玩法、知识或做法，都算。没有即将要办的事也算。没有同时识别到计划时，不追加清单。若主答案将是带 legs 的出行方案对比 → 建议为否，走行程工具 |
+| **计划** | 即将发生的事，要可照做的条目，拿掉钟点后条目还在。识别为计划，调用本工具。只是推荐、知识或做法，没有这份安排 → 不算计划 |
 | **两个都有** | 两次判定都为是。同一次调用里既给结论，也给清单 |
 | **清单内容** | 要做的事、要备的东西都算清单。没有要买的东西，只要这张清单还在，仍调用 |
 | **计划 vs 排期** | 拿掉钟点后还剩可勾选清单 → 计划，调用；主交付只是时间格 → 两者都不识别，不调用。同一句里两样都要 → 清单调用本工具，时间格用普通文字 |
 | **时间跨度** | 半天 / 一天 / 跨天，只要清单还在，都调用 |
 | **计划 vs 行程** | 见 §2.0；有拿掉钟点还在的清单 → 调用；有序交通行程段 → 不调用，走 `present_route_compare`；两样都要 → 各走各的工具 |
-| **建议 vs 攻略 / 菜谱** | 具体处境里的选择 → 建议；没有一件即将要办的事，只推荐景点、美食、玩法或写做法 → 两者都不识别 |
+| **推荐 / 知识 / 做法** | 识别为建议，调用本工具，给结论，不追加清单。不因为没有即将要办的事就判否 |
 | **缺信息** | 事情清楚，只缺钟点、日期、人数或预算 → 按常理补全后照常识别。事情本身不清楚 → 模糊需求，先追问。缺起终点的行程问 → 不改判为本工具 |
 | **HTML 目录** | 与建议 / 计划分开判。第一层结构门槛和第二层页面价值都过 → 加目录，条目与章节标题一致并可跳转。任一不过 → 保持文本 |
 
@@ -231,11 +231,11 @@
 ```text
 每一轮分别判定两件事，互不影响：是不是建议，是不是计划。可以只命中一个，也可以两个都命中。不要靠「建议」「计划」「推荐」「清单」这些词。事情已经清楚，只缺钟点、日期、人数或预算时，按常理补全后再判定。
 
-建议：有具体处境（谁、什么场合，或已经说清的目标），里面有还没定的选择或做法，用户要的是结论和理由。识别到之后调用本工具，并给出结论。二选一、三选一时结论就是选项本身；问法开放时加短理由，需要比较时给 2～3 个选项。本轮没有同时识别到计划时，不追加清单、步骤或时间表。若本轮主答案将交付带有序行程段的出行方案（含高铁 vs 飞机等出行方式对比）→ 建议判定为否，走 present_route_compare，不要用本工具抢结论。
+建议：用户要一个可以直接采用的结论。不要求有一件即将要办的事，也不要求先说清谁和场合。结论可以是具体处境里还没定的选择，可以是推荐（景点、美食、玩法），也可以是知识或做法（事实、原理，或怎么做才达到某个效果）。识别到之后调用本工具，并给出结论。二选一、三选一时结论就是选项本身；问法开放、推荐、知识或做法时加短理由，需要比较时给 2～3 个选项。本轮没有同时识别到计划时，不追加清单、步骤或时间表。若本轮主答案将交付带有序行程段的出行方案（含高铁 vs 飞机等出行方式对比）→ 建议判定为否，走 present_route_compare，不要用本工具抢结论。
 
-计划：有一件即将发生的具体的事，或一个已经说清、即将去做的目标；用户要可以照着做的安排；安排里有条目（要做的事、要备的东西，或先后顺序）；拿掉钟点后条目还在。识别到之后调用本工具，用 Intelligent UI 展示清单。时间可以写在条目旁边。半天到跨天都算。条目按天分开写仍然是清单。主交付若变成当天的时间格，则计划判定为否。时间格用普通文字。交通行程走 present_route_compare；同轮还有清单时两工具可双开。两个都识别到时，同一次调用里既给结论，也给清单。是否生成目录与建议 / 计划分开判，两层都过才加目录，任一不过就保持文本。第一层全部满足：正文超过 500 个中文字符（阈值可在 500–1200 间调，当前按 500）；至少 2 个二级标题，或 3 个以上编号章节；不是提问、澄清、失败、取消；不是以代码块为主；不是已有文件交付的说明文字。第二层只看结构，不看是建议还是计划：内容自包含、分章节，适合浏览、分享、回看，且具有多章节、步骤、清单、对比、时间安排或表格，才适合页面。代码为主、引用为主、短回答、情绪化回答、追问，保持文本。加目录时，目录项与章节标题一致，点击跳到对应章节。周日烤羊肉只是示例，不是白名单。
+计划：有一件即将发生的具体的事，或一个已经说清、即将去做的目标；用户要可以照着做的安排；安排里有条目（要做的事、要备的东西，或先后顺序）；拿掉钟点后条目还在。只是推荐、知识或做法，没有这份安排，计划判定为否。识别到之后调用本工具，用 Intelligent UI 展示清单。时间可以写在条目旁边。半天到跨天都算。条目按天分开写仍然是清单。主交付若变成当天的时间格，则计划判定为否。时间格用普通文字。交通行程走 present_route_compare；同轮还有清单时两工具可双开。两个都识别到时，同一次调用里既给结论，也给清单。是否生成目录与建议 / 计划分开判，两层都过才加目录，任一不过就保持文本。第一层全部满足：正文超过 500 个中文字符（阈值可在 500–1200 间调，当前按 500）；至少 2 个二级标题，或 3 个以上编号章节；不是提问、澄清、失败、取消；不是以代码块为主；不是已有文件交付的说明文字。第二层只看结构，不看是建议还是计划：内容自包含、分章节，适合浏览、分享、回看，且具有多章节、步骤、清单、对比、时间安排或表格，才适合页面。代码为主、引用为主、短回答、情绪化回答、追问，保持文本。加目录时，目录项与章节标题一致，点击跳到对应章节。周日烤羊肉只是示例，不是白名单。
 
-不要调用：只有两次判定都为否。包括：模糊需求（只有笼统愿望，或只丢出一个选项但看不出场合，本轮先追问）；知识或做法解释；主交付是时间格的排期；从哪到哪、怎么走的行程（含出行方式对比且会出 legs——让路给 present_route_compare，不要当建议）；没有具体要办的事的攻略或菜谱；用户已经点明条目、没有要求再做安排；订位、下单、付款、发消息、建群；翻译、总结、改写已有内容；项目排期、OKR、周报；缺起终点只能追问的行程问（不要改判成本工具）。确认、沿用、改人数、改时间、替换已有计划中的某一项，不在本触发规则里判定。
+不要调用：只有两次判定都为否。包括：模糊需求（只有笼统愿望，或只丢出一个选项但看不出场合，本轮先追问）；主交付是时间格的排期；从哪到哪、怎么走的行程（含出行方式对比且会出 legs——让路给 present_route_compare，不要当建议）；用户已经点明条目、没有要求再做安排；订位、下单、付款、发消息、建群；翻译、总结、改写已有内容；项目排期、OKR、周报；缺起终点只能追问的行程问（不要改判成本工具）。推荐景点美食玩法、知识或做法，都识别为建议，不要放进不调用。确认、沿用、改人数、改时间、替换已有计划中的某一项，不在本触发规则里判定。
 ```
 
 ### English（平台 description 要求英文时用）
@@ -243,11 +243,11 @@
 ```text
 Each turn, judge two things separately. Either, both, or neither may apply. Do not rely on the words "suggestion", "plan", "recommend", or "list". If the occasion is already clear and only the clock, date, headcount, or budget is missing, fill those in by common sense before judging.
 
-SUGGESTION: a concrete situation (who, what occasion, or a stated goal) contains an undecided choice, and the user wants a conclusion and the reason. Call this tool and deliver the conclusion. For a closed choice, the conclusion is the option itself. For an open question, add a short reason; when comparison helps, give 2–3 options. If this turn is not also a plan, do not add a checklist, steps, or a timetable. If the main answer will be travel plans with ordered legs (including mode comparison such as train vs flight), the suggestion judgment is no—use present_route_compare; do not steal the conclusion with this tool.
+SUGGESTION: the user wants a conclusion they can adopt. No upcoming occasion is required, and they need not name who or where first. The conclusion may be an undecided choice in a concrete situation, a recommendation (places, food, or things to do), or knowledge and method (a fact, a principle, or how to reach an effect). Call this tool and deliver the conclusion. For a closed choice, the conclusion is the option itself. For an open question, a recommendation, or knowledge and method, add a short reason; when comparison helps, give 2–3 options. If this turn is not also a plan, do not add a checklist, steps, or a timetable. If the main answer will be travel plans with ordered legs (including mode comparison such as train vs flight), the suggestion judgment is no—use present_route_compare; do not steal the conclusion with this tool.
 
-PLAN: there is a concrete upcoming occasion or a stated goal about to be done; the user wants an arrangement they can follow; the arrangement has items (actions, things to prepare, or an order); the items still hold after the clock is removed. Then call this tool so the checklist uses Intelligent UI. Times may sit beside items. Half-day through multi-day all count. Items grouped by day are still a checklist. If the main deliverable becomes time slots for the day, the plan judgment is no. Put time slots in plain text. Transport goes to present_route_compare; when the same turn also needs a checklist, both tools may fire. When both judgments are yes, deliver the conclusion and the checklist in the same call. Decide the table of contents separately from suggestion versus plan. Add one only when both layers pass; otherwise keep plain text. Layer 1, all required: body longer than 500 Chinese characters (threshold adjustable between 500 and 1200; use 500); at least 2 second-level headings, or 3 or more numbered chapters; not a question, clarification, failure, or cancellation; not primarily code blocks; not a note explaining a file already delivered. Layer 2 looks only at structure, not at suggestion versus plan: the text is a self-contained, sectioned piece meant to be browsed, shared, or reread, with sections, steps, lists, comparisons, schedules, or tables. Keep plain text when it is mostly code, mostly quotation, a short reply, an emotional reply, or a follow-up question. When a table of contents is added, each entry matches a chapter title and jumps to that chapter. The Sunday roast demo is an example only, not a whitelist.
+PLAN: there is a concrete upcoming occasion or a stated goal about to be done; the user wants an arrangement they can follow; the arrangement has items (actions, things to prepare, or an order); the items still hold after the clock is removed. A recommendation, a fact, or a method with no such arrangement is not a plan. Then call this tool so the checklist uses Intelligent UI. Times may sit beside items. Half-day through multi-day all count. Items grouped by day are still a checklist. If the main deliverable becomes time slots for the day, the plan judgment is no. Put time slots in plain text. Transport goes to present_route_compare; when the same turn also needs a checklist, both tools may fire. When both judgments are yes, deliver the conclusion and the checklist in the same call. Decide the table of contents separately from suggestion versus plan. Add one only when both layers pass; otherwise keep plain text. Layer 1, all required: body longer than 500 Chinese characters (threshold adjustable between 500 and 1200; use 500); at least 2 second-level headings, or 3 or more numbered chapters; not a question, clarification, failure, or cancellation; not primarily code blocks; not a note explaining a file already delivered. Layer 2 looks only at structure, not at suggestion versus plan: the text is a self-contained, sectioned piece meant to be browsed, shared, or reread, with sections, steps, lists, comparisons, schedules, or tables. Keep plain text when it is mostly code, mostly quotation, a short reply, an emotional reply, or a follow-up question. When a table of contents is added, each entry matches a chapter title and jumps to that chapter. The Sunday roast demo is an example only, not a whitelist.
 
-DO NOT CALL only when both judgments are no. Both are no for: vague requests (a bare wish, or a bare option with no occasion — ask first); facts, principles, or how-to explanations; schedules whose main deliverable is time slots; trips whose main deliverable is from/to and how to get there (including mode comparison that will deliver legs—defer to present_route_compare, not as a suggestion); guides or recipes with no concrete occasion the user is about to host; items the user already named, with no request to arrange the occasion; booking, ordering, paying, sending, or creating a group; translating, summarizing, or rewriting existing content; project schedules, OKRs, or weekly reports; itinerary asks that only need origin/destination clarification (do not reclassify as this tool). Confirmations and local edits (change the headcount, change a time, swap one item) are out of scope for this trigger.
+DO NOT CALL only when both judgments are no. Both are no for: vague requests (a bare wish, or a bare option with no occasion — ask first); schedules whose main deliverable is time slots; trips whose main deliverable is from/to and how to get there (including mode comparison that will deliver legs—defer to present_route_compare, not as a suggestion); items the user already named, with no request to arrange the occasion; booking, ordering, paying, sending, or creating a group; translating, summarizing, or rewriting existing content; project schedules, OKRs, or weekly reports; itinerary asks that only need origin/destination clarification (do not reclassify as this tool). Recommendations of places, food, or activities, and knowledge or how-to answers, are suggestions—do not put them here. Confirmations and local edits (change the headcount, change a time, swap one item) are out of scope for this trigger.
 ```
 
 ---
@@ -266,12 +266,12 @@ DO NOT CALL only when both judgments are no. Both are no for: vague requests (a 
 事情已经清楚，只缺钟点、日期、人数或预算：按常理补全，再做这两次判定。
 
 ## 建议
-同时满足即是：
-- 有具体处境：谁、什么场合，或一个已经说清的目标
-- 里面有还没定的选择或做法
-- 用户要的是结论和理由
+用户要一个可以直接采用的结论即是。不要求有一件即将要办的事，也不要求先说清谁和场合。结论是下面任一种：
+- 具体处境里还没定的选择
+- 推荐：景点、美食、玩法
+- 知识或做法：事实、原理，或怎么做才达到某个效果
 
-识别到建议后调用 present_plan_list，并给出结论。二选一、三选一时，结论就是选项本身。问法开放时加短理由，需要比较时给 2～3 个选项。本轮没有同时识别到计划时，不追加清单、步骤或时间表。
+识别到建议后调用 present_plan_list，并给出结论。二选一、三选一时，结论就是选项本身。问法开放、推荐、知识或做法时加短理由，需要比较时给 2～3 个选项。本轮没有同时识别到计划时，不追加清单、步骤或时间表。
 
 若本轮主答案将交付带有序行程段的出行方案（含高铁 vs 飞机等）→ 建议判定为否，走 present_route_compare；不要用本工具抢结论。
 
@@ -281,6 +281,8 @@ DO NOT CALL only when both judgments are no. Both are no for: vague requests (a 
 - 用户要可以照着做的安排
 - 有条目：要做的事、要备的东西，或先后顺序
 - 拿掉钟点后条目还在
+
+只是推荐、知识或做法，没有这份安排，就不是计划。
 
 清单是主体。时间可以写在条目旁边。半天到跨天都算。条目按天分开写仍然是清单。主交付变成当天的时间格时，计划判定为否。
 
@@ -312,11 +314,9 @@ DO NOT CALL only when both judgments are no. Both are no for: vague requests (a 
 ## 两者都不识别
 建议为否，计划也为否，不调用：
 - 模糊需求：只有笼统愿望，或只丢出一个选项但看不出场合。先追问
-- 知识或做法解释
 - 排期：主交付是时间格，拿掉钟点内容就不成立
 - 行程：从哪到哪、怎么走（含出行方式对比且会出 legs → 让路给 present_route_compare，不要当建议）
 - 缺起终点只能追问的行程问：不要改判成本工具
-- 攻略或菜谱：没有一件即将要办的具体的事
 - 用户已经点明要买什么、做什么，没有要求再做安排
 - 订位、下单、付款、发消息、建群
 - 翻译、总结、改写已有内容
@@ -344,6 +344,9 @@ DO NOT CALL only when both judgments are no. Both are no for: vague requests (a 
 | 一周跑步三次，早晨跑还是晚上跑？ | 目标清楚，选择未定 |
 | 12 人聚餐，有人吃素，餐厅选哪种？ | 开放建议，结论加短理由 |
 | 入职第一周，先熟悉业务还是先搭开发环境？ | 具体处境里的做法选择 |
+| 云南 7 日游，推荐景点和特色美食 | 推荐。没有即将要办的事也是建议。给结论，不追加每日清单 |
+| 羊肉怎么烤才嫩 | 知识或做法。结论加短理由，不追加步骤清单 |
+| 这道糖醋排骨写个做法 | 做法。同上 |
 
 ### 只识别为计划（调用）
 
@@ -373,7 +376,6 @@ DO NOT CALL only when both judgments are no. Both are no for: vague requests (a 
 |---|---|
 | 火锅还是烤肉？ | 模糊需求。只有选项，看不出场合 |
 | 我想请客，你看着办 | 模糊需求。先追问 |
-| 羊肉怎么烤才嫩 | 知识或做法 |
 | 周四面 4 个人，10 点开始，每人 45 分钟，中间留 15 分钟写评价。帮我排进当天，并标出什么时候吃饭。 | 排期。拿掉钟点，表就没了 |
 | 孩子生日派对当天的流程，从进门排到切蛋糕 | 排期 |
 | 我住徐汇滨江，9:30 陆家嘴、12:00 静安寺，帮我排出发时间和路线 | 行程，走 `present_route_compare` |
@@ -381,8 +383,6 @@ DO NOT CALL only when both judgments are no. Both are no for: vague requests (a 
 | 徐汇滨江到陆家嘴怎么走最快？ | 行程 |
 | 我明天有事，能帮我排路线吗？（没给地点） | 缺起终点，先按行程侧追问；不要改判成本工具 |
 | 明天 9 点开会，11 点写周报 | 只有时间块 |
-| 云南 7 日游，推荐景点和特色美食 | 攻略。没有一件即将要办的事 |
-| 这道糖醋排骨写个做法 | 菜谱 |
 | 买鸡蛋、牛奶、面包 | 已给出的条目 |
 | 帮我订周六晚上的餐厅 | 执行 |
 | 把刚才的计划写成周报 | 加工已有内容 |
