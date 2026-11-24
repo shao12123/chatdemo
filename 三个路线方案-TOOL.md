@@ -4,9 +4,9 @@
 |---|---|
 | 工具名 | `present_route_compare` |
 | 用途 | **只做一件事**：判断本轮是否走行程对比 Intelligent UI（改 UI 展现形式），而不是普通 Markdown |
-| 版本 | v0.7 · 2026-11-24 |
+| 版本 | v0.8 · 2026-11-24 |
 | 配套 | [三个路线方案-PRD.md](三个路线方案-PRD.md)（组件、数据、前后端）· [三个路线方案.html](三个路线方案.html)（交互 Demo）· 交叉优先级见与 `present_plan_list` 一节 |
-| 口径 | **场景 = 行程规划** · **严触发** · **首轮判定**（不含「改用方案二 / 改某一程」）· **交通和准备清单同时出现时只调本工具** |
+| 口径 | **场景 = 行程规划** · **严触发** · **首轮判定**（不含「改用方案二 / 改某一程」）· **交通和准备清单同时出现时二选一，判断不出只调本工具** |
 
 > 把下面的 **description** 和 **系统提示增补** 贴进 Agent 的 tools / system prompt。本文件**不写** JSON Schema、校验、渲染、兜底、多轮引用；那些在 PRD。
 
@@ -41,7 +41,7 @@
 - **用户未指定方案个数时，默认出 3 个**（上限 4；超过 4 只保留前 4，见 PRD）。
 - 缺时间、日期等非起终点信息：按常理假设后仍可调用（假设不展示给用户的细节见 PRD）。
 - 同一轮还夹了无关问题（如「顺便推荐酒店」）：**行程部分仍调用本工具**；无关部分用普通文字另答（怎么拼消息见 PRD）。
-- 同一轮既有交通行程，又有准备清单（带什么、几点入园、出发前要做的事）：**只调用本工具**。不调 `present_plan_list`。模型二选一，不能两个都填。
+- 同一轮既有交通行程，又有准备清单（带什么、几点入园、出发前要做的事）：模型二选一，不能两个都填。判断主交付更适合哪个：行程只调本工具，准备清单只调 `present_plan_list`。判断不出来，只调本工具。
 
 ### 不调用（普通 Markdown / 文本）
 
@@ -73,7 +73,7 @@
 | **时间跨度** | 半日 / 一日 / 多日都进；**不因天数拒绝调用**（无天数上限） |
 | **地理范围** | 同城 / 城际 / 跨省 / 跨国都进 |
 | **内容：攻略 vs 行程** | 看**主交付物**：能拆成有序行程段（起终点 + 时间或时长 + 交通）→ **进**；主交付是景点 / 美食 / 酒店清单、不要求排交通时段 → **不进**；「排行程 + 顺便推荐酒店」→ 行程进工具，酒店用文字 |
-| **与计划清单** | 见 §2.2；有交通行程，或交通和准备清单同时出现 → **只调本工具**，不调 `present_plan_list`。纯出行方式对比且会出 legs → **只调本工具**，不要用计划「建议」抢结论 |
+| **与计划清单** | 见 §2.2。交通和准备清单同时出现 → 二选一，不能两个都填；判断不出只调本工具。只有交通行程，或纯出行方式对比且会出 legs → **只调本工具**，不要用计划「建议」抢结论 |
 | **方案数** | 用户说了按说的（1–4，>4 截前 4）；**未指定默认 3**；只要 1 个仍调用，前端可不出对比卡 |
 | **字段范围（控复杂度）** | 触发不砍天数；卡内仍只承载**交通行程骨架**（有序 legs + 可选 nights）。每日玩住吃细项**不进卡字段**；用户要了用普通文字 |
 | **排除** | 单段 A→B 指路、知识问答、订票下单、缺起终点只追问、改写已有行程等（见 §2 不调用） |
@@ -82,10 +82,10 @@
 
 ## 2.2 与 `present_plan_list` 的优先级
 
-交通行程和准备清单同时出现时，模型必须二选一，只调本工具，不能两个都填。同一轮按下面顺序判定：
+交通行程和准备清单同时出现时，模型二选一，不能两个都填。判断主交付更适合哪个；判断不出来只调本工具。同一轮按下面顺序判定：
 
-1. 主交付是否含**有序交通行程段**（起终点 + 时间或时长 + 交通方式）→ **有则调用本工具**。
-2. 同一句里还有准备清单（带什么、几点入园、出发前要做的事）→ **仍只调本工具**，不调 `present_plan_list`。
+1. 同一句里同时有有序交通行程段和准备清单（带什么、几点入园、出发前要做的事）→ 判断主交付：行程只调本工具，准备清单只调 `present_plan_list`。判断不出来，只调本工具。例如「周六去上海迪士尼，怎么坐车、带什么、几点入园」。
+2. 只有有序交通行程段、没有准备清单 → 调用本工具。
 3. **纯出行方式对比**（如高铁 vs 飞机），且本轮会交付带 legs 的方案 → **只调本工具**；不要用 `present_plan_list` 的「建议」出结论抢对比卡。
 4. 主交付是玩 / 住 / 吃、**拆不出** legs → **本工具不调**；再交给计划工具判建议 / 计划；仍否 → 普通文本。
 5. **缺起点或终点**只能先追问 → **本工具不调**；不要改判成计划清单。
@@ -97,7 +97,7 @@
 ### 中文
 
 ```text
-何时调用：当用户意图是「行程规划」，且你要把可执行的行程 / 通勤 / 旅行方案作为本轮主答案交付时调用——至少一个方案，且每个方案有有序行程段（起点/终点 + 时间或时长 + 交通方式）。半日/一日/多日、同城到跨国都适用，不因天数拒绝。Demo 里的一日通勤、跨天旅行只是示例，不是白名单。用户未指定方案个数时默认出 3 个（1–4；只要 1 个也调用）。同一句里既有交通行程又有准备清单时，只调本工具，不调 present_plan_list，不能两个都填。纯出行方式对比且会交付带 legs 的方案时只调本工具，不要用 present_plan_list 的「建议」抢结论。
+何时调用：当用户意图是「行程规划」，且你要把可执行的行程 / 通勤 / 旅行方案作为本轮主答案交付时调用——至少一个方案，且每个方案有有序行程段（起点/终点 + 时间或时长 + 交通方式）。半日/一日/多日、同城到跨国都适用，不因天数拒绝。Demo 里的一日通勤、跨天旅行只是示例，不是白名单。用户未指定方案个数时默认出 3 个（1–4；只要 1 个也调用）。同一句里既有交通行程又有准备清单时，二选一，不能两个都填：判断主交付更适合行程就只调本工具，更适合准备清单就只调 present_plan_list；判断不出来只调本工具。纯出行方式对比且会交付带 legs 的方案时只调本工具，不要用 present_plan_list 的「建议」抢结论。
 
 不要调用：没有规划意图的单段 A→B 指路；主交付是玩/住/吃攻略或景点清单、不排交通时段；交通知识问答；起点或终点缺失只能追问（不要改判成计划清单）；订票下单；把已有行程拿去改写/翻译；以及其他非行程任务。
 
@@ -107,7 +107,7 @@
 ### English（平台 description 要求英文时用）
 
 ```text
-WHEN TO CALL: Call when the user intent is itinerary/travel planning (行程规划) and you are ready to deliver an executable travel/commute/itinerary plan as the main answer—at least one plan with ordered legs (from/to + time or duration + transport mode). Half-day, same-day, and multi-day all count; city to international all count; do not refuse by trip length. Demo cases are examples only, not a whitelist. If the user does not specify how many plans, default to 3 (range 1–4; still call for a single plan). If the same sentence has both a transport itinerary and a preparation checklist (what to bring, when to enter, what to do before leaving), call only this tool. Do not also call present_plan_list. For pure mode comparison (e.g. train vs flight) that will deliver legged plans, call only this tool; do not let present_plan_list’s “suggestion” steal the conclusion.
+WHEN TO CALL: Call when the user intent is itinerary/travel planning (行程规划) and you are ready to deliver an executable travel/commute/itinerary plan as the main answer—at least one plan with ordered legs (from/to + time or duration + transport mode). Half-day, same-day, and multi-day all count; city to international all count; do not refuse by trip length. Demo cases are examples only, not a whitelist. If the user does not specify how many plans, default to 3 (range 1–4; still call for a single plan). If the same sentence has both a transport itinerary and a preparation checklist (what to bring, when to enter, what to do before leaving), pick one tool and do not call both. Call this tool when the main deliverable is the itinerary, or present_plan_list when it is the checklist. If you cannot tell, call only this tool. For pure mode comparison (e.g. train vs flight) that will deliver legged plans, call only this tool; do not let present_plan_list’s “suggestion” steal the conclusion.
 
 DO NOT CALL for: one-shot A→B directions without planning intent; destination guides focused on sights/food/hotels without scheduling transport legs; transport knowledge Q&A; clarification-only turns when origin or destination is missing (do not reclassify as a plan checklist); booking/ticketing; rewriting/translating an existing itinerary; or unrelated tasks.
 
@@ -130,9 +130,8 @@ This tool only declares that this turn’s itinerary should use Intelligent UI. 
 - 否则 → 不调用，用普通文本 / Markdown
 
 ## 与 present_plan_list 的优先级
-同一轮先看主交付是否含有序交通行程段：
-- 有 → 调用本工具
-- 同一句里还有准备清单（带什么、几点入园、要做的事）→ 仍只调本工具，不调 present_plan_list；不能两个都填
+- 同一句里既有交通行程又有准备清单（带什么、几点入园、要做的事）→ 二选一，不能两个都填。判断主交付：行程只调本工具，准备清单只调 present_plan_list。判断不出来只调本工具。例如「周六去上海迪士尼，怎么坐车、带什么、几点入园」
+- 只有有序交通行程段、没有准备清单 → 调用本工具
 - 纯出行方式对比且会出 legs → 只调本工具；不要用计划「建议」抢结论
 - 拆不出 legs → 本工具不调；再交计划工具判建议/计划；仍否 → 普通文本
 - 缺起终点只能追问 → 本工具不调；不要改判成计划清单
@@ -175,7 +174,7 @@ This tool only declares that this turn’s itinerary should use Intelligent UI. 
 | 下周从上海去北京开会两天，高铁和飞机给我比一下 | 城际；未指定方案数 → 默认 3；**只调本工具**，不要用计划「建议」抢结论 |
 | 只要一个方案：明天浦东机场接机怎么走最稳 | 单方案仍调用 |
 | 帮我排巴塞和马略卡的行程，顺便推荐几家酒店 | 行程调用；酒店用文字另答 |
-| 周日去野餐，列要带的东西，并排从家到公园怎么走 | 交通和准备清单同时出现。只调本工具，不调 `present_plan_list` |
+| 周日去野餐，列要带的东西，并排从家到公园怎么走 | 交通和准备清单同时出现。能判断主交付就只调那一个；判断不出来只调本工具 |
 | 周六去上海迪士尼，怎么坐车、带什么、几点入园 | 同上。不能两个都填 |
 
 ### 不应调用
