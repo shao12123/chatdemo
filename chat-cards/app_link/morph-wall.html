@@ -4,15 +4,23 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>card_id · app_link · 形态墙</title>
+  <link rel="stylesheet" href="../../shared/moreai-tokens.css" />
   <style>
     :root {
-      --page: #f5f6f8; --ink: #000; --muted: rgba(0,0,0,.6); --faint: rgba(0,0,0,.4);
-      --line: #e3e4e7; --brand: #0a59f7; --chip: #fff; --chip-line: #e3e4e7;
+      /* 色：../../shared/moreai-tokens.css；形态墙 panel 面覆盖 --chip */
+      --chip: var(--bg-color-container);
+      --chip-line: var(--component-border);
+      --muted: var(--text-color-secondary);
+      --faint: var(--text-color-placeholder);
+      --line: var(--component-border);
     }
     html.theme-dark {
       color-scheme: dark;
-      --page: #090b0e; --ink: #fff; --muted: rgba(255,255,255,.6); --faint: rgba(255,255,255,.4);
-      --line: #292b2e; --brand: #317af7; --chip: #191a1d; --chip-line: #434448;
+      --chip: var(--bg-color-secondarycontainer);
+      --chip-line: var(--component-border);
+      --muted: var(--text-color-secondary);
+      --faint: var(--text-color-placeholder);
+      --line: var(--component-border);
     }
     * { box-sizing: border-box; }
     body { margin: 0; font-family: "PingFang SC", "Helvetica Neue", sans-serif; background: var(--page); color: var(--ink); }
@@ -41,8 +49,8 @@
     .panel { scroll-margin-top: 96px; margin: 0 0 24px; padding: 16px; border: 1px solid var(--line); border-radius: 16px; background: var(--chip); }
     .panel-head h2 { margin: 0; font-size: 15px; }
     .panel-head p { margin: 6px 0 12px; color: var(--muted); font-size: 12px; line-height: 18px; }
-    .tag { display: inline-block; margin-left: 8px; height: 20px; padding: 0 8px; border-radius: 99px; background: #f3f7ff; color: var(--brand); font-size: 11px; line-height: 20px; font-weight: 600; }
-    html.theme-dark .tag { background: #0a1831; }
+    .tag { display: inline-block; margin-left: 8px; height: 20px; padding: 0 8px; border-radius: 99px; background: var(--brand-color-soft); color: var(--brand); font-size: 11px; line-height: 20px; font-weight: 600; }
+    html.theme-dark .tag { background: var(--brand-color-soft); }
     .tag.gray { background: var(--page); color: var(--muted); }
     .stage { max-width: 736px; display: flex; flex-direction: column; gap: 10px; align-items: flex-start; }
     .note { margin: 12px 0 0; padding: 10px 12px; border-radius: 10px; background: var(--page); color: var(--muted); font-size: 12px; line-height: 18px; }
@@ -50,11 +58,7 @@
     .note code, .panel-head code { font-size: 11px; }
     .cap { margin: 0; color: var(--faint); font-size: 12px; line-height: 18px; }
     .lead { margin: 0; font-size: 14px; line-height: 24px; font-weight: 400; color: var(--ink); max-width: 100%; }
-
-    /* tokens ← 连接外部应用场景.html --gc-* */
-    :root { --gc-bg: #fff; --gc-ink: #1f2329; --gc-muted: #646a73; --gc-line: #e5e6eb; --gc-line-soft: #eef0f3; --gc-hover: #f5f6f7; --brand-hover: #1e61ea; }
-    html.theme-dark { --gc-bg: #191a1d; --gc-ink: #fff; --gc-muted: rgba(255,255,255,.62); --gc-line: #434448; --gc-line-soft: #292b2e; --gc-hover: rgba(255,255,255,.06); --brand-hover: #2762c6; }
-
+    /* --gc-*：shared/moreai-tokens.css */
     /* ← article.link（授权弹层 .auth-mask 属 host 浮层，不进本墙） */
     .link {
       width: min(436px, 100%); display: flex; align-items: center; gap: 12px; margin-top: 0; padding: 12px 14px;

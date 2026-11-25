@@ -1,5 +1,5 @@
 {
-  "version": "2026.11.24-15",
-  "updatedAt": "2026-11-25 11:00",
-  "note": "B2：conversations + 三个路线方案挂 moreai-tokens；--err/--rt 映射现网，qnav 对齐对话目录"
+  "version": "2026.11.25-01",
+  "updatedAt": "2026-11-25 11:05",
+  "note": "B3：卡片库 2A 七墙挂 moreai-tokens；--gc/--b 映射现网，清飞书灰"
 }

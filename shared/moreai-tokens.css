@@ -48,6 +48,7 @@
   --ink: var(--text-color-primary);
   --sub: var(--text-color-secondary);
   --muted: var(--text-color-placeholder);
+  --faint: var(--text-color-placeholder); /* 形态墙三级字；场景壳多用 --muted */
   --line: var(--component-stroke);
   --border: var(--component-border);
   --brand: var(--brand-color);
@@ -119,11 +120,37 @@
   --file-on: #e5edff;
   --avatar: #dae6fe;
 
+  /* doc_summary brief --b-*（≡ 现网） */
+  --b-bg: var(--bg-color-container);
+  --b-line: var(--component-border);
+  --b-sec: var(--bg-color-secondarycontainer);
+  --b-ink: var(--text-color-primary);
+  --b-t2: var(--text-color-secondary);
+  --b-t3: var(--text-color-placeholder);
+  --b-body: var(--text-color-secondary);
+  --b-tag-bg: var(--brand-color-soft);
+  --b-point-bg: color-mix(in srgb, var(--brand-color) 8%, transparent);
+  --b-tbl-line: var(--component-border);
+  --b-tbl-bg: var(--bg-color-container);
+  --b-tbl-alt: var(--bg-color-page);
+  --b-tbl-head: var(--bg-color-secondarycontainer);
+  --b-tbl-ink: var(--text-color-primary);
+  --b-notes-bg: var(--bg-color-page);
+  --b-white: var(--bg-color-container);
+  --b-white-line: var(--component-border);
+  --b-tip-bg: var(--bg-color-secondarycontainer);
+  --b-tip-ink: var(--text-color-primary);
+  --b-tip-2: var(--text-color-secondary);
+  --b-tip-dot: var(--text-color-placeholder);
+  --b-tip-ico: var(--warning-color);
+
   --font: "HarmonyOS Sans SC", "HarmonyOS Sans", "PingFang SC", "Noto Sans SC", -apple-system,
     BlinkMacSystemFont, sans-serif;
 }
 
-html.theme-dark {
+/* .scope-dark：形态墙内嵌深色对照块，与 html.theme-dark 同值 */
+html.theme-dark,
+.scope-dark {
   --text-color-primary: #ffffff;
   /* 现网深色：secondary / tertiary / placeholder / disabled 合并为同一 muted */
   --text-color-secondary: #c5c8ce;
@@ -173,4 +200,8 @@ html.theme-dark {
 
   --file-on: #0a1831;
   --avatar: #0f254a;
+
+  --b-point-bg: color-mix(in srgb, #317af7 18%, transparent);
+  --b-tbl-alt: #15161a;
+  --b-notes-bg: #0d0e11;
 }

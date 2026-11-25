@@ -4,18 +4,24 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>card_id · weather_card · 形态墙</title>
+  <link rel="stylesheet" href="../../shared/moreai-tokens.css" />
   <style>
 
     :root {
-      --page: #f5f6f8; --ink: #171717; --muted: rgba(0,0,0,.6); --faint: rgba(0,0,0,.4);
-      --line: #e3e4e7; --brand: #0a59f7; --chip: #fff; --chip-line: #e3e4e7;
-      --card: #ffffff; --font: Inter, "PingFang SC", sans-serif;
+      /* 色：../../shared/moreai-tokens.css；形态墙 panel 面覆盖 --chip */
+      --chip: var(--bg-color-container);
+      --chip-line: var(--component-border);
+      --muted: var(--text-color-secondary);
+      --faint: var(--text-color-placeholder);
+      --line: var(--component-border);
     }
     html.theme-dark {
       color-scheme: dark;
-      --page: #090b0e; --ink: #fff; --muted: rgba(255,255,255,.6); --faint: rgba(255,255,255,.4);
-      --line: #292b2e; --brand: #317af7; --chip: #191a1d; --chip-line: #434448;
-      --card: #111216;
+      --chip: var(--bg-color-secondarycontainer);
+      --chip-line: var(--component-border);
+      --muted: var(--text-color-secondary);
+      --faint: var(--text-color-placeholder);
+      --line: var(--component-border);
     }
     * { box-sizing: border-box; }
     body { margin: 0; font-family: "PingFang SC", "HarmonyOS Sans SC", "Helvetica Neue", sans-serif; background: var(--page); color: var(--ink); }
@@ -266,9 +272,9 @@
     .ask-trigger b { display: flex; align-items: center; gap: 8px; min-width: 0; overflow: hidden; font-weight: 400; }
     .ask-trigger b span { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     .ask-trigger b .is-placeholder,
-    .ask-range-sep { color: #bbbfc4; }
+    .ask-range-sep { color: var(--text-color-disabled); }
     .ask-range-sep { flex: none; }
-    .ask-trigger svg { flex: none; color: #8f959e; }
+    .ask-trigger svg { flex: none; color: var(--muted); }
     .ask-trigger:hover { border-color: #c3c6cb; }
     .ask-trigger.is-open { border-color: var(--brand); }
     .ask-trigger.is-open svg { color: var(--brand); }
@@ -292,7 +298,7 @@
       border: 0;
       border-radius: 6px;
       background: transparent;
-      color: #646a73;
+      color: var(--sub);
       display: grid;
       place-items: center;
       cursor: pointer;
@@ -300,7 +306,7 @@
     .ask-cal-nav:hover:not(:disabled) { background: #f2f3f5; color: var(--ink); }
     .ask-cal-nav:disabled { opacity: .35; cursor: default; }
     .ask-week, .ask-days { display: grid; grid-template-columns: repeat(7, 1fr); }
-    .ask-week span { height: 32px; display: grid; place-items: center; color: #8f959e; font-size: 12px; line-height: 22px; font-weight: 400; }
+    .ask-week span { height: 32px; display: grid; place-items: center; color: var(--muted); font-size: 12px; line-height: 22px; font-weight: 400; }
     .ask-day {
       width: 28px;
       height: 28px;

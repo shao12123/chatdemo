@@ -26,4 +26,5 @@
 人读对照：[CHATDEMO-STANDARDS.md §5](../docs/CHATDEMO-STANDARDS.md) · [对话目录 PRD 工程表](../对话目录-PRD.md) · 金样 [对话目录.html](../对话目录.html)。
 
 已挂 B1：建群 / 发送邮件 / 连接外部应用 / 时间 / 模糊需求 / 天气 / 映射对照。  
-已挂 B2：`conversations.html`、`三个路线方案.html`（含 `--err-*` / `--rt-*`）。
+已挂 B2：`conversations.html`、`三个路线方案.html`（含 `--err-*` / `--rt-*`）。  
+已挂 B3：`group_form` / `group_result` / `ask_form` / `weather_card` / `doc_summary` / `doc_entry` / `app_link` 形态墙。
