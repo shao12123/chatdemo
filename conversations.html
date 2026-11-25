@@ -2347,17 +2347,6 @@
       const body = m.open && card ? `<div class="think-body">${card}</div>` : "";
       return `<div class="think paper-think${working ? "" : " done"}${m.open ? " open" : ""}">${head}${body}</div>`;
     }
-    function netCardHtml(m, index) {
-      if (m.dismissed) return "";
-      const failed = m.stage === "failed";
-      const saved = m.full ? `已写好的 ${m.full} 节` : "写好的部分";
-      const text = failed ? `多次重连没有成功。${saved}保留在文档里。` : `网络连接中断。${saved}保留在文档里，网络恢复后会自动接着写。`;
-      const actions = failed
-        ? (m.resume && !m.resume.used ? `<button class="act-primary" type="button" data-resume="${index}">重试</button>` : "")
-        : `<button class="act-secondary" type="button" data-net-now="${index}">立即重试</button>`;
-      const status = !failed && m.status ? `<p class="net-status">${esc(m.status)}</p>` : "";
-      return `<div class="net-wrap"><div class="net-card${failed ? " failed" : ""}"><p class="net-main"><i class="msg-tone">${iconSvg("error", 16)}</i><span>${esc(text)}</span></p><div class="net-actions">${actions}<button class="net-x" type="button" data-net-close="${index}" aria-label="关闭">${iconSvg("closeSm")}</button></div></div>${status}</div>`;
-    }
     const WEEKDAY = "日一二三四五六";
     function startOfDay(date) {
       return new Date(date.getFullYear(), date.getMonth(), date.getDate()).getTime();
@@ -2419,7 +2408,6 @@
     }
     function messageHtml(session, m, index) {
       if (m.type === "think" && m.purpose === "paper") return paperThinkHtml(m, index);
-      if (m.role === "netcard") return netCardHtml(m, index);
       if (m.type === "think") {
         const list = m.steps || [];
         if (m.done && m.summary) return `<div class="msg assistant">${esc(m.summary)}</div>`;
@@ -3521,33 +3509,8 @@
       session.thinking = false;
       session.activePaper = null;
       session.tag = null;
-      if (retractTurn(session, item)) return;
-      session.messages.push({ type: "assistant", role: "resume", text: "已停止生成，还没有写入文档。需要的话重新发送要求。" });
+      session.messages.push({ type: "assistant", text: "已停止生成。停止 / 继续 / 断网等交互见《生成异常与恢复》Demo。" });
       paperPaint(session);
-    }
-    function retractTurn(session, item) {
-      const at = session.messages.indexOf(item);
-      let from = at - 1;
-      while (from >= 0 && session.messages[from].type !== "user") from--;
-      const user = session.messages[from];
-      if (!user || !user.typed || user.files?.length || user.quotes?.length) return false;
-      const turn = session.messages.slice(from + 1, at);
-      if (turn.some(m => m.type === "artifact" || m.type === "think" || m.actions)) return false;
-      session.messages.splice(from);
-      if (item.group && session.variants?.[item.group]?.count === 1) delete session.variants[item.group];
-      const job = session.jobs?.[item.jobAt];
-      if (item.jobAt > 0 && item.jobAt === session.jobs.length - 1 && !jobFinished(job)) {
-        session.jobs.pop();
-        session.job = session.jobs.length - 1;
-      }
-      if (!session.messages.some(m => m.type === "artifact")) {
-        session.jobs = [];
-        session.card = null;
-        session.progress = false;
-      }
-      paperPaint(session);
-      fillComposer(user.text);
-      return true;
     }
     function paperDoc(session, title, mode) {
       const doc = openWindow(session, title);
@@ -3582,101 +3545,24 @@
       item.writing = false;
       if (!sessions.includes(session) || item.halted) return false;
       if (res && res.halted) {
-        if (item.failWrite) await paperReconnect(session, item, row, doc, blocks, res, phaseRun, phaseDone);
-        else paperInterrupted(session, item, row, doc, blocks, res, phaseRun, phaseDone);
+        paperInterrupted(session, item, row, doc, blocks, res);
         return false;
       }
       return true;
     }
-    function paperInterrupted(session, item, row, doc, blocks, res, phaseRun, phaseDone) {
-      const error = !!item.failWrite;
-      const heads = blocks.filter(b => b.kind === "h");
+    function paperInterrupted(session, item, row, doc, blocks, res) {
       const atHead = !blocks[res.written] || blocks[res.written].kind === "h";
       const started = blocks.slice(0, res.written).filter(b => b.kind === "h").length;
       const full = Math.max(0, atHead ? started : started - 1);
-      row.state = error ? "fail" : "stop";
+      row.state = "stop";
       row.progress = "";
-      const kept = full ? `写到第 ${full} 节（预览）` : `写到第 1 节（预览）`;
-      row.note = error ? `网络中断，${kept}。` : `已停止，${kept}。`;
-      const tag = session.tag;
-      paperFinish(item, error ? "error" : "stopped");
-      session.thinking = false;
-      session.activePaper = null;
-      const saved = full ? `已写到第 ${full} 节的预览` : "写好的部分（预览）";
-      const text = error
-        ? `生成中断：网络连接断开。${saved}仍可见；点「重试」接着跑。（断网目标行为，与线上代码有差异）`
-        : `已停止生成。可以继续生成。（跟线上：继续=通用续跑/聊续写；预览未落盘不保证已写入文件）`;
-      session.messages.push(stamp(session, { type: "assistant", role: "resume", tone: error ? "error" : "", text, label: error ? "重试" : "继续生成", resume: { winId: doc.id, blocks, from: res.written, phaseRun, phaseDone, mode: item.mode, total: heads.length, full, tag, used: false } }));
-      session.tag = null;
-      paperPaint(session);
-    }
-    const RECONNECT_TRIES = 5;
-    const RECONNECT_WAIT = 5;
-    async function paperReconnect(session, item, row, doc, blocks, res, phaseRun, phaseDone) {
-      const atHead = !blocks[res.written] || blocks[res.written].kind === "h";
-      const started = blocks.slice(0, res.written).filter(b => b.kind === "h").length;
-      const full = Math.max(0, atHead ? started : started - 1);
-      const kept = full ? `已写好 ${full} 节` : "写到第 1 节";
-      const tag = session.tag;
-      item.noStop = true;
-      item.faceError = true;
-      item.stage = "连接中断，正在重连";
-      row.progress = "";
-      const card = stamp(session, { type: "assistant", role: "netcard", stage: "retrying", full, status: "", skip: false, dismissed: false });
-      session.messages.push(card);
-      for (let attempt = 1; attempt <= RECONNECT_TRIES; attempt++) {
-        row.note = `网络中断，${kept}，正在重连（第 ${attempt} 次）。`;
-        card.skip = false;
-        for (let left = RECONNECT_WAIT; left > 0 && !card.skip; left--) {
-          card.status = `正在检查网络… ${left} 秒后重试`;
-          paperPaint(session, false);
-          await wait(1000);
-          if (!sessions.includes(session)) return;
-        }
-        card.status = `正在重连（第 ${attempt} 次）…`;
-        paperPaint(session, false);
-        await wait(1200);
-        if (!sessions.includes(session)) return;
-      }
-      const heads = blocks.filter(b => b.kind === "h");
-      row.state = "fail";
-      row.note = `网络中断，${kept}，重连 ${RECONNECT_TRIES} 次没有成功。`;
-      card.stage = "failed";
-      card.status = "";
-      card.label = "重试";
-      card.resume = { winId: doc.id, blocks, from: res.written, phaseRun, phaseDone, mode: item.mode, total: heads.length, full, tag, used: false };
-      paperFinish(item, "error");
+      row.note = full ? `已停止，写到第 ${full} 节（预览）。` : "已停止，写到第 1 节（预览）。";
+      paperFinish(item, "stopped");
       session.thinking = false;
       session.activePaper = null;
       session.tag = null;
+      session.messages.push(stamp(session, { type: "assistant", text: "已停止生成。停止 / 继续 / 断网等交互见《生成异常与恢复》Demo。" }));
       paperPaint(session);
-    }
-    async function paperResume(session, msg) {
-      const info = msg?.resume;
-      if (!info || info.used || session.thinking || session.running) return;
-      const doc = (session.windows || []).find(w => w.id === info.winId);
-      if (!doc) return;
-      info.used = true;
-      session.tag = info.tag || null;
-      openArtifact(session, doc.id);
-      const retry = msg.label === "重试";
-      const item = paperThink(session, info.mode, retry ? "正在重新连接" : "正在继续生成");
-      const next = info.blocks.filter(b => b.kind === "h")[info.full]?.text || "";
-      if (!await paperRow(session, item, { key: "resume", title: retry ? "重新连接" : "继续生成", note: retry
-        ? `重新接上后继续（断网补收目标，与线上代码有差异；Demo 从第 ${info.full + 1} 节「${next}」演示接写）。`
-        : `继续生成（跟线上：通用续跑/聊续写；Demo 从第 ${info.full + 1} 节「${next}」演示接写，不代表线上按节断点）。`, wait: 800 })) return;
-      const write = await paperRow(session, item, { key: "write", title: "写入文档", wait: 300, keep: true });
-      if (!write) return;
-      const art = session.messages.find(m => m.type === "artifact" && m.winId === doc.id);
-      if (art) art.state = "writing";
-      if (!await paperStream(session, item, write, doc, info.blocks, info.phaseRun, info.phaseDone, (block, at, total) => {
-        write.progress = `正在写「${block.text}」· ${at} / ${total} 节`;
-      }, info.from)) return;
-      write.progress = "";
-      write.note = `${info.total} 节已全部写完。`;
-      if (!await paperRow(session, item, { key: "check", title: "核对引用与篇幅", note: `前后衔接已核对，${info.total} 节齐全。`, wait: 800 })) return;
-      if (!await paperAnswer(session, item, doc, [`<p>已从第 ${info.full + 1} 节接着写完，共 ${info.total} 节。文档在下面，可以直接改。</p>`])) return;
-      paperDone(session, item);
     }
     function uniqueTitle(session, base) {
       const used = new Set((session.windows || []).map(w => w.title));
@@ -4699,25 +4585,11 @@
         editResend(session, Number(editSend.dataset.editSend), box ? box.value : "");
         return;
       }
-      const netNow = event.target.closest("[data-net-now]");
-      if (netNow) {
-        const card = session.messages[Number(netNow.dataset.netNow)];
-        if (card) { card.skip = true; card.status = "正在重连…"; renderThread(false); }
-        return;
-      }
-      const netClose = event.target.closest("[data-net-close]");
-      if (netClose) {
-        const card = session.messages[Number(netClose.dataset.netClose)];
-        if (card) { card.dismissed = true; renderThread(false); }
-        return;
-      }
       const msgBtn = event.target.closest("[data-msg-act]");
       if (msgBtn) {
         if (!msgBtn.disabled) msgAction(session, session.messages[Number(msgBtn.dataset.msgIndex)], msgBtn.dataset.msgAct);
         return;
       }
-      const resumeBtn = event.target.closest("[data-resume]");
-      if (resumeBtn) { paperResume(session, session.messages[Number(resumeBtn.dataset.resume)]); return; }
       const thinkBtn = event.target.closest("[data-think]");
       if (thinkBtn) {
         const item = session.messages[Number(thinkBtn.dataset.think)];
@@ -6026,7 +5898,7 @@
       {
         id: "f-send", cat: "feature", status: "已实现", anchor: "#threadComposer .send, #welcomeComposer .send",
         title: "输入框状态：发送与停止",
-        body: "【用途】发送消息；生成文档时随时停止。\n【展示条件】\n1、默认：发送箭头，输入框为空且没有文件时半透明、不可点；\n2、添加文件未输入文字，不可点；\n3、输入文字或添加文件后可点。\n4、生成文档过程中：按钮变成实心方块，悬停提示「停止」。\n【交互】\n1、生成开始执行之前停止：用户输入的query重新填入对话框中，发送箭头可点。\n2、生成一半（中途）停止：query不回填。断网重连期间不能停止。\n【验收】停止后输入框恢复可用。"
+        body: "【用途】发送消息；生成中可点停止结束本轮演示。\n【展示条件】空闲为发送箭头；生成中为实心方块。\n【说明】写前回填、写中「继续生成」、断网重连等完整异常交互见《生成异常与恢复》Demo，本页不演示。\n【验收】停止后输入框恢复可用。"
       },
       {
         id: "f-read", cat: "feature", status: "已实现（部分路径）", anchor: ".msg-notice.msg-error, .msg.user.has-files",
@@ -6036,7 +5908,7 @@
       {
         id: "f-think", cat: "feature", status: "已实现", anchor: ".paper-think .think-row",
         title: "思考过程的显示与折叠",
-        body: "【展示】 当前阶段（流光文字，如「正在检索文献」）+ 实时秒数。展开后是执行步骤卡片：标题「已执行 N 个步骤」，每一步是短标题加一句说明；参考文献直接列出，不再折叠。\n【折叠规则】\n1、只有外层可以折叠；\n2、默认展开，进行中也能收起；\n3、完成后自动收起，显示「已完成 N 秒」。内层步骤卡片不能折叠；底部不显示三个跳动的点。\n【状态】进行中 / 已完成 / 已停止 / 生成中断。断网时头像晕眩；正常完成时头像跳一下。\n【验收】进行中点开后，新步骤陆续出现时保持展开；完成后自动收起。\n【与分析卡分工】思考过程回答「模型在干什么」（读、比、写）；「结构化分析卡」回答「凭什么这样定、接下来动哪里」。有工具轨迹不等于要出分析卡。"
+        body: "【展示】 当前阶段（流光文字，如「正在检索文献」）+ 实时秒数。展开后是执行步骤卡片：标题「已执行 N 个步骤」，每一步是短标题加一句说明；参考文献直接列出，不再折叠。\n【折叠规则】\n1、只有外层可以折叠；\n2、默认展开，进行中也能收起；\n3、完成后自动收起，显示「已完成 N 秒」。内层步骤卡片不能折叠；底部不显示三个跳动的点。\n【状态】进行中 / 已完成 / 已停止。正常完成时头像跳一下；断网晕眩等见异常 Demo。\n【验收】进行中点开后，新步骤陆续出现时保持展开；完成后自动收起。\n【与分析卡分工】思考过程回答「模型在干什么」（读、比、写）；「结构化分析卡」回答「凭什么这样定、接下来动哪里」。有工具轨迹不等于要出分析卡。"
       },
       {
         id: "f-analysis", cat: "feature", status: "已实现", anchor: ".revise-card",
@@ -6078,8 +5950,6 @@
         title: "对比结果与「没有可比性」",
         body: "【流程】读取文档 → 对齐章节 → 整理差异；结果在右侧「方案对比」页签，只列写得不一样的部分。\n【内容不相关】两份主题不同时（比如论文和报销制度），不生成对比表，直接回复：「这两份没有可比性：「A」讲的是……，「B」讲的是……，主题不同，逐项对比没有意义。换一份主题相近的文件再对比；如果想了解其中一份的内容，可以直接问我。」3 份时点名不相关的那两份。\n【实现情况】已实现（部分路径）：相关性用关键词重合度粗略判断，真实产品的判断方式待确认；上传文件和生成文档对比时，只能按「正文」整体对照。"
       },
-
-
       {
         id: "f-tabs", cat: "feature", status: "已实现", anchor: "#docTabs",
         title: "文档区页签与工具栏（与线上代码有差异）",
@@ -6093,18 +5963,13 @@
       {
         id: "f-tooltip", cat: "feature", status: "已实现",
         title: "悬停提示气泡规范",
-        body: "【样式】白底、1px #e3e4e7 描边、圆角 8px、内边距上下 2px 左右 12px、12px 黑色字、行高 20px、两层很淡的投影。\n【位置】在按钮下方 4px、水平居中；下方空间不够时放在上方。\n【不显示气泡】消息时间戳、文档页签的关闭按钮、断网提示卡片的关闭按钮。"
+        body: "【样式】白底、1px #e3e4e7 描边、圆角 8px、内边距上下 2px 左右 12px、12px 黑色字、行高 20px、两层很淡的投影。\n【位置】在按钮下方 4px、水平居中；下方空间不够时放在上方。\n【不显示气泡】消息时间戳、文档页签的关闭按钮。"
       },
       {
         id: "s-normal", cat: "scene", status: "已实现", scenes: ["paper"],
         title: "正常生成课程论文",
         body: "实现状态：已实现\n【前置】用户发出写课程论文的要求。\n【流程】按推荐自动定方向，不弹选择 → 检索文献（6 篇）→ 获取评审评论失败（公开材料里没有，讨论里写明缺口）→ 搭建结构（8 节）→ 写入文档，右侧逐节出现 → 核对引用与篇幅 → 结论逐字输出。\n【状态】理解题目 → 确定方向 → 检索文献 → 获取评审评论失败 → 搭建结构 → 写入文档（第 N / 8 节）→ 核对 → 整理结论 → 已完成。\n【验收】思考区默认收起，完成后自动收起；「获取评审评论」显示失败但不影响后续步骤；文档 8 节齐全，目录同步；结论下方有操作栏和推荐操作。\n【当前 / 缺口】文献、正文和结论为预设内容；生成速度为模拟。"
       },
-
-
-
-
-
       {
         id: "s-revise", cat: "scene", status: "已实现",
         title: "再生成一版（与线上代码有差异）",
