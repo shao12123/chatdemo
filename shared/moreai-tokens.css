@@ -84,6 +84,41 @@
   --gc-pop: var(--bg-color-container);
   --gc-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
 
+  /* 错误卡 --err-*（conversations / error_card） */
+  --err-card: var(--bg-color-secondarycontainer);
+  --err-text: var(--text-color-primary);
+  --err-text-2: var(--text-color-secondary);
+  --err-icon: #e84026;
+  --err-ok: var(--success-color);
+  --err-x-hover: color-mix(in srgb, var(--text-color-primary) 6%, transparent);
+
+  /* 行程对比 / tip / table --rt-*（≡ 现网语义；方案色保留） */
+  --rt-text-1: var(--text-color-primary);
+  --rt-text-2: var(--text-color-secondary);
+  --rt-text-3: var(--text-color-secondary);
+  --rt-text-4: var(--text-color-placeholder);
+  --rt-card: var(--bg-color-secondarycontainer);
+  --rt-block: var(--bg-color-container);
+  --rt-table: var(--bg-color-container);
+  --rt-table-head: var(--bg-color-secondarycontainer);
+  --rt-dot: var(--bg-color-container);
+  --rt-line: var(--component-border);
+  --rt-line-soft: var(--component-stroke);
+  --rt-divider: var(--component-stroke);
+  --rt-hover-line: var(--brand-color-hover-line);
+  --rt-pick-bg: var(--success-color-bg);
+  --rt-pick-fg: var(--success-color);
+  --rt-tip-icon: var(--warning-color);
+  --rt-brand: var(--brand-color);
+  --rt-plan-1: var(--brand-color);
+  --rt-plan-2: #8c3bfe;
+  --rt-plan-3: #00a7ad;
+
+  /* 路线壳杂项 */
+  --mark: #3370ff;
+  --file-on: #e5edff;
+  --avatar: #dae6fe;
+
   --font: "HarmonyOS Sans SC", "HarmonyOS Sans", "PingFang SC", "Noto Sans SC", -apple-system,
     BlinkMacSystemFont, sans-serif;
 }
@@ -130,4 +165,12 @@ html.theme-dark {
   --gc-avatar-ink: #b7c0ff;
   --gc-pop: var(--bg-color-secondarycontainer);
   --gc-shadow: none;
+
+  --err-x-hover: rgba(255, 255, 255, 0.08);
+
+  --rt-plan-2: #7f45e2;
+  --rt-plan-3: #00afaf;
+
+  --file-on: #0a1831;
+  --avatar: #0f254a;
 }
