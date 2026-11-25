@@ -4,27 +4,26 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>card_id · option_compare · 形态墙</title>
+  <link rel="stylesheet" href="../../shared/moreai-tokens.css" />
   <style>
     :root {
-      --page: #f5f6f8; --ink: #000; --muted: rgba(0,0,0,.6); --faint: rgba(0,0,0,.4);
-      --line: #e3e4e7; --brand: #0a59f7; --chip: #fff; --chip-line: #e3e4e7;
-      --rt-text-1: #000; --rt-text-2: rgba(0,0,0,.6); --rt-text-3: rgba(0,0,0,.6); --rt-text-4: rgba(0,0,0,.4);
-      --rt-card: #eef0f3; --rt-block: #fff; --rt-dot: #fff;
-      --rt-pick-bg: #e9f5e7; --rt-pick-fg: #64bb5c; --rt-tip-icon: #ed6f21; --rt-brand: #0a59f7;
-      --rt-plan-1: #0a59f7; --rt-plan-2: #8c3bfe; --rt-plan-3: #00a7ad;
-      --rt-line: #d8d9dd; --rt-line-soft: #e3e4e7; --rt-table: #fff; --rt-table-head: #eef0f3;
+      /* 色：../../shared/moreai-tokens.css；形态墙 panel 面覆盖 --chip */
+      --chip: var(--bg-color-container);
+      --chip-line: var(--component-border);
+      --muted: var(--text-color-secondary);
+      --faint: var(--text-color-placeholder);
+      --line: var(--component-border);
     }
     html.theme-dark {
       color-scheme: dark;
-      --page: #090b0e; --ink: #fff; --muted: rgba(255,255,255,.6); --faint: rgba(255,255,255,.4);
-      --line: #292b2e; --brand: #317af7; --chip: #191a1d; --chip-line: #434448;
-      --rt-text-1: #fff; --rt-text-2: rgba(255,255,255,.6); --rt-text-3: rgba(255,255,255,.6); --rt-text-4: rgba(255,255,255,.4);
-      --rt-card: #191a1d; --rt-block: #111216; --rt-dot: #111216;
-      --rt-pick-bg: #122211; --rt-pick-fg: #5ba854; --rt-tip-icon: #db6b42; --rt-brand: #317af7;
-      --rt-plan-1: #317af7; --rt-plan-2: #7f45e2; --rt-plan-3: #00afaf;
-      --rt-line: #434448; --rt-line-soft: #292b2e; --rt-table: #111216; --rt-table-head: #191a1d;
+      --chip: var(--bg-color-secondarycontainer);
+      --chip-line: var(--component-border);
+      --muted: var(--text-color-secondary);
+      --faint: var(--text-color-placeholder);
+      --line: var(--component-border);
     }
-    * { box-sizing: border-box; }
+    /* --rt-*：shared */
+* { box-sizing: border-box; }
     body { margin: 0; font-family: "PingFang SC", "Helvetica Neue", sans-serif; background: var(--page); color: var(--ink); }
     .top {
       position: sticky; top: 0; z-index: 20; display: flex; flex-wrap: wrap; gap: 12px; align-items: flex-start;

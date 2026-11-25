@@ -4,8 +4,17 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>课程论文对话 PRD</title>
+  <link rel="stylesheet" href="shared/moreai-tokens.css" />
   <style>
-    :root { --ink: #1c2330; --sub: #344054; --muted: #667085; --line: #e4e7ec; --brand: #0a59f7; --page: #f5f6f8; }
+    :root {
+      /* 色：shared/moreai-tokens.css */
+      --ink: var(--text-color-primary);
+      --sub: var(--text-color-secondary);
+      --muted: var(--text-color-placeholder);
+      --line: var(--component-border);
+      --brand: var(--brand-color);
+      --page: var(--bg-color-page);
+    }
     * { box-sizing: border-box; }
     body { margin: 0; background: var(--page); color: var(--ink); font: 14px/1.7 -apple-system, BlinkMacSystemFont, "PingFang SC", "Helvetica Neue", sans-serif; }
     .bar { position: sticky; top: 0; z-index: 5; display: flex; align-items: center; gap: 12px; padding: 12px 24px; background: rgba(255,255,255,.92); backdrop-filter: blur(8px); border-bottom: 1px solid var(--line); }
@@ -39,9 +48,9 @@
     article blockquote p { margin: 0; color: var(--ink); }
     article a { color: var(--brand); }
     article hr { border: 0; border-top: 1px solid var(--line); margin: 24px 0; }
-    .tbl { overflow-x: auto; margin: 12px 0; border: 1px solid #eceef2; border-radius: 12px; }
+    .tbl { overflow-x: auto; margin: 12px 0; border: 1px solid var(--border); border-radius: 12px; }
     table { width: 100%; border-collapse: collapse; font-size: 13px; line-height: 20px; }
-    th { padding: 8px 12px; background: #f7f8fa; color: var(--muted); font-weight: 500; text-align: left; border-bottom: 1px solid #eceef2; white-space: nowrap; }
+    th { padding: 8px 12px; background: var(--bg-color-secondarycontainer); color: var(--muted); font-weight: 500; text-align: left; border-bottom: 1px solid var(--border); white-space: nowrap; }
     td { padding: 8px 12px; color: var(--ink); vertical-align: top; border-bottom: 1px solid #f0f1f4; }
     tr:last-child td { border-bottom: 0; }
     td .st-wait { display: inline-block; padding: 0 6px; border-radius: 99px; background: #fff4e5; color: #b54708; font-size: 12px; font-weight: 600; white-space: nowrap; }

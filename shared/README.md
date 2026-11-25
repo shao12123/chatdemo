@@ -27,4 +27,5 @@
 
 已挂 B1：建群 / 发送邮件 / 连接外部应用 / 时间 / 模糊需求 / 天气 / 映射对照。  
 已挂 B2：`conversations.html`、`三个路线方案.html`（含 `--err-*` / `--rt-*`）。  
-已挂 B3：`group_form` / `group_result` / `ask_form` / `weather_card` / `doc_summary` / `doc_entry` / `app_link` 形态墙。
+已挂 B3：`group_form` / `group_result` / `ask_form` / `weather_card` / `doc_summary` / `doc_entry` / `app_link` 形态墙。  
+已挂 B4：其余形态墙 + `AI形象优化` / `高频主题汇总` / `生成异常与恢复` + 各 `*-PRD.html` 文档皮。

@@ -4,25 +4,23 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>card_id · user_file · 形态墙</title>
+  <link rel="stylesheet" href="../../shared/moreai-tokens.css" />
   <style>
     :root {
-      --page: #f5f6f8; --ink: #171717; --muted: rgba(0,0,0,.6); --faint: rgba(0,0,0,.4);
-      --line: #e3e4e7; --brand: #0a59f7; --chip: #fff; --chip-line: #e3e4e7;
-      --fc-border: #eef0f3;
-      --ico-docx-bg: #e6eefe; --ico-docx: #3370ff;
-      --ico-md-bg: #e5f6f7; --ico-md: #12b5c7;
-      --ico-xlsx-bg: #eff8ef; --ico-xlsx: #2da641;
-      --ico-pdf-bg: #fdece9; --ico-pdf: #f54a45;
-      --ico-html-bg: #f3ebff; --ico-html: #8b5cf6;
-      --ico-pptx-bg: #fdece9; --ico-pptx: #f54a45;
+      /* 色：../../shared/moreai-tokens.css；形态墙 panel 面覆盖 --chip */
+      --chip: var(--bg-color-container);
+      --chip-line: var(--component-border);
+      --muted: var(--text-color-secondary);
+      --faint: var(--text-color-placeholder);
+      --line: var(--component-border);
     }
     html.theme-dark {
       color-scheme: dark;
-      --page: #090b0e; --ink: #fff; --muted: rgba(255,255,255,.6); --faint: rgba(255,255,255,.4);
-      --line: #292b2e; --brand: #317af7; --chip: #191a1d; --chip-line: #434448;
-      --fc-border: #292b2e;
-      --ico-docx-bg: #0a1831; --ico-md-bg: #0f2426; --ico-xlsx-bg: #122211;
-      --ico-pdf-bg: #2a1412; --ico-html-bg: #1a1230; --ico-pptx-bg: #2a1412;
+      --chip: var(--bg-color-secondarycontainer);
+      --chip-line: var(--component-border);
+      --muted: var(--text-color-secondary);
+      --faint: var(--text-color-placeholder);
+      --line: var(--component-border);
     }
     * { box-sizing: border-box; }
     body { margin: 0; font-family: "PingFang SC", "HarmonyOS Sans SC", "Helvetica Neue", sans-serif; background: var(--page); color: var(--ink); }

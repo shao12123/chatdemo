@@ -4,21 +4,23 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>card_id · paper_compare_pick · 形态墙</title>
+  <link rel="stylesheet" href="../../shared/moreai-tokens.css" />
   <style>
     :root {
-      --page: #f5f6f8; --ink: #000; --muted: rgba(0,0,0,.6); --faint: rgba(0,0,0,.4);
-      --line: #e3e4e7; --brand: #0a59f7; --chip: #fff; --chip-line: #e3e4e7;
-      --pk-bg: #fff; --pk-line: #f0f0f0; --pk-field: #eceff3; --pk-sel-bg: #f3f7ff; --pk-sel-line: #b9d0ff; --pk-hover: #eaf0ff;
-      --pk-t3: #98a2b3; --pk-t2: #667085; --pk-hint: #8b93a6; --pk-menu-line: #eef1f6; --pk-dis-bg: #d7e4ff; --pk-dis-ink: #c5c8ce;
-      --err-card: #eef0f3; --err-text: #000; --err-text-2: rgba(0,0,0,.6); --err-icon: #e84026; --err-x-hover: rgba(0,0,0,.06);
+      /* 色：../../shared/moreai-tokens.css；形态墙 panel 面覆盖 --chip */
+      --chip: var(--bg-color-container);
+      --chip-line: var(--component-border);
+      --muted: var(--text-color-secondary);
+      --faint: var(--text-color-placeholder);
+      --line: var(--component-border);
     }
     html.theme-dark {
       color-scheme: dark;
-      --page: #090b0e; --ink: #fff; --muted: rgba(255,255,255,.6); --faint: rgba(255,255,255,.4);
-      --line: #292b2e; --brand: #317af7; --chip: #191a1d; --chip-line: #434448;
-      --pk-bg: #111216; --pk-line: #292b2e; --pk-field: #434448; --pk-sel-bg: #0a1831; --pk-sel-line: #1f4aa8; --pk-hover: #0a1831;
-      --pk-t3: rgba(255,255,255,.4); --pk-t2: rgba(255,255,255,.6); --pk-hint: rgba(255,255,255,.4); --pk-menu-line: #292b2e; --pk-dis-bg: #1b2d52; --pk-dis-ink: rgba(255,255,255,.3);
-      --err-card: #191a1d; --err-text: #fff; --err-text-2: rgba(255,255,255,.6); --err-x-hover: rgba(255,255,255,.08);
+      --chip: var(--bg-color-secondarycontainer);
+      --chip-line: var(--component-border);
+      --muted: var(--text-color-secondary);
+      --faint: var(--text-color-placeholder);
+      --line: var(--component-border);
     }
     * { box-sizing: border-box; }
     body { margin: 0; font-family: "PingFang SC", "Helvetica Neue", sans-serif; background: var(--page); color: var(--ink); }

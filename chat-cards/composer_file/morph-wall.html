@@ -4,19 +4,30 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>card_id · composer_file · 形态墙</title>
+  <link rel="stylesheet" href="../../shared/moreai-tokens.css" />
   <style>
     :root {
-      --page: #f5f6f8; --ink: #171717; --muted: rgba(0,0,0,.6); --faint: rgba(0,0,0,.4);
-      --line: #e3e4e7; --brand: #0a59f7; --chip: #fff; --chip-line: #e3e4e7;
-      --fc-border: #eef0f3; --fc-name: #171717; --fc-size: rgba(0,0,0,.4);
-      --ico-bg: #e6eefe; --ico: #3370ff;
+      /* 色：../../shared/moreai-tokens.css；形态墙 panel 面覆盖 --chip */
+      --chip: var(--bg-color-container);
+      --chip-line: var(--component-border);
+      --muted: var(--text-color-secondary);
+      --faint: var(--text-color-placeholder);
+      --line: var(--component-border);
     }
     html.theme-dark {
       color-scheme: dark;
-      --page: #090b0e; --ink: #fff; --muted: rgba(255,255,255,.6); --faint: rgba(255,255,255,.4);
-      --line: #292b2e; --brand: #317af7; --chip: #191a1d; --chip-line: #434448;
-      --fc-border: #292b2e; --fc-name: #fff; --fc-size: rgba(255,255,255,.4);
-      --ico-bg: #0a1831; --ico: #317af7;
+      --chip: var(--bg-color-secondarycontainer);
+      --chip-line: var(--component-border);
+      --muted: var(--text-color-secondary);
+      --faint: var(--text-color-placeholder);
+      --line: var(--component-border);
+    }
+    :root {
+      --fc-border: var(--bg-color-secondarycontainer);
+      --fc-name: var(--text-color-primary);
+      --fc-size: var(--text-color-placeholder);
+      --ico-bg: var(--brand-color-soft);
+      --ico: var(--brand-color);
     }
     * { box-sizing: border-box; }
     body { margin: 0; font-family: "PingFang SC", "HarmonyOS Sans SC", "Helvetica Neue", sans-serif; background: var(--page); color: var(--ink); }
@@ -118,7 +129,7 @@
     .composer-foot { display: flex; align-items: center; gap: 8px; padding: 0 12px; }
     .composer-ph { flex: 1; color: var(--faint); font-size: 14px; line-height: 22px; }
     .composer-send {
-      width: 32px; height: 32px; border: 0; border-radius: 50%; background: #165dff; color: #fff;
+      width: 32px; height: 32px; border: 0; border-radius: 50%; background: var(--brand); color: #fff;
       display: grid; place-items: center; cursor: pointer;
     }
     @media (max-width: 800px) {

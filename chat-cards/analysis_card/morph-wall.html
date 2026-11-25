@@ -4,15 +4,23 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>card_id · analysis_card · 形态墙</title>
+  <link rel="stylesheet" href="../../shared/moreai-tokens.css" />
   <style>
     :root {
-      --page: #f5f6f8; --ink: #000; --muted: rgba(0,0,0,.6); --faint: rgba(0,0,0,.4);
-      --line: #e3e4e7; --brand: #0a59f7; --chip: #fff; --chip-line: #e3e4e7;
+      /* 色：../../shared/moreai-tokens.css；形态墙 panel 面覆盖 --chip */
+      --chip: var(--bg-color-container);
+      --chip-line: var(--component-border);
+      --muted: var(--text-color-secondary);
+      --faint: var(--text-color-placeholder);
+      --line: var(--component-border);
     }
     html.theme-dark {
       color-scheme: dark;
-      --page: #090b0e; --ink: #fff; --muted: rgba(255,255,255,.6); --faint: rgba(255,255,255,.4);
-      --line: #292b2e; --brand: #317af7; --chip: #191a1d; --chip-line: #434448;
+      --chip: var(--bg-color-secondarycontainer);
+      --chip-line: var(--component-border);
+      --muted: var(--text-color-secondary);
+      --faint: var(--text-color-placeholder);
+      --line: var(--component-border);
     }
     * { box-sizing: border-box; }
     body { margin: 0; font-family: "PingFang SC", "Helvetica Neue", sans-serif; background: var(--page); color: var(--ink); }
@@ -82,7 +90,7 @@
 
     /* ===== 深色 · 源 conversations.html 无 .revise-* 深色规则；本墙补 token（上线前并回主页 html.theme-dark） ===== */
     html.theme-dark .revise-lead { color: #fff; }
-    html.theme-dark .revise-cell { background: #25272b; }
+    html.theme-dark .revise-cell { background: var(--bg-color-secondarycontainer); }
     html.theme-dark .revise-cell > span { color: rgba(255,255,255,.6); }
     html.theme-dark .revise-cell > b { color: #fff; }
     html.theme-dark .revise-plan { color: #fff; }
@@ -186,7 +194,7 @@
         <div class="stage">
           <div data-mount="v6"></div>
         </div>
-        <p class="note">深色 token（墙内定义）：cell <code>#25272b</code> · 分割线 <code>#3a3c41</code> · 次文 <code>rgba(255,255,255,.6)</code> · 被选用角标 <code>#12301f / #5ba854</code> · chip <code>#111216 / #8fb0ff</code>。上线前需并回主页 <code>html.theme-dark</code>。</p>
+        <p class="note">深色跟 <code>shared/moreai-tokens.css</code>：cell 用 <code>--bg-color-secondarycontainer</code>；分割/次文走现网 border / text-secondary。</p>
       </section>
     </main>
   </div>

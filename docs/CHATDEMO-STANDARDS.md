@@ -108,6 +108,7 @@
 | 场景壳（B1） | 建群 / 邮件 / 外链 / 时间 / 模糊需求 / 天气 / 映射对照：已 `link` 公共 CSS；`--gc-*` 在 token 文件内映射现网 |
 | 主对话 / 行程（B2） | [`conversations.html`](../conversations.html)、[`三个路线方案.html`](../三个路线方案.html)：`--err-*` / `--rt-*` 映射现网；qnav 对齐对话目录 |
 | 卡片库 2A（B3） | group_form / group_result / ask_form / weather_card / doc_summary / doc_entry / app_link：已 `link`；`--gc-*` / `--b-*` 在公共 CSS |
+| 收尾（B4） | 其余 morph-wall；AI形象 / 高频主题 / 生成异常；各 `*-PRD.html` 文档皮：均已 `link`，样式禁止色清零 |
 | 说明 | [`shared/README.md`](../shared/README.md) |
 
 ### 5.1 现网语义对照（工程 / Demo 共用）
