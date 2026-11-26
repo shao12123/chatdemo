@@ -60,19 +60,30 @@
     }
     .hint .acts button:hover { border-color: var(--brand-color-hover-line); color: var(--brand); }
     .hint .acts button.on { border-color: var(--brand); color: var(--brand); background: var(--brand-color-soft); }
-    .stage-row { flex: 1; min-height: 0; display: flex; }
-    .stage-row .scroll { flex: 1; }
+    .stage-row { flex: 1; min-height: 0; display: flex; min-width: 0; }
+    .chat-col { position: relative; flex: 1; min-width: 0; min-height: 0; display: flex; flex-direction: column; }
+    .main.with-doc .chat-col { flex: none; width: var(--chat-col, 420px); max-width: calc(100% - 120px); }
+    .pane-resize {
+      display: none; flex: none; width: 8px; margin: 0 -4px; position: relative; z-index: 4; cursor: col-resize;
+    }
+    .main.with-doc .pane-resize { display: block; }
+    .pane-resize::after {
+      content: ""; position: absolute; top: 12px; bottom: 12px; left: 3px; width: 2px; border-radius: 1px;
+      background: transparent; transition: background .15s ease;
+    }
+    .pane-resize:hover::after, .pane-resize.is-dragging::after { background: #84acfb; }
     .fake-doc {
-      display: none; width: 280px; flex: none; border-left: 1px solid var(--line);
+      display: none; flex: 1; min-width: 160px; border-left: 1px solid var(--line);
       background: var(--secondary); padding: 16px; overflow: auto; font-size: 12px; color: var(--sub); line-height: 20px;
     }
     .main.with-doc .fake-doc { display: block; }
     .fake-doc h4 { margin: 0 0 8px; font-size: 13px; color: var(--ink); }
     .scroll {
-      flex: 1; min-height: 0; overflow: auto; padding: 16px 48px 48px 24px; position: relative;
+      flex: 1; min-height: 0; overflow: auto; padding: 16px 48px 48px 24px;
     }
+    .scroll-inner { width: min(680px, 100%); margin: 0 auto; }
     .block {
-      max-width: 680px; margin: 0 0 20px; padding: 14px 16px; border-radius: 14px; background: var(--secondary);
+      max-width: 100%; margin: 0 0 20px; padding: 14px 16px; border-radius: 14px; background: var(--secondary);
       scroll-margin-top: 24px;
     }
     .block.user { background: var(--brand-color-soft); margin-left: auto; width: fit-content; max-width: min(440px, 100%); }
@@ -170,10 +181,13 @@
       <section class="main">
         <div class="hint" id="hint"></div>
         <div class="stage-row">
-          <div class="scroll" id="scroller"></div>
+          <div class="chat-col" id="chatCol">
+            <div class="scroll" id="scroller"><div class="scroll-inner" id="scrollInner"></div></div>
+          </div>
+          <div class="pane-resize" id="paneResize" role="separator" aria-orientation="vertical" aria-label="调整对话和右侧宽度" tabindex="0"></div>
           <aside class="fake-doc" id="fakeDoc" aria-label="模拟右侧文档台">
-            <h4>模拟右侧文档台</h4>
-            <p>打开后，对话列上的提问 / 消息目录应隐藏；右侧也不出文档目录（本期改云文档承接）。本 case 演示「隐藏提问目录」。</p>
+            <h4>模拟右侧 App / 文档台</h4>
+            <p>打开后可拖中间分割线改对话列宽。列窄时提问目录隐藏；拖宽后目录回来。右侧仍不出文档目录（云文档承接）。</p>
           </aside>
         </div>
       </section>
@@ -183,6 +197,7 @@
 
   <script>
     const OUTLINE_MIN = 2, OUTLINE_MAX = 18, OUTLINE_PITCH = 10;
+    const OUTLINE_RAIL_GUTTER = 40; // 正文列右缘到对话列右缘的最小空隙
     const OUTLINE_CARD_MAX = 12, OUTLINE_ROW_H = 30; // 展开卡最多约 12 行，兼顾 1440 小屏
     const outlineReduced = () => window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     const esc = s => String(s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
@@ -457,7 +472,7 @@
         notes: [
           { t: "出现条件", b: "≥2 个可跳转块；业务侧用 data-sum-sec 等挂锚（见文档分析 PRD）。" },
           { t: "与提问目录关系", b: "同一控件；列表内容由业务填充 items，不改交互壳。" },
-          { t: "右侧打开时", b: "正式产品中消息目录应隐藏或让位；本 Demo 单独演示故仍显示。" }
+          { t: "列宽不足时", b: "正式产品中对话列挤窄后消息目录隐藏；本 Demo 单独演示故按当前列宽判定。" }
         ],
         blocks: [
           { key: 0, kind: "sec", title: "导语", body: "三份材料一起看：总判断先给，再按文件拆开。", answer: "导语：先总判断再分文件。" },
@@ -490,23 +505,23 @@
         ]
       },
       {
-        id: "mutex",
-        title: "右侧打开时隐藏",
-        hint: "默认显示提问目录；点「打开右侧」后轨应消失，关闭后淡入回来。",
+        id: "width",
+        title: "列宽显隐",
+        hint: "点「打开右侧」后拖中间分割线：对话列窄 → 轨藏；拖宽 → 轨回。对齐 Cursor Message map rail。",
         peek: true,
         label: "提问目录",
         filter: "user",
-        mutex: true,
+        widthGate: true,
         notes: [
-          { t: "本期互斥", b: "右侧展示区打开（doc / HTML 等）→ 对话列提问 / 消息目录隐藏；右侧也**不出**文档目录。" },
-          { t: "原因", b: "云文档即将上线，文档大纲改云文档做；本期 Chat 只做「打开右侧时让位隐藏」。" },
-          { t: "验收", b: "打开右侧 → 无短横线、右侧无文档目录；关闭右侧 → 短横线回来且仍可跳转。" }
+          { t: "闸门", b: "items≥2 且对话列右缘相对正文列空隙 ≥ OUTLINE_RAIL_GUTTER（约 40px）。不与「右侧是否打开」硬绑。" },
+          { t: "分割线", b: "打开右侧后可拖 chat|panel；拖动过程中重算显隐。右侧仍不出文档目录（云文档承接）。" },
+          { t: "验收", b: "打开右侧默认常藏；拖宽 chat 出现短横线；再拖窄消失；关闭右侧后列宽恢复且可跳转。" }
         ],
         blocks: [
           { key: 0, kind: "user", title: "帮我写一篇课程论文", answer: "已按推荐定下方向并开始写入。" },
-          { key: 1, kind: "ai", title: "写入中", body: "右侧打开时，对话列提问目录隐藏；右侧也不挂文档目录。" },
+          { key: 1, kind: "ai", title: "写入中", body: "拖宽对话列时，提问目录可在右侧打开时继续显示。" },
           { key: 2, kind: "user", title: "把讨论写得保守一点", answer: "已出修订页签，旧版保留。" },
-          { key: 3, kind: "ai", title: "修订完成", body: "可关闭右侧后再用目录跳回提问。" }
+          { key: 3, kind: "ai", title: "修订完成", body: "列宽足够时目录可跳回提问；右侧仍不挂文档目录。" }
         ]
       },
       {
@@ -572,15 +587,35 @@
       many.blocks = blocks;
     })();
 
+    const chatCol = document.getElementById("chatCol");
     const scroller = document.getElementById("scroller");
+    const scrollInner = document.getElementById("scrollInner");
     const main = document.querySelector(".main");
+    const paneResize = document.getElementById("paneResize");
     let outline = null;
     let activeId = CASES[0].id;
     let mode = "preview";
     let docOpen = false;
     let extraAsk = 0;
+    let chatColWidth = 420;
 
     function current() { return CASES.find(c => c.id === activeId) || CASES[0]; }
+
+    function chatHasOutlineRoom() {
+      if (!chatCol || !scrollInner) return false;
+      const host = chatCol.getBoundingClientRect();
+      const inner = scrollInner.getBoundingClientRect();
+      return host.right - inner.right >= OUTLINE_RAIL_GUTTER;
+    }
+
+    function applyChatCol(px) {
+      const row = chatCol.parentElement;
+      const max = Math.max(240, row.clientWidth - 168);
+      const next = Math.round(Math.min(max, Math.max(240, px)));
+      chatColWidth = next;
+      main.style.setProperty("--chat-col", next + "px");
+      paneResize.setAttribute("aria-valuenow", String(next));
+    }
 
     function paintList() {
       document.getElementById("caseList").innerHTML = CASES.map(c =>
@@ -612,14 +647,23 @@
       };
     }
 
+    function paintOutlineOnly() {
+      const c = current();
+      if (!outline) return;
+      const { items } = outlineItems(c);
+      const show = items.length >= OUTLINE_MIN && chatHasOutlineRoom();
+      outline.paint(items, show, c.id + ":" + extraAsk + ":" + chatColWidth + ":" + (docOpen ? 1 : 0));
+    }
+
     function paintContent() {
       const c = current();
-      if (c.id !== "mutex") docOpen = false;
+      if (c.id !== "width") docOpen = false;
       if (c.id !== "few") extraAsk = 0;
-      main.classList.toggle("with-doc", !!(c.mutex && docOpen));
+      main.classList.toggle("with-doc", !!(c.widthGate && docOpen));
+      if (c.widthGate && docOpen) applyChatCol(chatColWidth);
 
       const acts = [];
-      if (c.mutex) {
+      if (c.widthGate) {
         acts.push(`<button type="button" data-act="toggle-doc" class="${docOpen ? "on" : ""}">${docOpen ? "关闭右侧" : "打开右侧"}</button>`);
       }
       if (c.grow) {
@@ -630,7 +674,7 @@
         (acts.length ? `<span class="acts">${acts.join("")}</span>` : "");
 
       const { blocks, items } = outlineItems(c);
-      scroller.innerHTML = blocks.map(b => {
+      scrollInner.innerHTML = blocks.map(b => {
         if (b.kind === "user") {
           return `<article class="block user" data-oid="${b.key}"><span class="kicker">用户</span><p>${esc(b.title)}</p></article>`;
         }
@@ -644,17 +688,19 @@
       outline = createOutline({
         id: "demoQnav",
         label: c.label,
-        host: main,
+        host: chatCol,
         scroller,
         peek: c.peek,
         denseRail: !!c.denseRail,
         line: 48,
         offset: 24,
         unpinOnChange: c.id === "doc",
-        nodeFor: key => scroller.querySelector(`[data-oid="${key}"]`)
+        nodeFor: key => scrollInner.querySelector(`[data-oid="${key}"]`)
       });
-      const show = items.length >= OUTLINE_MIN && !(c.mutex && docOpen);
-      outline.paint(items, show, c.id + ":" + extraAsk + ":" + (docOpen ? 1 : 0));
+      requestAnimationFrame(() => {
+        const show = items.length >= OUTLINE_MIN && chatHasOutlineRoom();
+        outline.paint(items, show, c.id + ":" + extraAsk + ":" + chatColWidth + ":" + (docOpen ? 1 : 0));
+      });
     }
 
     function setMode(next) {
@@ -676,12 +722,42 @@
       if (!btn || btn.disabled) return;
       if (btn.dataset.act === "toggle-doc") {
         docOpen = !docOpen;
+        if (docOpen) chatColWidth = Math.min(420, Math.max(240, chatCol.parentElement.clientWidth - 280));
         paintContent();
       }
       if (btn.dataset.act === "add-ask") {
         extraAsk = 1;
         paintContent();
       }
+    });
+    paneResize.addEventListener("pointerdown", event => {
+      if (!main.classList.contains("with-doc") || event.button !== 0) return;
+      event.preventDefault();
+      paneResize.setPointerCapture(event.pointerId);
+      const startX = event.clientX;
+      const startW = chatCol.getBoundingClientRect().width;
+      paneResize.classList.add("is-dragging");
+      const prevSelect = document.body.style.userSelect;
+      document.body.style.userSelect = "none";
+      function move(ev) {
+        applyChatCol(startW + ev.clientX - startX);
+        paintOutlineOnly();
+      }
+      function stop() {
+        paneResize.removeEventListener("pointermove", move);
+        paneResize.removeEventListener("pointerup", stop);
+        paneResize.removeEventListener("pointercancel", stop);
+        paneResize.classList.remove("is-dragging");
+        document.body.style.userSelect = prevSelect;
+        paintOutlineOnly();
+      }
+      paneResize.addEventListener("pointermove", move);
+      paneResize.addEventListener("pointerup", stop);
+      paneResize.addEventListener("pointercancel", stop);
+    });
+    window.addEventListener("resize", () => {
+      if (main.classList.contains("with-doc")) applyChatCol(chatColWidth);
+      paintOutlineOnly();
     });
     document.querySelector(".mode").addEventListener("click", event => {
       const btn = event.target.closest("[data-mode]");

@@ -2519,6 +2519,7 @@
       paintQnav(session);
     }
     const OUTLINE_MIN = 2;
+    const OUTLINE_RAIL_GUTTER = 40;
     const OUTLINE_MAX = 30;
     const OUTLINE_PITCH = 10;
     const outlineReduced = () => window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -2712,10 +2713,20 @@
       new MutationObserver(paintDocNav).observe(document.getElementById("doc"), { attributes: true, attributeFilter: ["class"] });
       window.addEventListener("resize", repaint);
     }
+    function chatHasOutlineRoom() {
+      const thread = document.querySelector(".thread");
+      const inner = messages.querySelector(".messages-inner");
+      if (!thread || !inner || !main.classList.contains("chatting")) return false;
+      if (stage.classList.contains("panel-max")) return false;
+      if (stage.classList.contains("with-doc") && window.matchMedia("(max-width: 980px)").matches) return false;
+      const host = thread.getBoundingClientRect();
+      const content = inner.getBoundingClientRect();
+      return host.right - content.right >= OUTLINE_RAIL_GUTTER;
+    }
     function paintQnav(session) {
       ensureOutlines();
       const items = session ? qnavItems(session) : [];
-      const show = !!session && main.classList.contains("chatting") && !stage.classList.contains("with-doc") && items.length >= OUTLINE_MIN;
+      const show = !!session && main.classList.contains("chatting") && items.length >= OUTLINE_MIN && chatHasOutlineRoom();
       chatOutline.paint(items, show, session ? session.id : "");
     }
     function paintDocNav() {
@@ -5828,6 +5839,7 @@
       paneResize.setAttribute("aria-valuemin", String(bounds.min));
       paneResize.setAttribute("aria-valuemax", String(bounds.max));
       paneResize.setAttribute("aria-valuenow", String(next));
+      paintQnav(current());
     }
     function paneResizeEnabled() {
       return stage.classList.contains("with-doc") && !stage.classList.contains("panel-max") && !window.matchMedia("(max-width: 980px)").matches;
@@ -5923,7 +5935,7 @@
       {
         id: "f-qnav", cat: "feature", status: "已实现", anchor: "#qnav.show .qnav-rail",
         title: "提问目录",
-        body: "【用途】对话较长时，快速找到并跳到某一次提问。和「文档目录」是同一个控件：右侧展示区展开且是文档时，控件在展示区当文档目录；展示区收起或关闭时，控件在对话区当提问目录。\n【展示条件】\n1、对话里至少有 2 条用户消息才出现；\n2、右侧展示区打开时隐藏，收起或关闭后淡入出现；\n3、生成中也显示，新发出一条消息就多一条横线。\n【收起状态】对话栏右边缘、竖直居中，一条用户消息一条短横线，间距固定 10px，最多露出 30 条（约 300px）。超过 30 条时只露出一段，当前项尽量停在中间，到两端时停在端点；滚动对话、点击跳转时，横线列平滑滚动把当前项带回中间。当前项更长、颜色更深。\n【展开】鼠标移到横线上，约 200ms 从右往左展开成列表卡片：每行一条用户消息，单行右对齐，过长省略，行尾带横线；当前那条加粗。打开时列表滚到让当前项居中。卡片最高不超过对话栏，超出时在卡片里滚动。\n【悬停某一行】停留约 80ms 后这一行展开：用户原话最多 1 行，AI 回复首句（灰字）最多 2 行，文字改为左对齐；还没有回复时显示「生成中…」。\n【交互】点击某行，对话平滑滚动到这条消息并轻微高亮，这一条成为当前项；鼠标离开卡片约 150ms 后收起。\n【验收】条目和对话里的用户消息一一对应；滚动对话时当前项跟着变并保持居中；开启「减少动态效果」时不播展开、收起动画。"
+        body: "【用途】对话较长时，快速找到并跳到某一次提问。控件挂在对话列右缘（Message map rail 同思路）。\n【展示条件】\n1、对话里至少有 2 条用户消息；\n2、对话列右缘相对正文列空隙 ≥ 约 40px 才显示（打开右侧后拖宽 chat 可让轨回来；拖窄则藏）；不与「右侧是否打开」硬绑；\n3、panel 全宽 / 窄屏叠层时强制隐藏；\n4、生成中也显示，新发出一条消息就多一条横线。\n【收起状态】对话栏右边缘、竖直居中，一条用户消息一条短横线，间距固定 10px；很多条时轨窗口 + 边缘平移。当前项更长、颜色更深。\n【展开】鼠标移到横线上展开列表卡片：每行一条用户消息；当前那条加粗。\n【悬停某一行】停留约 80ms 后 peek：AI 首句最多 2 行。\n【交互】点击跳转并 flash；离开约 150ms 收起。\n【验收】≥2 问且列宽足够时出现；打开右侧默认常藏，拖宽 chat 后轨出现；减少动态效果时无展开动画。"
       },
       {
         id: "f-time", cat: "feature", status: "已实现", anchor: ".user-actions, .msg-actions",
