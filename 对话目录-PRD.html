@@ -167,19 +167,19 @@
 ### 4.1 出现与隐藏
 | 条件 | 行为 |
 |---|---|
-| `items.length >= 2`（`OUTLINE_MIN`）且对话列右缘空隙 ≥ `OUTLINE_RAIL_GUTTER`（约 40px） | 显示轨（对话列） |
+| `items.length >= 2`（`OUTLINE_MIN`）且对话列宽 ≥ `OUTLINE_CONTENT_MAX + OUTLINE_RAIL_SLOT` | 显示轨（对话列） |
 | `items.length < 2` | 隐藏并关闭展开 |
-| 对话列被分割线挤窄，正文贴满、右缘空隙不足 | **隐藏**对话列目录（右侧打开时常落入此态，但是因宽度而非开闭本身） |
+| 对话列被分割线 / 窗口缩窄，低于上述阈值 | **隐藏**对话列目录（右侧打开时常落入此态，但是因宽度而非开闭本身） |
 | 拖宽对话列、或关闭右侧后列宽恢复，且仍 ≥2 条锚点 | 对话列目录重新显示 |
 | 右侧文档区 | **始终不出**文档目录（云文档承接，见 Q5） |
 | `panel-max` / 窄屏叠层 | 可强制隐藏 |
 | 生成中 / 新增锚点 | 仍显示（宽度足够时）；新横线可播 `is-new` 入场 |
 
-判定建议（几何，优于写死像素阈值）：
+判定（用列宽阈值；**不要**用「host.right − inner.right」，窄屏时 padding 仍会留下约 48px 导致误显示）：
 
 ```js
-// host = 对话列（thread / scroll）；inner = 正文列（messages-inner）
-host.getBoundingClientRect().right - inner.getBoundingClientRect().right >= OUTLINE_RAIL_GUTTER
+// Demo: CONTENT_MAX=680；conversations: 736（messages-inner）
+chatCol.clientWidth >= OUTLINE_CONTENT_MAX + OUTLINE_RAIL_SLOT // SLOT≈56
 ```
 
 ### 4.2 收起态（轨）
@@ -309,7 +309,7 @@ type OutlineConfig = {
 };
 ```
 
-常量：`OUTLINE_MIN=2`，`OUTLINE_MAX=18`，`OUTLINE_PITCH=10`，`OUTLINE_RAIL_GUTTER≈40`，卡内约 12 行。逻辑以 Demo `createOutline` 为准。拖 chat|panel 分割线时须重算 `visible`。
+常量：`OUTLINE_MIN=2`，`OUTLINE_MAX=18`，`OUTLINE_PITCH=10`，`OUTLINE_CONTENT_MAX`（Demo 680 / 工程对话列正文 max），`OUTLINE_RAIL_SLOT≈56`，卡内约 12 行。拖分割线与 `ResizeObserver` 时须重算 `visible`。
 
 ### 5.6 文案规则
 - 提问标题：用户首行；空则文件名 / 引用 /「（空消息）」。

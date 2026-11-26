@@ -197,7 +197,9 @@
 
   <script>
     const OUTLINE_MIN = 2, OUTLINE_MAX = 18, OUTLINE_PITCH = 10;
-    const OUTLINE_RAIL_GUTTER = 40; // 正文列右缘到对话列右缘的最小空隙
+    // 正文最大宽（.scroll-inner）+ 轨槽；列宽低于此则藏轨（勿用 padding 空隙，窄屏时 padding 仍≈48 会误判一直显示）
+    const OUTLINE_CONTENT_MAX = 680;
+    const OUTLINE_RAIL_SLOT = 56;
     const OUTLINE_CARD_MAX = 12, OUTLINE_ROW_H = 30; // 展开卡最多约 12 行，兼顾 1440 小屏
     const outlineReduced = () => window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     const esc = s => String(s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
@@ -443,13 +445,33 @@
 
     const CASES = [
       {
+        id: "width",
+        title: "列宽显隐",
+        hint: "本 case 默认打开右侧且列偏窄（轨应藏）。拖中间分割线加宽对话列 → 轨出现；缩窗口同理会藏。",
+        peek: true,
+        label: "提问目录",
+        filter: "user",
+        widthGate: true,
+        notes: [
+          { t: "闸门", b: "items≥2 且 chatCol 宽 ≥ OUTLINE_CONTENT_MAX(680) + OUTLINE_RAIL_SLOT(56)。不与「右侧是否打开」硬绑。" },
+          { t: "分割线", b: "进入本 case 会自动打开右侧（偏窄）；拖中间分割线改宽，轨应出现。右侧仍不出文档目录。" },
+          { t: "验收", b: "进入即右侧开、轨藏；拖宽 chat 过约 736px → 轨出现；拖窄 / 缩窗口 → 再藏。" }
+        ],
+        blocks: [
+          { key: 0, kind: "user", title: "帮我写一篇课程论文", answer: "已按推荐定下方向并开始写入。" },
+          { key: 1, kind: "ai", title: "写入中", body: "拖宽对话列时，提问目录可在右侧打开时继续显示。" },
+          { key: 2, kind: "user", title: "把讨论写得保守一点", answer: "已出修订页签，旧版保留。" },
+          { key: 3, kind: "ai", title: "修订完成", body: "列宽足够时目录可跳回提问；右侧仍不挂文档目录。" }
+        ]
+      },,
+      {
         id: "ask",
         title: "提问目录",
         hint: "悬停右侧短横线展开列表；悬停某一行可 peek AI 首句；点击跳转到对应提问。",
         peek: true,
         label: "提问目录",
         notes: [
-          { t: "出现条件", b: "≥2 条用户消息；本 Demo 无右侧文档台，故始终显示。" },
+          { t: "出现条件", b: "≥2 条用户消息，且对话列宽 ≥ 正文最大宽 + 轨槽（约 736px）；缩窄窗口也会藏轨。" },
           { t: "收起", b: "右缘短横线，一条提问一条；当前项更长更深；滚动时轨跟随居中。" },
           { t: "展开 / peek", b: "悬停展开 280 宽卡片；行悬停约 80ms 展开 AI 首句（灰字最多 2 行）。" },
           { t: "交互", b: "点击跳转并短暂高亮；离开约 150ms 收起；减弱动效时关闭动画。" }
@@ -502,26 +524,6 @@
           { key: 5, kind: "h", title: "六、讨论", body: "证据测量的是写代码，不是评审评论。" },
           { key: 6, kind: "h", title: "七、结论", body: "按研究问题给出有边界的答案。" },
           { key: 7, kind: "h", title: "八、参考文献", body: "正文引用的六篇文献列表。" }
-        ]
-      },
-      {
-        id: "width",
-        title: "列宽显隐",
-        hint: "点「打开右侧」后拖中间分割线：对话列窄 → 轨藏；拖宽 → 轨回。对齐 Cursor Message map rail。",
-        peek: true,
-        label: "提问目录",
-        filter: "user",
-        widthGate: true,
-        notes: [
-          { t: "闸门", b: "items≥2 且对话列右缘相对正文列空隙 ≥ OUTLINE_RAIL_GUTTER（约 40px）。不与「右侧是否打开」硬绑。" },
-          { t: "分割线", b: "打开右侧后可拖 chat|panel；拖动过程中重算显隐。右侧仍不出文档目录（云文档承接）。" },
-          { t: "验收", b: "打开右侧默认常藏；拖宽 chat 出现短横线；再拖窄消失；关闭右侧后列宽恢复且可跳转。" }
-        ],
-        blocks: [
-          { key: 0, kind: "user", title: "帮我写一篇课程论文", answer: "已按推荐定下方向并开始写入。" },
-          { key: 1, kind: "ai", title: "写入中", body: "拖宽对话列时，提问目录可在右侧打开时继续显示。" },
-          { key: 2, kind: "user", title: "把讨论写得保守一点", answer: "已出修订页签，旧版保留。" },
-          { key: 3, kind: "ai", title: "修订完成", body: "列宽足够时目录可跳回提问；右侧仍不挂文档目录。" }
         ]
       },
       {
@@ -595,17 +597,16 @@
     let outline = null;
     let activeId = CASES[0].id;
     let mode = "preview";
-    let docOpen = false;
+    let docOpen = activeId === "width"; // 首屏即列宽 case：右侧开、列偏窄
     let extraAsk = 0;
-    let chatColWidth = 420;
+    let chatColWidth = 360;
 
     function current() { return CASES.find(c => c.id === activeId) || CASES[0]; }
 
     function chatHasOutlineRoom() {
-      if (!chatCol || !scrollInner) return false;
-      const host = chatCol.getBoundingClientRect();
-      const inner = scrollInner.getBoundingClientRect();
-      return host.right - inner.right >= OUTLINE_RAIL_GUTTER;
+      if (!chatCol) return false;
+      // 列宽须能放下「正文最大宽 + 轨槽」；仅缩浏览器 / 拖分割线都会触发
+      return chatCol.clientWidth >= OUTLINE_CONTENT_MAX + OUTLINE_RAIL_SLOT;
     }
 
     function applyChatCol(px) {
@@ -661,6 +662,7 @@
       if (c.id !== "few") extraAsk = 0;
       main.classList.toggle("with-doc", !!(c.widthGate && docOpen));
       if (c.widthGate && docOpen) applyChatCol(chatColWidth);
+      else main.style.removeProperty("--chat-col");
 
       const acts = [];
       if (c.widthGate) {
@@ -713,6 +715,10 @@
       const btn = event.target.closest("[data-case]");
       if (!btn) return;
       activeId = btn.dataset.case;
+      if (activeId === "width") {
+        docOpen = true;
+        chatColWidth = 360; // 先窄：轨应隐藏，拖宽后再出现
+      }
       paintList();
       paintNotes();
       paintContent();
@@ -722,7 +728,7 @@
       if (!btn || btn.disabled) return;
       if (btn.dataset.act === "toggle-doc") {
         docOpen = !docOpen;
-        if (docOpen) chatColWidth = Math.min(420, Math.max(240, chatCol.parentElement.clientWidth - 280));
+        if (docOpen) chatColWidth = Math.min(360, Math.max(240, chatCol.parentElement.clientWidth - 280));
         paintContent();
       }
       if (btn.dataset.act === "add-ask") {
@@ -759,6 +765,9 @@
       if (main.classList.contains("with-doc")) applyChatCol(chatColWidth);
       paintOutlineOnly();
     });
+    if (typeof ResizeObserver !== "undefined") {
+      new ResizeObserver(() => paintOutlineOnly()).observe(chatCol);
+    }
     document.querySelector(".mode").addEventListener("click", event => {
       const btn = event.target.closest("[data-mode]");
       if (btn) setMode(btn.dataset.mode);

@@ -2519,7 +2519,8 @@
       paintQnav(session);
     }
     const OUTLINE_MIN = 2;
-    const OUTLINE_RAIL_GUTTER = 40;
+    const OUTLINE_CONTENT_MAX = 736; // #stage .messages-inner max
+    const OUTLINE_RAIL_SLOT = 56;
     const OUTLINE_MAX = 30;
     const OUTLINE_PITCH = 10;
     const outlineReduced = () => window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -2715,13 +2716,10 @@
     }
     function chatHasOutlineRoom() {
       const thread = document.querySelector(".thread");
-      const inner = messages.querySelector(".messages-inner");
-      if (!thread || !inner || !main.classList.contains("chatting")) return false;
+      if (!thread || !main.classList.contains("chatting")) return false;
       if (stage.classList.contains("panel-max")) return false;
       if (stage.classList.contains("with-doc") && window.matchMedia("(max-width: 980px)").matches) return false;
-      const host = thread.getBoundingClientRect();
-      const content = inner.getBoundingClientRect();
-      return host.right - content.right >= OUTLINE_RAIL_GUTTER;
+      return thread.clientWidth >= OUTLINE_CONTENT_MAX + OUTLINE_RAIL_SLOT;
     }
     function paintQnav(session) {
       ensureOutlines();
