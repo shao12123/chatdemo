@@ -1380,15 +1380,6 @@ html.theme-dark body,
         steps: ["读取消息里的图片", "确认群名和成员", "把头像用到群名片"],
         lead: "头像用你发的这张图。群名是「周末聚餐」，张伟、李娜、陈静、杨光已经在右侧。",
         draft: blankDraft({ name: "周末聚餐", selected: ["c1", "c2", "c5", "c6"], avatar: "assets/group-request-photo.png" })
-      },
-      {
-        id: "done",
-        title: "群已创建",
-        prompt: "建一个叫「周末聚餐」的群，成员是张伟、李娜、陈静、杨光",
-        seconds: 3,
-        steps: ["确认群名和成员", "创建群组", "整理成员名单"],
-        lead: "群已创建。名称是「周末聚餐」，一共 4 位成员。",
-        draft: blankDraft({ name: "周末聚餐", selected: ["c1", "c2", "c5", "c6"], created: true, title: "周末聚餐" })
       }
     ];
     const sessions = scenes.map(scene => ({
@@ -1431,7 +1422,6 @@ const toastIcons = {
     function sceneByText(text) {
       if (/周杰|找不到|没有这个人/.test(text)) return "miss";
       if (/头像|这张图/.test(text)) return "photo";
-      if (/周末聚餐|已经建好|建好了/.test(text)) return "done";
       if (/项目同步/.test(text)) return "named";
       if (/刘强|不填群名|没写群名/.test(text)) return "noname";
       if (/建群|群聊|拉群|创建群|建一个群/.test(text)) return "create";
@@ -1969,7 +1959,6 @@ const toastIcons = {
         { id: "s2", group: "scene", title: "指定群名和成员", body: "【前置】打开左侧「指定群名和成员」。\n【期望】群名是项目同步，右侧已有张伟、李娜、王芳。创建可点。\n【当前】点这条对话即可看到已填好的卡片。" },
         { id: "s3", group: "scene", title: "不填群名直接建", body: "【前置】打开左侧「不填群名直接建」。\n【期望】没有群名，张伟和刘强已选上。创建后名称是「张伟、刘强」。\n【当前】点这条对话即可看到未填群名的卡片。" },
         { id: "s4", group: "scene", title: "找不到要拉的人", body: "【前置】打开左侧「找不到要拉的人」。\n【期望】搜索框是周杰，左侧提示没有找到，右侧为空，创建不可点。\n【当前】点这条对话即可看到找不到人的说明。" },
-        { id: "s5", group: "scene", title: "群已创建", body: "【前置】打开左侧「群已创建」。\n【期望】完成卡片是一张群名片：默认群头像、群名和成员名字。点「查看群聊」进入群聊。\n【当前】点这条对话即可看到群名片。" },
         { id: "s6", group: "scene", title: "指定头像", body: "【前置】打开左侧「指定头像」。\n【期望】用户消息上方有一张图片。建群卡片的头像和这张图片一致。\n【当前】点这条对话即可看到带图片的消息和同一张头像。" }
       ];
       const embedded = document.getElementById("revEmbedded");
