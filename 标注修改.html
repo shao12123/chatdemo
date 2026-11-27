@@ -1353,7 +1353,8 @@
     .hp-film-media .hp-wait-bar{width:78%;height:3px}
     .hp-revise-status{position:relative;z-index:1;display:inline-flex;align-items:center;gap:6px;height:28px;padding:0 12px 0 10px;border-radius:999px;background:#fff;color:#0a59f7;font:500 12px/20px var(--font);box-shadow:0 4px 14px rgba(15,23,42,.16)}
     .hp-revise-status::before{content:"";width:6px;height:6px;border-radius:50%;background:#0a59f7;box-shadow:0 0 0 3px rgba(10,89,247,.16);animation:hp-revise-pulse 1.4s ease-in-out infinite}
-    .hp-film-media .hp-revise-status{display:none}
+    .hp-film-media .hp-revise-status{position:absolute;left:50%;bottom:7px;z-index:2;transform:translateX(-50%);height:14px;max-width:calc(100% - 8px);padding:0 5px 0 4px;gap:3px;font-size:8px;line-height:14px;box-shadow:0 2px 6px rgba(15,23,42,.16)}
+    .hp-film-media .hp-revise-status::before{width:4px;height:4px;box-shadow:0 0 0 2px rgba(10,89,247,.16)}
     .hp-redraw-overlay>.hp-wait-bar{position:absolute;bottom:0;left:0;right:0;z-index:2;width:auto;height:4px;border-radius:0;background:rgba(255,255,255,.92);box-shadow:inset 0 1px 0 rgba(10,89,247,.45),0 -1px 8px rgba(10,89,247,.35);outline:none}
     .hp-redraw-overlay>.hp-wait-bar::after{content:"";position:absolute;top:0;bottom:0;left:0;width:28%;background:linear-gradient(90deg,transparent,rgba(10,89,247,.5),transparent);animation:hp-bar-sheen 1.6s ease-in-out infinite}
     .hp-redraw-overlay>.hp-wait-bar>i{position:relative;z-index:1;background:linear-gradient(90deg,#0a59f7 0%,#0a59f7 78%,#9ec0ff 100%)}
@@ -1803,8 +1804,10 @@
     html.theme-dark .oo-app .hp-film button[aria-current=page] .hp-film-image,
     html.theme-dark .oo-app .hp-film button[aria-current=page][data-page-state=ready] .hp-film-image { border-color: var(--brand); }
     html.theme-dark .oo-app .hp-film button[data-page-state=ready]:hover:not([aria-current=page]) .hp-film-image { border-color: #434448; }
-    html.theme-dark .hp-revise-status { background: #191a1d; color: var(--brand); box-shadow: none; }
+    html.theme-dark .hp-revise-status,
+    html.theme-dark .hp-film-media .hp-revise-status { background: #191a1d; color: var(--brand); box-shadow: none; }
     html.theme-dark .hp-revise-status::before { background: var(--brand); box-shadow: 0 0 0 3px rgba(49, 122, 247, .24); }
+    html.theme-dark .hp-film-media .hp-revise-status::before { box-shadow: 0 0 0 2px rgba(49, 122, 247, .24); }
     html.theme-dark .hp-history { background: var(--card); border-left-color: #292b2e; color: var(--ink); box-shadow: none; }
     html.theme-dark .hp-history header { border-bottom-color: #292b2e; }
     html.theme-dark .hp-history header button { color: var(--ink-2); }
